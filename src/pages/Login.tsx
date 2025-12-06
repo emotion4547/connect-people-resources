@@ -7,10 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Briefcase, HardHat, Settings, ArrowLeft } from 'lucide-react';
+import { Briefcase, HardHat, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 
-type RoleType = 'hr' | 'worker' | 'admin';
+type RoleType = 'hr' | 'worker';
 
 const loginSchema = z.object({
   email: z.string().trim().email('Введите корректный email'),
@@ -48,10 +48,10 @@ const Login: React.FC = () => {
     }
   }, [user, role, authLoading, navigate]);
 
+  // Only HR and Worker can self-register, Admin is assigned by existing admin
   const roles = [
-    { id: 'hr' as RoleType, label: 'HR федеральных сетей', icon: <Briefcase className="w-5 h-5" /> },
+    { id: 'hr' as RoleType, label: 'HR', icon: <Briefcase className="w-5 h-5" /> },
     { id: 'worker' as RoleType, label: 'Исполнитель', icon: <HardHat className="w-5 h-5" /> },
-    { id: 'admin' as RoleType, label: 'Администратор', icon: <Settings className="w-5 h-5" /> },
   ];
 
   const validateForm = () => {
@@ -186,31 +186,34 @@ const Login: React.FC = () => {
           </CardHeader>
 
           <CardContent>
-            {/* Role Selection */}
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {roles.map((role) => (
-                <button
-                  key={role.id}
-                  type="button"
-                  onClick={() => setSelectedRole(role.id)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
-                    selectedRole === role.id
-                      ? "border-secondary bg-secondary/10 text-foreground"
-                      : "border-border hover:border-secondary/50 text-muted-foreground"
-                  )}
-                >
-                  <span className={cn(
-                    selectedRole === role.id ? "text-secondary" : "text-muted-foreground"
-                  )}>
-                    {role.icon}
-                  </span>
-                  <span className="text-xs font-medium text-center leading-tight">
-                    {role.label}
-                  </span>
-                </button>
-              ))}
-            </div>
+            {/* Role Selection - only shown for signup */}
+            {isSignUp && (
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {roles.map((role) => (
+                  <button
+                    key={role.id}
+                    type="button"
+                    onClick={() => setSelectedRole(role.id)}
+                    className={cn(
+                      "flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all duration-200",
+                      selectedRole === role.id
+                        ? "border-secondary bg-secondary/10 text-foreground"
+                        : "border-border hover:border-secondary/50 text-muted-foreground"
+                    )}
+                  >
+                    <span className={cn(
+                      "flex-shrink-0",
+                      selectedRole === role.id ? "text-secondary" : "text-muted-foreground"
+                    )}>
+                      {role.icon}
+                    </span>
+                    <span className="font-medium whitespace-nowrap">
+                      {role.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (

@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, UserPlus, FileText } from 'lucide-react';
+import { Eye, UserPlus, FileText, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -35,6 +35,14 @@ interface Response {
   city?: string;
 }
 
+interface Worker {
+  user_id: string;
+  full_name: string | null;
+  phone: string | null;
+  city: string | null;
+  is_active: boolean;
+}
+
 const AdminRequests: React.FC = () => {
   const { toast } = useToast();
   const [requests, setRequests] = useState<Request[]>([]);
@@ -42,9 +50,13 @@ const AdminRequests: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [responses, setResponses] = useState<Response[]>([]);
   const [loadingResponses, setLoadingResponses] = useState(false);
+  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [selectedWorkerToAssign, setSelectedWorkerToAssign] = useState<string>('');
 
   useEffect(() => {
     fetchRequests();
+    fetchAllWorkers();
   }, []);
 
   const fetchRequests = async () => {
@@ -73,6 +85,28 @@ const AdminRequests: React.FC = () => {
       console.error('Error fetching requests:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllWorkers = async () => {
+    try {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'worker');
+
+      if (!roles?.length) return;
+
+      const workerIds = roles.map(r => r.user_id);
+
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, phone, city, is_active')
+        .in('user_id', workerIds);
+
+      setWorkers((profiles || []).filter(w => w.is_active));
+    } catch (error) {
+      console.error('Error fetching workers:', error);
     }
   };
 
@@ -111,6 +145,19 @@ const AdminRequests: React.FC = () => {
   };
 
   const handleStatusChange = async (requestId: string, newStatus: string) => {
+    // Check if trying to set "assigned" without assigned workers
+    if (newStatus === 'assigned') {
+      const hasAssignedWorker = responses.some(r => r.status === 'assigned');
+      if (!hasAssignedWorker) {
+        toast({
+          title: 'Невозможно изменить статус',
+          description: 'Сначала назначьте исполнителя на заявку',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     try {
       const { error } = await supabase
         .from('requests')
@@ -134,7 +181,7 @@ const AdminRequests: React.FC = () => {
     }
   };
 
-  const handleAssignWorker = async (responseId: string) => {
+  const handleAssignWorkerFromResponse = async (responseId: string) => {
     try {
       const { error } = await supabase
         .from('responses')
@@ -154,11 +201,48 @@ const AdminRequests: React.FC = () => {
     }
   };
 
+  const handleAssignWorkerDirectly = async () => {
+    if (!selectedRequest || !selectedWorkerToAssign) return;
+
+    try {
+      // Check if response already exists
+      const existingResponse = responses.find(r => r.worker_id === selectedWorkerToAssign);
+      
+      if (existingResponse) {
+        // Update existing response
+        await supabase
+          .from('responses')
+          .update({ status: 'assigned' as any })
+          .eq('id', existingResponse.id);
+      } else {
+        // Create new response
+        await supabase
+          .from('responses')
+          .insert({
+            request_id: selectedRequest.id,
+            worker_id: selectedWorkerToAssign,
+            status: 'assigned',
+          });
+      }
+
+      toast({ title: 'Исполнитель назначен' });
+      setShowAssignDialog(false);
+      setSelectedWorkerToAssign('');
+      
+      // Refresh responses
+      await fetchResponses(selectedRequest.id);
+    } catch (error) {
+      console.error('Error assigning worker:', error);
+      toast({ title: 'Ошибка', variant: 'destructive' });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
       new: { label: 'Новая', className: 'bg-status-orange/20 text-status-orange' },
       in_progress: { label: 'В работе', className: 'bg-primary/20 text-primary' },
       assigned: { label: 'Назначено', className: 'bg-status-gold/20 text-secondary' },
+      pending_confirmation: { label: 'Ожидает подтверждения', className: 'bg-purple-500/20 text-purple-600' },
       completed: { label: 'Выполнено', className: 'bg-status-success/20 text-status-success' },
       cancelled: { label: 'Отменена', className: 'bg-status-gray/20 text-muted-foreground' },
       pending: { label: 'Ожидает', className: 'bg-status-orange/20 text-status-orange' },
@@ -166,6 +250,11 @@ const AdminRequests: React.FC = () => {
     };
     const variant = variants[status] || variants.new;
     return <Badge className={variant.className}>{variant.label}</Badge>;
+  };
+
+  const canSetCompleted = () => {
+    // Can only set to pending_confirmation if there are assigned workers
+    return responses.some(r => r.status === 'assigned');
   };
 
   return (
@@ -223,7 +312,7 @@ const AdminRequests: React.FC = () => {
       </div>
 
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Детали заявки</DialogTitle>
           </DialogHeader>
@@ -233,21 +322,41 @@ const AdminRequests: React.FC = () => {
                 <div><p className="text-sm text-muted-foreground">Должность</p><p className="font-medium">{selectedRequest.position}</p></div>
                 <div><p className="text-sm text-muted-foreground">Адрес</p><p className="font-medium">{selectedRequest.address}</p></div>
               </div>
+              
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Изменить статус</p>
                 <Select value={selectedRequest.status} onValueChange={(v) => handleStatusChange(selectedRequest.id, v)}>
-                  <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-64"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="new">Новая</SelectItem>
                     <SelectItem value="in_progress">В работе</SelectItem>
-                    <SelectItem value="assigned">Назначено</SelectItem>
-                    <SelectItem value="completed">Выполнено</SelectItem>
+                    <SelectItem value="assigned" disabled={!responses.some(r => r.status === 'assigned')}>
+                      Назначено
+                    </SelectItem>
+                    <SelectItem value="pending_confirmation" disabled={!canSetCompleted()}>
+                      Выполнено (ожидает подтверждения HR)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
+                {selectedRequest.status !== 'assigned' && !responses.some(r => r.status === 'assigned') && (
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    Для статуса "Назначено" нужно назначить исполнителя
+                  </p>
+                )}
               </div>
+
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Отклики</p>
-                {loadingResponses ? <div className="h-20 bg-muted animate-shimmer rounded-lg" /> : responses.length > 0 ? (
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-medium">Отклики и назначения</p>
+                  <Button size="sm" variant="outline" onClick={() => setShowAssignDialog(true)} className="gap-1">
+                    <UserPlus className="w-4 h-4" />
+                    Назначить из списка
+                  </Button>
+                </div>
+                {loadingResponses ? (
+                  <div className="h-20 bg-muted animate-shimmer rounded-lg" />
+                ) : responses.length > 0 ? (
                   <div className="space-y-2">
                     {responses.map((r) => (
                       <div key={r.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
@@ -258,16 +367,51 @@ const AdminRequests: React.FC = () => {
                         <div className="flex items-center gap-2">
                           {getStatusBadge(r.status)}
                           {r.status === 'pending' && (
-                            <Button size="sm" onClick={() => handleAssignWorker(r.id)}><UserPlus className="w-4 h-4 mr-1" />Назначить</Button>
+                            <Button size="sm" onClick={() => handleAssignWorkerFromResponse(r.id)}>
+                              <UserPlus className="w-4 h-4 mr-1" />Назначить
+                            </Button>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-sm text-muted-foreground">Откликов нет</p>}
+                ) : (
+                  <p className="text-sm text-muted-foreground">Откликов нет. Вы можете назначить исполнителя из списка.</p>
+                )}
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Worker Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Назначить исполнителя</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Select value={selectedWorkerToAssign} onValueChange={setSelectedWorkerToAssign}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите исполнителя" />
+              </SelectTrigger>
+              <SelectContent>
+                {workers.map((worker) => (
+                  <SelectItem key={worker.user_id} value={worker.user_id}>
+                    {worker.full_name || 'Без имени'} {worker.city ? `(${worker.city})` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
+                Отмена
+              </Button>
+              <Button onClick={handleAssignWorkerDirectly} disabled={!selectedWorkerToAssign}>
+                Назначить
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </DashboardLayout>

@@ -27,6 +27,7 @@ import WorkerSupport from "./pages/worker/WorkerSupport";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminWorkers from "./pages/admin/AdminWorkers";
+import AdminUsers from "./pages/admin/AdminUsers";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -103,6 +104,11 @@ const App = () => (
             <Route path="/admin/workers" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminWorkers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminUsers />
               </ProtectedRoute>
             } />
             <Route path="/admin/reports" element={

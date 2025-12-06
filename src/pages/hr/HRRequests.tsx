@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { PlusCircle, Eye, CheckCircle, FileText } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
 
 interface Request {
   id: string;
@@ -33,14 +33,17 @@ const statusFilters = [
   { id: 'new', label: 'Новые' },
   { id: 'in_progress', label: 'В работе' },
   { id: 'assigned', label: 'Назначено' },
+  { id: 'pending_confirmation', label: 'Ожидает подтверждения' },
   { id: 'completed', label: 'Выполнено' },
 ];
 
 const HRRequests: React.FC = () => {
+  const { toast } = useToast();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -62,6 +65,40 @@ const HRRequests: React.FC = () => {
     }
   };
 
+  const handleConfirmCompletion = async (requestId: string) => {
+    setConfirmingId(requestId);
+    try {
+      const { error } = await supabase
+        .from('requests')
+        .update({ status: 'completed' as any })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
+      setRequests(requests.map(r =>
+        r.id === requestId ? { ...r, status: 'completed' } : r
+      ));
+
+      if (selectedRequest?.id === requestId) {
+        setSelectedRequest({ ...selectedRequest, status: 'completed' });
+      }
+
+      toast({
+        title: 'Заявка подтверждена',
+        description: 'Заявка отмечена как выполненная',
+      });
+    } catch (error) {
+      console.error('Error confirming request:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось подтвердить выполнение',
+        variant: 'destructive',
+      });
+    } finally {
+      setConfirmingId(null);
+    }
+  };
+
   const filteredRequests = activeFilter === 'all'
     ? requests
     : requests.filter(r => r.status === activeFilter);
@@ -71,6 +108,7 @@ const HRRequests: React.FC = () => {
       new: { label: 'Новая', className: 'bg-status-orange/20 text-status-orange' },
       in_progress: { label: 'В работе', className: 'bg-primary/20 text-primary' },
       assigned: { label: 'Назначено', className: 'bg-status-gold/20 text-secondary' },
+      pending_confirmation: { label: 'Ожидает подтверждения', className: 'bg-purple-500/20 text-purple-600' },
       completed: { label: 'Выполнено', className: 'bg-status-success/20 text-status-success' },
       cancelled: { label: 'Отменена', className: 'bg-status-gray/20 text-muted-foreground' },
     };
@@ -142,15 +180,28 @@ const HRRequests: React.FC = () => {
                         <td className="py-4 px-4">{request.quantity}</td>
                         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
                         <td className="py-4 px-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedRequest(request)}
-                            className="gap-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Детали
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedRequest(request)}
+                              className="gap-1"
+                            >
+                              <Eye className="w-4 h-4" />
+                              Детали
+                            </Button>
+                            {request.status === 'pending_confirmation' && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleConfirmCompletion(request.id)}
+                                disabled={confirmingId === request.id}
+                                className="gap-1 bg-status-success hover:bg-status-success/90"
+                              >
+                                <ThumbsUp className="w-4 h-4" />
+                                Подтвердить
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -177,6 +228,11 @@ const HRRequests: React.FC = () => {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Детали заявки</DialogTitle>
+            {selectedRequest?.status === 'pending_confirmation' && (
+              <DialogDescription className="text-purple-600">
+                Заявка ожидает вашего подтверждения выполнения
+              </DialogDescription>
+            )}
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-4">
@@ -224,10 +280,23 @@ const HRRequests: React.FC = () => {
                 </div>
               )}
 
-              {selectedRequest.webhook_sent && (
+              {selectedRequest.webhook_sent && selectedRequest.status !== 'pending_confirmation' && (
                 <div className="flex items-center gap-2 p-3 bg-status-success/10 rounded-lg">
                   <CheckCircle className="w-4 h-4 text-status-success" />
                   <span className="text-sm text-status-success">Опубликовано в соцсетях</span>
+                </div>
+              )}
+
+              {selectedRequest.status === 'pending_confirmation' && (
+                <div className="pt-4 border-t">
+                  <Button
+                    onClick={() => handleConfirmCompletion(selectedRequest.id)}
+                    disabled={confirmingId === selectedRequest.id}
+                    className="w-full gap-2 bg-status-success hover:bg-status-success/90"
+                  >
+                    <ThumbsUp className="w-4 h-4" />
+                    Подтвердить выполнение заявки
+                  </Button>
                 </div>
               )}
             </div>
