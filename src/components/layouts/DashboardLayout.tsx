@@ -32,33 +32,33 @@ interface DashboardLayoutProps {
 }
 
 const hrNavItems: NavItem[] = [
-  { label: '🏠 Дашборд', href: '/hr/dashboard', icon: <Home className="w-5 h-5" /> },
-  { label: '📋 Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
-  { label: '➕ Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
-  { label: '💬 Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Дашборд', href: '/hr/dashboard', icon: <Home className="w-5 h-5" /> },
+  { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
+  { label: 'Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
 
 const workerNavItems: NavItem[] = [
-  { label: '👤 Моя анкета', href: '/worker/profile', icon: <User className="w-5 h-5" /> },
-  { label: '📋 Доступные смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
-  { label: '✅ Мои отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
-  { label: '💬 Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Моя анкета', href: '/worker/profile', icon: <User className="w-5 h-5" /> },
+  { label: 'Доступные смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Мои отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
+  { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
 
 const adminNavItems: NavItem[] = [
-  { label: '🏠 Дашборд', href: '/admin/dashboard', icon: <Home className="w-5 h-5" /> },
-  { label: '📋 Заявки', href: '/admin/requests', icon: <FileText className="w-5 h-5" /> },
-  { label: '👥 Исполнители', href: '/admin/workers', icon: <Users className="w-5 h-5" /> },
-  { label: '👤 Пользователи', href: '/admin/users', icon: <User className="w-5 h-5" /> },
-  { label: '📊 Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
-  { label: '📨 Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
-  { label: '⚙️ Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
+  { label: 'Дашборд', href: '/admin/dashboard', icon: <Home className="w-5 h-5" /> },
+  { label: 'Заявки', href: '/admin/requests', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Исполнители', href: '/admin/workers', icon: <Users className="w-5 h-5" /> },
+  { label: 'Пользователи', href: '/admin/users', icon: <User className="w-5 h-5" /> },
+  { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
+  { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
+  { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, role: userRole } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems = role === 'hr' ? hrNavItems : role === 'worker' ? workerNavItems : adminNavItems;
@@ -73,6 +73,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
       return profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
     }
     return profile?.email?.[0]?.toUpperCase() || 'U';
+  };
+
+  const getProfileLink = () => {
+    if (userRole === 'hr') return '/hr/profile';
+    if (userRole === 'admin') return '/admin/profile';
+    return '/worker/profile';
   };
 
   return (
@@ -124,7 +130,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
 
         {/* User profile */}
         <div className="p-4 border-t border-sidebar-border">
-          <div className="flex items-center gap-3 mb-3">
+          <Link 
+            to={getProfileLink()} 
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 mb-3 p-2 -m-2 rounded-xl hover:bg-sidebar-accent/50 transition-colors cursor-pointer"
+          >
             <Avatar className="w-10 h-10 border-2 border-secondary">
               <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
                 {getInitials()}
@@ -134,7 +144,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
               <p className="font-medium truncate">{profile?.full_name || 'Пользователь'}</p>
               <p className="text-xs text-sidebar-foreground/60 truncate">{profile?.company || profile?.email}</p>
             </div>
-          </div>
+          </Link>
           <Button
             variant="ghost"
             size="sm"
