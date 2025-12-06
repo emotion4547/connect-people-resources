@@ -87,7 +87,7 @@ const Index = () => {
                     <div className="h-32 bg-muted rounded-xl"></div>
                   </div>
                 </div>
-                <div className="absolute -bottom-4 left-0 bg-secondary text-white px-4 py-2 rounded-xl shadow-lg text-sm font-medium">
+                <div className="absolute -top-4 right-4 bg-secondary text-white px-4 py-2 rounded-xl shadow-lg text-sm font-medium">
                   Личный кабинет
                 </div>
               </div>
