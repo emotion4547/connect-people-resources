@@ -383,6 +383,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      hr_has_worker: {
+        Args: { _hr_id: string; _worker_user_id: string }
+        Returns: boolean
+      }
+      worker_responded_to_request: {
+        Args: { _request_id: string; _worker_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "hr" | "worker" | "admin"
