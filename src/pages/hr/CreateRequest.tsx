@@ -21,14 +21,17 @@ const positions = [
   'Разнорабочий',
 ];
 
+const CUSTOM_POSITION = '__custom__';
+
 const CreateRequest: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState('');
+  const [customPosition, setCustomPosition] = useState('');
   const [formData, setFormData] = useState({
-    position: '',
     startDate: '',
     endDate: '',
     startTime: '09:00',
@@ -40,8 +43,17 @@ const CreateRequest: React.FC = () => {
     pay: '',
   });
 
+  const getPosition = () => {
+    if (selectedPosition === CUSTOM_POSITION) {
+      return customPosition.trim();
+    }
+    return selectedPosition;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const position = getPosition();
     
     if (!user) {
       toast({
@@ -52,7 +64,7 @@ const CreateRequest: React.FC = () => {
       return;
     }
 
-    if (!formData.position || !formData.startDate || !formData.endDate || !formData.address) {
+    if (!position || !formData.startDate || !formData.endDate || !formData.address) {
       toast({
         title: 'Ошибка',
         description: 'Заполните все обязательные поля',
@@ -68,7 +80,7 @@ const CreateRequest: React.FC = () => {
         .from('requests')
         .insert({
           hr_id: user.id,
-          position: formData.position,
+          position: position,
           start_date: formData.startDate,
           end_date: formData.endDate,
           start_time: formData.startTime,
@@ -129,11 +141,16 @@ const CreateRequest: React.FC = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Position */}
-              <div>
+              <div className="space-y-3">
                 <Label htmlFor="position">Должность *</Label>
                 <Select
-                  value={formData.position}
-                  onValueChange={(value) => setFormData({ ...formData, position: value })}
+                  value={selectedPosition}
+                  onValueChange={(value) => {
+                    setSelectedPosition(value);
+                    if (value !== CUSTOM_POSITION) {
+                      setCustomPosition('');
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Выберите должность" />
@@ -142,8 +159,17 @@ const CreateRequest: React.FC = () => {
                     {positions.map((pos) => (
                       <SelectItem key={pos} value={pos}>{pos}</SelectItem>
                     ))}
+                    <SelectItem value={CUSTOM_POSITION}>Другая (указать)</SelectItem>
                   </SelectContent>
                 </Select>
+                
+                {selectedPosition === CUSTOM_POSITION && (
+                  <Input
+                    placeholder="Введите название должности"
+                    value={customPosition}
+                    onChange={(e) => setCustomPosition(e.target.value)}
+                  />
+                )}
               </div>
 
               {/* Dates */}

@@ -327,6 +327,7 @@ export type Database = {
         | "assigned"
         | "completed"
         | "cancelled"
+        | "pending_confirmation"
       response_status:
         | "pending"
         | "assigned"
@@ -469,6 +470,7 @@ export const Constants = {
         "assigned",
         "completed",
         "cancelled",
+        "pending_confirmation",
       ],
       response_status: [
         "pending",
