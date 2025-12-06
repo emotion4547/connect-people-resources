@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, UserPlus, FileText, AlertCircle } from 'lucide-react';
+import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -54,6 +55,11 @@ const AdminRequests: React.FC = () => {
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [selectedWorkerToAssign, setSelectedWorkerToAssign] = useState<string>('');
 
+  // Filters
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [companyFilter, setCompanyFilter] = useState<string>('');
+  const [dateFilter, setDateFilter] = useState<string>('');
+
   useEffect(() => {
     fetchRequests();
     fetchAllWorkers();
@@ -68,7 +74,6 @@ const AdminRequests: React.FC = () => {
 
       if (error) throw error;
       
-      // Fetch HR profiles separately
       const hrIds = [...new Set((data || []).map(r => r.hr_id))];
       const { data: profiles } = await supabase
         .from('profiles')
@@ -139,13 +144,30 @@ const AdminRequests: React.FC = () => {
     }
   };
 
+  // Filter logic
+  const filteredRequests = useMemo(() => {
+    return requests.filter(r => {
+      if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+      if (companyFilter && !r.company?.toLowerCase().includes(companyFilter.toLowerCase())) return false;
+      if (dateFilter && r.start_date !== dateFilter) return false;
+      return true;
+    });
+  }, [requests, statusFilter, companyFilter, dateFilter]);
+
+  const resetFilters = () => {
+    setStatusFilter('all');
+    setCompanyFilter('');
+    setDateFilter('');
+  };
+
+  const hasActiveFilters = statusFilter !== 'all' || companyFilter || dateFilter;
+
   const handleViewDetails = async (request: Request) => {
     setSelectedRequest(request);
     await fetchResponses(request.id);
   };
 
   const handleStatusChange = async (requestId: string, newStatus: string) => {
-    // Check if trying to set "assigned" without assigned workers
     if (newStatus === 'assigned') {
       const hasAssignedWorker = responses.some(r => r.status === 'assigned');
       if (!hasAssignedWorker) {
@@ -205,17 +227,14 @@ const AdminRequests: React.FC = () => {
     if (!selectedRequest || !selectedWorkerToAssign) return;
 
     try {
-      // Check if response already exists
       const existingResponse = responses.find(r => r.worker_id === selectedWorkerToAssign);
       
       if (existingResponse) {
-        // Update existing response
         await supabase
           .from('responses')
           .update({ status: 'assigned' as any })
           .eq('id', existingResponse.id);
       } else {
-        // Create new response
         await supabase
           .from('responses')
           .insert({
@@ -229,7 +248,6 @@ const AdminRequests: React.FC = () => {
       setShowAssignDialog(false);
       setSelectedWorkerToAssign('');
       
-      // Refresh responses
       await fetchResponses(selectedRequest.id);
     } catch (error) {
       console.error('Error assigning worker:', error);
@@ -253,7 +271,6 @@ const AdminRequests: React.FC = () => {
   };
 
   const canSetCompleted = () => {
-    // Can only set to pending_confirmation if there are assigned workers
     return responses.some(r => r.status === 'assigned');
   };
 
@@ -261,6 +278,61 @@ const AdminRequests: React.FC = () => {
     <DashboardLayout role="admin">
       <div className="space-y-6 animate-slide-up">
         <h1 className="text-3xl font-bold">Заявки</h1>
+
+        {/* Filters */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-4 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Статус</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все статусы" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все статусы</SelectItem>
+                    <SelectItem value="new">Новая</SelectItem>
+                    <SelectItem value="in_progress">В работе</SelectItem>
+                    <SelectItem value="assigned">Назначено</SelectItem>
+                    <SelectItem value="pending_confirmation">Ожидает подтверждения</SelectItem>
+                    <SelectItem value="completed">Выполнено</SelectItem>
+                    <SelectItem value="cancelled">Отменена</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Компания</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Поиск по компании"
+                    value={companyFilter}
+                    onChange={(e) => setCompanyFilter(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Дата начала</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={resetFilters} className="gap-2">
+                  <RotateCcw className="w-4 h-4" />
+                  Сбросить
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardContent className="p-0">
@@ -270,7 +342,7 @@ const AdminRequests: React.FC = () => {
                   <div key={i} className="h-16 bg-muted animate-shimmer rounded-lg" />
                 ))}
               </div>
-            ) : requests.length > 0 ? (
+            ) : filteredRequests.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -284,7 +356,7 @@ const AdminRequests: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {requests.map((request) => (
+                    {filteredRequests.map((request) => (
                       <tr key={request.id} className="border-b last:border-0 hover:bg-muted/30">
                         <td className="py-4 px-4 text-sm font-mono">{request.id.slice(0, 8)}</td>
                         <td className="py-4 px-4">{request.company || '-'}</td>
@@ -304,7 +376,7 @@ const AdminRequests: React.FC = () => {
             ) : (
               <div className="text-center py-12">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-                <p className="text-muted-foreground">Заявок пока нет</p>
+                <p className="text-muted-foreground">{hasActiveFilters ? 'Нет заявок по заданным фильтрам' : 'Заявок пока нет'}</p>
               </div>
             )}
           </CardContent>
@@ -384,7 +456,6 @@ const AdminRequests: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Assign Worker Dialog */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
