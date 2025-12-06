@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -36,8 +36,17 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { user, role, loading: authLoading, signIn, signUp } = useAuth();
   const { toast } = useToast();
+
+  // Redirect authenticated users based on their role
+  useEffect(() => {
+    if (!authLoading && user && role) {
+      if (role === 'hr') navigate('/hr/dashboard', { replace: true });
+      else if (role === 'worker') navigate('/worker/vacancies', { replace: true });
+      else if (role === 'admin') navigate('/admin/dashboard', { replace: true });
+    }
+  }, [user, role, authLoading, navigate]);
 
   const roles = [
     { id: 'hr' as RoleType, label: 'HR федеральных сетей', icon: <Briefcase className="w-5 h-5" /> },
@@ -102,13 +111,9 @@ const Login: React.FC = () => {
 
         toast({
           title: 'Регистрация успешна!',
-          description: 'Вы успешно зарегистрированы',
+          description: 'Добро пожаловать в систему',
         });
-        
-        // Navigate based on role
-        if (selectedRole === 'hr') navigate('/hr/dashboard');
-        else if (selectedRole === 'worker') navigate('/worker/vacancies');
-        else if (selectedRole === 'admin') navigate('/admin/dashboard');
+        // Redirect will happen via useEffect when role is loaded
       } else {
         const { error } = await signIn(email, password);
 
@@ -125,13 +130,36 @@ const Login: React.FC = () => {
           title: 'Добро пожаловать!',
           description: 'Вы успешно вошли в систему',
         });
-        
-        // Will be redirected by useEffect in AuthContext
+        // Redirect will happen via useEffect when role is loaded
       }
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading if checking auth state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is already logged in but role is loading, show loading
+  if (user && !role) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground">Загрузка профиля...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
