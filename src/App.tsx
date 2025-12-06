@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 
 // HR Pages
 import HRDashboard from "./pages/hr/HRDashboard";
+import HRProfile from "./pages/hr/HRProfile";
 import CreateRequest from "./pages/hr/CreateRequest";
 import HRRequests from "./pages/hr/HRRequests";
 import HRSupport from "./pages/hr/HRSupport";
@@ -25,6 +26,7 @@ import WorkerSupport from "./pages/worker/WorkerSupport";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProfile from "./pages/admin/AdminProfile";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminWorkers from "./pages/admin/AdminWorkers";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -67,6 +69,11 @@ const App = () => (
                 <HRSupport />
               </ProtectedRoute>
             } />
+            <Route path="/hr/profile" element={
+              <ProtectedRoute allowedRoles={['hr']}>
+                <HRProfile />
+              </ProtectedRoute>
+            } />
 
             {/* Worker routes */}
             <Route path="/worker/profile" element={
@@ -94,6 +101,11 @@ const App = () => (
             <Route path="/admin/dashboard" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/profile" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminProfile />
               </ProtectedRoute>
             } />
             <Route path="/admin/requests" element={
