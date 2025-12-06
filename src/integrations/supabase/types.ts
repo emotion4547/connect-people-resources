@@ -100,6 +100,54 @@ export type Database = {
         }
         Relationships: []
       }
+      request_templates: {
+        Row: {
+          address: string | null
+          comments: string | null
+          created_at: string
+          end_time: string | null
+          hr_id: string
+          id: string
+          name: string
+          pay: string | null
+          position: string
+          quantity: number | null
+          requirements: string | null
+          start_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          comments?: string | null
+          created_at?: string
+          end_time?: string | null
+          hr_id: string
+          id?: string
+          name: string
+          pay?: string | null
+          position: string
+          quantity?: number | null
+          requirements?: string | null
+          start_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          comments?: string | null
+          created_at?: string
+          end_time?: string | null
+          hr_id?: string
+          id?: string
+          name?: string
+          pay?: string | null
+          position?: string
+          quantity?: number | null
+          requirements?: string | null
+          start_time?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       requests: {
         Row: {
           address: string
@@ -197,6 +245,7 @@ export type Database = {
           created_at: string
           id: string
           is_closed: boolean | null
+          request_id: string | null
           unread_count: number | null
           updated_at: string
           user_id: string
@@ -206,6 +255,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_closed?: boolean | null
+          request_id?: string | null
           unread_count?: number | null
           updated_at?: string
           user_id: string
@@ -215,12 +265,21 @@ export type Database = {
           created_at?: string
           id?: string
           is_closed?: boolean | null
+          request_id?: string | null
           unread_count?: number | null
           updated_at?: string
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_chats_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

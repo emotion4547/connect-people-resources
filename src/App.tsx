@@ -17,6 +17,7 @@ import HRProfile from "./pages/hr/HRProfile";
 import CreateRequest from "./pages/hr/CreateRequest";
 import HRRequests from "./pages/hr/HRRequests";
 import HRSupport from "./pages/hr/HRSupport";
+import HRTemplates from "./pages/hr/HRTemplates";
 
 // Worker Pages
 import WorkerProfile from "./pages/worker/WorkerProfile";
@@ -67,6 +68,11 @@ const App = () => (
             <Route path="/hr/support" element={
               <ProtectedRoute allowedRoles={['hr']}>
                 <HRSupport />
+              </ProtectedRoute>
+            } />
+            <Route path="/hr/templates" element={
+              <ProtectedRoute allowedRoles={['hr']}>
+                <HRTemplates />
               </ProtectedRoute>
             } />
             <Route path="/hr/profile" element={

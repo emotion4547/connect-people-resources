@@ -14,6 +14,7 @@ import {
   Users,
   BarChart3,
   Mail,
+  Copy,
   Settings,
   LogOut,
   Menu,
@@ -35,6 +36,7 @@ const hrNavItems: NavItem[] = [
   { label: 'Дашборд', href: '/hr/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
   { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
+  { label: 'Шаблоны', href: '/hr/templates', icon: <Copy className="w-5 h-5" /> },
   { label: 'Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
 
