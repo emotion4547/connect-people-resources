@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { MapPin, Calendar, Clock, Banknote, Briefcase } from 'lucide-react';
+import { MapPin, Calendar, Clock, Banknote, Briefcase, Search, RotateCcw, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 interface Vacancy {
   id: string;
@@ -24,13 +27,29 @@ interface Vacancy {
   status: string;
 }
 
+const POSITIONS = [
+  'Сортировщик',
+  'Упаковщик',
+  'Грузчик',
+  'Комплектовщик',
+  'Кладовщик',
+  'Водитель погрузчика',
+  'Разнорабочий',
+];
+
 const WorkerVacancies: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [applyingId, setApplyingId] = useState<string | null>(null);
+
+  // Filters
+  const [searchFilter, setSearchFilter] = useState('');
+  const [positionFilter, setPositionFilter] = useState<string>('all');
+  const [dateFilter, setDateFilter] = useState<string>('');
 
   useEffect(() => {
     fetchData();
@@ -40,7 +59,6 @@ const WorkerVacancies: React.FC = () => {
     if (!user) return;
 
     try {
-      // Fetch available vacancies
       const { data: requests } = await supabase
         .from('requests')
         .select('*')
@@ -49,7 +67,6 @@ const WorkerVacancies: React.FC = () => {
 
       setVacancies(requests || []);
 
-      // Fetch user's responses
       const { data: responses } = await supabase
         .from('responses')
         .select('request_id')
@@ -64,6 +81,29 @@ const WorkerVacancies: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Filter logic
+  const filteredVacancies = useMemo(() => {
+    return vacancies.filter(v => {
+      if (searchFilter) {
+        const search = searchFilter.toLowerCase();
+        const matchPosition = v.position.toLowerCase().includes(search);
+        const matchAddress = v.address.toLowerCase().includes(search);
+        if (!matchPosition && !matchAddress) return false;
+      }
+      if (positionFilter !== 'all' && v.position !== positionFilter) return false;
+      if (dateFilter && v.start_date !== dateFilter) return false;
+      return true;
+    });
+  }, [vacancies, searchFilter, positionFilter, dateFilter]);
+
+  const resetFilters = () => {
+    setSearchFilter('');
+    setPositionFilter('all');
+    setDateFilter('');
+  };
+
+  const hasActiveFilters = searchFilter || positionFilter !== 'all' || dateFilter;
 
   const handleApply = async (vacancyId: string) => {
     if (!user) return;
@@ -106,6 +146,10 @@ const WorkerVacancies: React.FC = () => {
     }
   };
 
+  const handleContactSupport = (vacancyId: string) => {
+    navigate(`/worker/support?request_id=${vacancyId}`);
+  };
+
   return (
     <DashboardLayout role="worker">
       <div className="space-y-6 animate-slide-up">
@@ -116,15 +160,67 @@ const WorkerVacancies: React.FC = () => {
           </p>
         </div>
 
+        {/* Filters */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-4 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Поиск</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Должность или адрес"
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div className="w-[180px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Должность</label>
+                <Select value={positionFilter} onValueChange={setPositionFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все должности" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все должности</SelectItem>
+                    {POSITIONS.map(pos => (
+                      <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-[180px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Дата</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={resetFilters} className="gap-2">
+                  <RotateCcw className="w-4 h-4" />
+                  Сбросить
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="h-64 bg-muted animate-shimmer rounded-2xl" />
             ))}
           </div>
-        ) : vacancies.length > 0 ? (
+        ) : filteredVacancies.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {vacancies.map((vacancy, index) => (
+            {filteredVacancies.map((vacancy, index) => (
               <Card
                 key={vacancy.id}
                 className={`card-hover animate-float-up stagger-${(index % 5) + 1} border-secondary/20`}
@@ -182,20 +278,30 @@ const WorkerVacancies: React.FC = () => {
                     </p>
                   )}
 
-                  {/* Button */}
-                  <Button
-                    className="w-full btn-hover"
-                    disabled={appliedIds.has(vacancy.id) || applyingId === vacancy.id}
-                    onClick={() => handleApply(vacancy.id)}
-                  >
-                    {applyingId === vacancy.id ? (
-                      <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                    ) : appliedIds.has(vacancy.id) ? (
-                      'Вы откликнулись'
-                    ) : (
-                      'Откликнуться'
-                    )}
-                  </Button>
+                  {/* Buttons */}
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1 btn-hover"
+                      disabled={appliedIds.has(vacancy.id) || applyingId === vacancy.id}
+                      onClick={() => handleApply(vacancy.id)}
+                    >
+                      {applyingId === vacancy.id ? (
+                        <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                      ) : appliedIds.has(vacancy.id) ? (
+                        'Вы откликнулись'
+                      ) : (
+                        'Откликнуться'
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleContactSupport(vacancy.id)}
+                      title="Связаться с поддержкой"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -205,11 +311,13 @@ const WorkerVacancies: React.FC = () => {
             <CardContent className="text-center">
               <Briefcase className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
               <p className="text-muted-foreground">
-                Пока нет доступных смен
+                {hasActiveFilters ? 'Нет вакансий по заданным фильтрам' : 'Пока нет доступных смен'}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Новые вакансии появятся здесь
-              </p>
+              {hasActiveFilters && (
+                <Button variant="link" onClick={resetFilters} className="mt-2">
+                  Сбросить фильтры
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}
