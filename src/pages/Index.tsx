@@ -33,7 +33,7 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Block */}
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left relative z-10">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
                 Аутстаффинг персонала{" "}
                 <span className="text-primary">в один клик</span>
