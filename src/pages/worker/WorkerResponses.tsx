@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { FileText } from 'lucide-react';
+import { FileText, RotateCcw, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 interface Response {
   id: string;
   status: string;
   created_at: string;
+  request_id: string;
   requests: {
     position: string;
     start_date: string;
@@ -22,8 +26,12 @@ interface Response {
 
 const WorkerResponses: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [responses, setResponses] = useState<Response[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Filters
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     if (user) {
@@ -41,6 +49,7 @@ const WorkerResponses: React.FC = () => {
           id,
           status,
           created_at,
+          request_id,
           requests (
             position,
             start_date,
@@ -60,6 +69,18 @@ const WorkerResponses: React.FC = () => {
     }
   };
 
+  // Filter logic
+  const filteredResponses = useMemo(() => {
+    if (statusFilter === 'all') return responses;
+    return responses.filter(r => r.status === statusFilter);
+  }, [responses, statusFilter]);
+
+  const resetFilters = () => {
+    setStatusFilter('all');
+  };
+
+  const hasActiveFilters = statusFilter !== 'all';
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
       pending: { label: 'Рассматривается', className: 'bg-status-orange/20 text-status-orange' },
@@ -72,6 +93,10 @@ const WorkerResponses: React.FC = () => {
     return <Badge className={variant.className}>{variant.label}</Badge>;
   };
 
+  const handleContactSupport = (requestId: string) => {
+    navigate(`/worker/support?request_id=${requestId}`);
+  };
+
   return (
     <DashboardLayout role="worker">
       <div className="space-y-6 animate-slide-up">
@@ -82,6 +107,36 @@ const WorkerResponses: React.FC = () => {
           </p>
         </div>
 
+        {/* Filters */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-4 items-end">
+              <div className="w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Статус</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все статусы" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все статусы</SelectItem>
+                    <SelectItem value="pending">Рассматривается</SelectItem>
+                    <SelectItem value="assigned">Назначен</SelectItem>
+                    <SelectItem value="rejected">Отклонён</SelectItem>
+                    <SelectItem value="completed">Выполнено</SelectItem>
+                    <SelectItem value="no_show">Не вышел</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={resetFilters} className="gap-2">
+                  <RotateCcw className="w-4 h-4" />
+                  Сбросить
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardContent className="p-0">
             {loading ? (
@@ -90,7 +145,7 @@ const WorkerResponses: React.FC = () => {
                   <div key={i} className="h-16 bg-muted animate-shimmer rounded-lg" />
                 ))}
               </div>
-            ) : responses.length > 0 ? (
+            ) : filteredResponses.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -100,10 +155,11 @@ const WorkerResponses: React.FC = () => {
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Адрес</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Оплата</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Статус</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Действия</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {responses.map((response) => (
+                    {filteredResponses.map((response) => (
                       <tr key={response.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                         <td className="py-4 px-4 font-medium">{response.requests.position}</td>
                         <td className="py-4 px-4 text-sm text-muted-foreground">
@@ -116,6 +172,17 @@ const WorkerResponses: React.FC = () => {
                           {response.requests.pay || '-'}
                         </td>
                         <td className="py-4 px-4">{getStatusBadge(response.status)}</td>
+                        <td className="py-4 px-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleContactSupport(response.request_id)}
+                            className="gap-1"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            Поддержка
+                          </Button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -124,10 +191,14 @@ const WorkerResponses: React.FC = () => {
             ) : (
               <div className="text-center py-12">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-                <p className="text-muted-foreground mb-2">Откликов пока нет</p>
-                <p className="text-sm text-muted-foreground">
-                  Откликнитесь на вакансию в разделе "Доступные смены"
+                <p className="text-muted-foreground mb-2">
+                  {hasActiveFilters ? 'Нет откликов по заданному фильтру' : 'Откликов пока нет'}
                 </p>
+                {!hasActiveFilters && (
+                  <p className="text-sm text-muted-foreground">
+                    Откликнитесь на вакансию в разделе "Доступные смены"
+                  </p>
+                )}
               </div>
             )}
           </CardContent>
