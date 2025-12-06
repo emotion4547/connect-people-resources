@@ -102,12 +102,14 @@ const HRDashboard: React.FC = () => {
         </div>
 
         {/* Create button */}
-        <Link to="/hr/create-request">
-          <Button size="lg" className="btn-hover gap-2">
-            <PlusCircle className="w-5 h-5" />
-            Создать заявку
-          </Button>
-        </Link>
+        <div className="pt-2">
+          <Link to="/hr/create-request">
+            <Button size="lg" className="btn-hover gap-2">
+              <PlusCircle className="w-5 h-5" />
+              Создать заявку
+            </Button>
+          </Link>
+        </div>
 
         {/* Recent requests */}
         <Card className="animate-fade-in">
