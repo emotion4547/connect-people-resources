@@ -1,0 +1,283 @@
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import { Briefcase, HardHat, Settings, ArrowLeft } from 'lucide-react';
+import { z } from 'zod';
+
+type RoleType = 'hr' | 'worker' | 'admin';
+
+const loginSchema = z.object({
+  email: z.string().trim().email('Введите корректный email'),
+  password: z.string().min(6, 'Пароль должен быть не менее 6 символов'),
+});
+
+const signupSchema = loginSchema.extend({
+  fullName: z.string().trim().min(2, 'Введите ваше имя'),
+  company: z.string().optional(),
+});
+
+const Login: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const initialRole = searchParams.get('role') as RoleType | null;
+  
+  const [selectedRole, setSelectedRole] = useState<RoleType>(initialRole || 'hr');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [company, setCompany] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
+  const { toast } = useToast();
+
+  const roles = [
+    { id: 'hr' as RoleType, label: 'HR федеральных сетей', icon: <Briefcase className="w-5 h-5" /> },
+    { id: 'worker' as RoleType, label: 'Исполнитель', icon: <HardHat className="w-5 h-5" /> },
+    { id: 'admin' as RoleType, label: 'Администратор', icon: <Settings className="w-5 h-5" /> },
+  ];
+
+  const validateForm = () => {
+    try {
+      if (isSignUp) {
+        signupSchema.parse({ email, password, fullName, company });
+      } else {
+        loginSchema.parse({ email, password });
+      }
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0] as string] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setLoading(true);
+
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(email, password, {
+          role: selectedRole,
+          full_name: fullName,
+          company: selectedRole === 'hr' ? company : undefined,
+        });
+
+        if (error) {
+          if (error.message.includes('already registered')) {
+            toast({
+              title: 'Ошибка регистрации',
+              description: 'Пользователь с таким email уже зарегистрирован',
+              variant: 'destructive',
+            });
+          } else {
+            toast({
+              title: 'Ошибка регистрации',
+              description: error.message,
+              variant: 'destructive',
+            });
+          }
+          return;
+        }
+
+        toast({
+          title: 'Регистрация успешна!',
+          description: 'Вы успешно зарегистрированы',
+        });
+        
+        // Navigate based on role
+        if (selectedRole === 'hr') navigate('/hr/dashboard');
+        else if (selectedRole === 'worker') navigate('/worker/vacancies');
+        else if (selectedRole === 'admin') navigate('/admin/dashboard');
+      } else {
+        const { error } = await signIn(email, password);
+
+        if (error) {
+          toast({
+            title: 'Ошибка входа',
+            description: 'Неверный email или пароль',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        toast({
+          title: 'Добро пожаловать!',
+          description: 'Вы успешно вошли в систему',
+        });
+        
+        // Will be redirected by useEffect in AuthContext
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
+      <div className="w-full max-w-md animate-scale-in">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          На главную
+        </Link>
+
+        <Card className="shadow-card border-secondary/20">
+          <CardHeader className="text-center pb-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
+              <span className="text-primary-foreground font-bold text-xl">ЛР</span>
+            </div>
+            <CardTitle className="text-2xl">
+              {isSignUp ? 'Регистрация' : 'Вход'} в "ЛЮДИ И РЕСУРСЫ"
+            </CardTitle>
+            <CardDescription>
+              {isSignUp ? 'Создайте аккаунт для начала работы' : 'Войдите в свой аккаунт'}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            {/* Role Selection */}
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {roles.map((role) => (
+                <button
+                  key={role.id}
+                  type="button"
+                  onClick={() => setSelectedRole(role.id)}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
+                    selectedRole === role.id
+                      ? "border-secondary bg-secondary/10 text-foreground"
+                      : "border-border hover:border-secondary/50 text-muted-foreground"
+                  )}
+                >
+                  <span className={cn(
+                    selectedRole === role.id ? "text-secondary" : "text-muted-foreground"
+                  )}>
+                    {role.icon}
+                  </span>
+                  <span className="text-xs font-medium text-center leading-tight">
+                    {role.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {isSignUp && (
+                <>
+                  <div>
+                    <Label htmlFor="fullName">ФИО</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Иванов Иван Иванович"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className={cn(errors.fullName && "border-destructive")}
+                    />
+                    {errors.fullName && (
+                      <p className="text-xs text-destructive mt-1">{errors.fullName}</p>
+                    )}
+                  </div>
+
+                  {selectedRole === 'hr' && (
+                    <div>
+                      <Label htmlFor="company">Компания</Label>
+                      <Input
+                        id="company"
+                        type="text"
+                        placeholder="Название компании"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="example@mail.ru"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={cn(errors.email && "border-destructive")}
+                />
+                {errors.email && (
+                  <p className="text-xs text-destructive mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="password">Пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={cn(errors.password && "border-destructive")}
+                />
+                {errors.password && (
+                  <p className="text-xs text-destructive mt-1">{errors.password}</p>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full btn-hover" disabled={loading}>
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                    Загрузка...
+                  </span>
+                ) : isSignUp ? (
+                  'Зарегистрироваться'
+                ) : (
+                  'Войти'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setErrors({});
+                }}
+                className="text-sm text-primary hover:underline"
+              >
+                {isSignUp ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
