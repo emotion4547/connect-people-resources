@@ -63,8 +63,8 @@ const Index = () => {
             </div>
             
             {/* Illustration / Dashboard Preview */}
-            <div className="hidden lg:block">
-              <div className="relative">
+            <div className="hidden lg:block relative z-0">
+              <div className="relative ml-4">
                 <div className="bg-card rounded-3xl shadow-2xl border border-border p-6 transform rotate-1 hover:rotate-0 transition-transform duration-500">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-3 h-3 rounded-full bg-destructive"></div>
@@ -87,7 +87,7 @@ const Index = () => {
                     <div className="h-32 bg-muted rounded-xl"></div>
                   </div>
                 </div>
-                <div className="absolute -bottom-4 -left-4 bg-secondary text-white px-4 py-2 rounded-xl shadow-lg text-sm font-medium">
+                <div className="absolute -bottom-4 left-0 bg-secondary text-white px-4 py-2 rounded-xl shadow-lg text-sm font-medium">
                   Личный кабинет
                 </div>
               </div>
