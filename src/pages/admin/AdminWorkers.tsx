@@ -256,12 +256,12 @@ const AdminWorkers: React.FC = () => {
               </div>
               <div className="w-[180px]">
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Город</label>
-                <Select value={cityFilter} onValueChange={setCityFilter}>
+                <Select value={cityFilter || "all"} onValueChange={(val) => setCityFilter(val === "all" ? "" : val)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Все города" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Все города</SelectItem>
+                    <SelectItem value="all">Все города</SelectItem>
                     {uniqueCities.map(city => (
                       <SelectItem key={city} value={city}>{city}</SelectItem>
                     ))}
