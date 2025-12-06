@@ -387,6 +387,10 @@ export type Database = {
         Args: { _hr_id: string; _worker_user_id: string }
         Returns: boolean
       }
+      hr_owns_request: {
+        Args: { _hr_id: string; _request_id: string }
+        Returns: boolean
+      }
       worker_responded_to_request: {
         Args: { _request_id: string; _worker_id: string }
         Returns: boolean
