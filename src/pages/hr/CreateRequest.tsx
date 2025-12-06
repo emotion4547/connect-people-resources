@@ -85,9 +85,22 @@ const CreateRequest: React.FC = () => {
 
       if (error) throw error;
 
+      // Trigger webhook
+      let webhookSuccess = false;
+      try {
+        const { data: webhookResult } = await supabase.functions.invoke('send-webhook', {
+          body: { request_id: data.id, test_mode: false }
+        });
+        webhookSuccess = webhookResult?.success === true;
+      } catch (webhookError) {
+        console.error('Webhook error:', webhookError);
+      }
+
       toast({
         title: 'Заявка создана!',
-        description: 'Заявка автоматически опубликуется в Telegram и VK',
+        description: webhookSuccess 
+          ? '✅ Опубликовано в Telegram и VK!' 
+          : 'Заявка создана. Публикация в соцсетях недоступна.',
       });
 
       navigate('/hr/requests');

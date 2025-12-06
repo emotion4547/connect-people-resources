@@ -101,44 +101,35 @@ const AdminSettings: React.FC = () => {
       return;
     }
 
+    // First save settings to ensure webhook URL is saved
+    if (!settings.id || settings.webhook_url !== settings.webhook_url) {
+      await handleSave();
+    }
+
     setTesting(true);
     setTestResult(null);
 
     try {
-      const testData = {
-        id: 'test-123',
-        company: 'Тестовая компания',
-        position: 'Сортировщик',
-        date: new Date().toISOString().split('T')[0],
-        time: '09:00-18:00',
-        address: 'Москва, ул. Тестовая, 1',
-        quantity: 3,
-        requirements: 'Без опыта',
-        pay: '3500 руб/смена',
-      };
-
-      const response = await fetch(settings.webhook_url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(testData),
+      const { data: result, error } = await supabase.functions.invoke('send-webhook', {
+        body: { request_id: null, test_mode: true }
       });
 
-      if (response.ok) {
+      if (error) throw error;
+
+      if (result?.success) {
         setTestResult('success');
         toast({
           title: 'Тест успешен',
           description: 'Webhook работает корректно',
         });
       } else {
-        throw new Error('Request failed');
+        throw new Error(result?.message || 'Request failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       setTestResult('error');
       toast({
         title: 'Тест не пройден',
-        description: 'Не удалось отправить данные на webhook',
+        description: error.message || 'Не удалось отправить данные на webhook',
         variant: 'destructive',
       });
     } finally {
