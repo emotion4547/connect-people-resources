@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, CheckCircle } from 'lucide-react';
+import { Send, CheckCircle, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 interface Message {
   id: string;
@@ -16,13 +19,25 @@ interface Message {
   created_at: string;
 }
 
+interface RequestInfo {
+  id: string;
+  position: string;
+  start_date: string;
+  address: string;
+  status: string;
+}
+
 const HRSupport: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const requestId = searchParams.get('request');
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [chatId, setChatId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [requestInfo, setRequestInfo] = useState<RequestInfo | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,7 +48,7 @@ const HRSupport: React.FC = () => {
     if (user) {
       initializeChat();
     }
-  }, [user]);
+  }, [user, requestId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -68,12 +83,32 @@ const HRSupport: React.FC = () => {
     if (!user) return;
 
     try {
+      // Fetch request info if requestId provided
+      if (requestId) {
+        const { data: reqData } = await supabase
+          .from('requests')
+          .select('id, position, start_date, address, status')
+          .eq('id', requestId)
+          .maybeSingle();
+        
+        if (reqData) {
+          setRequestInfo(reqData);
+        }
+      }
+
       // Check for existing chat
-      let { data: existingChat } = await supabase
+      let query = supabase
         .from('support_chats')
         .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        .eq('user_id', user.id);
+      
+      if (requestId) {
+        query = query.eq('request_id', requestId);
+      } else {
+        query = query.is('request_id', null);
+      }
+
+      let { data: existingChat } = await query.maybeSingle();
 
       if (!existingChat) {
         // Create new chat
@@ -82,6 +117,7 @@ const HRSupport: React.FC = () => {
           .insert({
             user_id: user.id,
             user_type: 'hr',
+            request_id: requestId || null,
           })
           .select()
           .single();
@@ -128,6 +164,18 @@ const HRSupport: React.FC = () => {
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      new: 'Новая',
+      in_progress: 'В работе',
+      assigned: 'Назначено',
+      pending_confirmation: 'Ожидает подтверждения',
+      completed: 'Выполнено',
+      cancelled: 'Отменена',
+    };
+    return labels[status] || status;
+  };
+
   return (
     <DashboardLayout role="hr">
       <div className="h-[calc(100vh-8rem)] flex flex-col animate-slide-up">
@@ -140,6 +188,20 @@ const HRSupport: React.FC = () => {
                 Менеджер онлайн
               </div>
             </div>
+            
+            {/* Request Info Banner */}
+            {requestInfo && (
+              <div className="mt-3 p-3 bg-primary/10 rounded-lg flex items-center gap-3">
+                <FileText className="w-5 h-5 text-primary" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Обращение по заявке: {requestInfo.position}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(requestInfo.start_date), 'd MMMM yyyy', { locale: ru })} • {requestInfo.address}
+                  </p>
+                </div>
+                <Badge variant="outline">{getStatusLabel(requestInfo.status)}</Badge>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="flex-1 flex flex-col p-0">
             {/* Messages */}
@@ -183,7 +245,11 @@ const HRSupport: React.FC = () => {
                 ))
               ) : (
                 <div className="text-center text-muted-foreground py-8">
-                  <p>Напишите нам, если у вас есть вопросы</p>
+                  <p>
+                    {requestInfo 
+                      ? 'Напишите нам по поводу этой заявки' 
+                      : 'Напишите нам, если у вас есть вопросы'}
+                  </p>
                 </div>
               )}
               <div ref={messagesEndRef} />

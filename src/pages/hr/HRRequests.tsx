@@ -4,10 +4,15 @@ import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -28,6 +33,19 @@ interface Request {
   created_at: string;
 }
 
+interface Response {
+  id: string;
+  worker_id: string;
+  status: string;
+  worker_profile?: {
+    full_name: string | null;
+    phone: string | null;
+    city: string | null;
+    experience: string | null;
+    rating: number | null;
+  };
+}
+
 const statusFilters = [
   { id: 'all', label: 'Все' },
   { id: 'new', label: 'Новые' },
@@ -39,11 +57,18 @@ const statusFilters = [
 
 const HRRequests: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [assignedWorkers, setAssignedWorkers] = useState<Response[]>([]);
+  
+  // Additional filters
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [payFilter, setPayFilter] = useState('');
 
   useEffect(() => {
     fetchRequests();
@@ -63,6 +88,36 @@ const HRRequests: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchAssignedWorkers = async (requestId: string) => {
+    const { data } = await supabase
+      .from('responses')
+      .select('id, worker_id, status')
+      .eq('request_id', requestId)
+      .eq('status', 'assigned');
+    
+    if (data && data.length > 0) {
+      const workerIds = data.map(r => r.worker_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, phone, city, experience, rating')
+        .in('user_id', workerIds);
+      
+      const workersWithProfiles = data.map(resp => ({
+        ...resp,
+        worker_profile: profiles?.find(p => p.user_id === resp.worker_id)
+      }));
+      
+      setAssignedWorkers(workersWithProfiles);
+    } else {
+      setAssignedWorkers([]);
+    }
+  };
+
+  const handleViewDetails = async (request: Request) => {
+    setSelectedRequest(request);
+    await fetchAssignedWorkers(request.id);
   };
 
   const handleConfirmCompletion = async (requestId: string) => {
@@ -99,9 +154,61 @@ const HRRequests: React.FC = () => {
     }
   };
 
-  const filteredRequests = activeFilter === 'all'
-    ? requests
-    : requests.filter(r => r.status === activeFilter);
+  const handleContactSupport = async (request: Request) => {
+    if (!user) return;
+    
+    try {
+      // Check for existing chat for this request
+      let { data: existingChat } = await supabase
+        .from('support_chats')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('request_id', request.id)
+        .maybeSingle();
+
+      if (!existingChat) {
+        const { data: newChat, error } = await supabase
+          .from('support_chats')
+          .insert({
+            user_id: user.id,
+            user_type: 'hr',
+            request_id: request.id,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        existingChat = newChat;
+      }
+
+      // Navigate to support with request context
+      window.location.href = `/hr/support?request=${request.id}`;
+    } catch (error) {
+      console.error('Error creating support chat:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось открыть чат поддержки',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const hasFilters = activeFilter !== 'all' || dateFrom || dateTo || payFilter;
+
+  const clearFilters = () => {
+    setActiveFilter('all');
+    setDateFrom('');
+    setDateTo('');
+    setPayFilter('');
+  };
+
+  const filteredRequests = requests.filter(r => {
+    if (activeFilter !== 'all' && r.status !== activeFilter) return false;
+    if (dateFrom && r.start_date < dateFrom) return false;
+    if (dateTo && r.start_date > dateTo) return false;
+    if (payFilter && r.pay && !r.pay.toLowerCase().includes(payFilter.toLowerCase())) return false;
+    return true;
+  });
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
@@ -130,19 +237,60 @@ const HRRequests: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2">
-          {statusFilters.map((filter) => (
-            <Button
-              key={filter.id}
-              variant={activeFilter === filter.id ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setActiveFilter(filter.id)}
-              className="rounded-full"
-            >
-              {filter.label}
-            </Button>
-          ))}
-        </div>
+        <Card className="p-4">
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex flex-wrap gap-2">
+              {statusFilters.map((filter) => (
+                <Button
+                  key={filter.id}
+                  variant={activeFilter === filter.id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setActiveFilter(filter.id)}
+                  className="rounded-full"
+                >
+                  {filter.label}
+                </Button>
+              ))}
+            </div>
+            
+            <div className="flex gap-2 items-center">
+              <div>
+                <Label className="text-xs">Дата от</Label>
+                <Input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-36 h-8"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Дата до</Label>
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="w-36 h-8"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Оплата</Label>
+                <Input
+                  placeholder="Поиск..."
+                  value={payFilter}
+                  onChange={(e) => setPayFilter(e.target.value)}
+                  className="w-28 h-8"
+                />
+              </div>
+            </div>
+            
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+                <X className="w-3 h-3" />
+                Сбросить
+              </Button>
+            )}
+          </div>
+        </Card>
 
         {/* Requests table */}
         <Card>
@@ -161,6 +309,7 @@ const HRRequests: React.FC = () => {
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">ID</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Должность</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Дата</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Оплата</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Кол-во</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Статус</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Действия</th>
@@ -177,6 +326,7 @@ const HRRequests: React.FC = () => {
                             <> - {format(new Date(request.end_date), 'd MMM', { locale: ru })}</>
                           )}
                         </td>
+                        <td className="py-4 px-4 text-sm">{request.pay || '—'}</td>
                         <td className="py-4 px-4">{request.quantity}</td>
                         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
                         <td className="py-4 px-4">
@@ -184,11 +334,20 @@ const HRRequests: React.FC = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setSelectedRequest(request)}
+                              onClick={() => handleViewDetails(request)}
                               className="gap-1"
                             >
                               <Eye className="w-4 h-4" />
                               Детали
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleContactSupport(request)}
+                              className="gap-1"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              Поддержка
                             </Button>
                             {request.status === 'pending_confirmation' && (
                               <Button
@@ -212,11 +371,13 @@ const HRRequests: React.FC = () => {
               <div className="text-center py-12">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
                 <p className="text-muted-foreground mb-2">
-                  {activeFilter === 'all' ? 'Заявок пока нет' : 'Нет заявок с выбранным статусом'}
+                  {hasFilters ? 'Нет заявок по выбранным фильтрам' : 'Заявок пока нет'}
                 </p>
-                <Link to="/hr/create-request" className="text-primary hover:underline text-sm">
-                  Создать первую заявку
-                </Link>
+                {!hasFilters && (
+                  <Link to="/hr/create-request" className="text-primary hover:underline text-sm">
+                    Создать первую заявку
+                  </Link>
+                )}
               </div>
             )}
           </CardContent>
@@ -225,7 +386,7 @@ const HRRequests: React.FC = () => {
 
       {/* Details Dialog */}
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Детали заявки</DialogTitle>
             {selectedRequest?.status === 'pending_confirmation' && (
@@ -277,6 +438,44 @@ const HRRequests: React.FC = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Требования</p>
                   <p className="text-sm">{selectedRequest.requirements}</p>
+                </div>
+              )}
+
+              {/* Assigned Workers */}
+              {assignedWorkers.length > 0 && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Назначенные исполнители</p>
+                  <div className="space-y-2">
+                    {assignedWorkers.map(worker => (
+                      <Popover key={worker.id}>
+                        <PopoverTrigger asChild>
+                          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                            <Avatar className="w-8 h-8">
+                              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                                {worker.worker_profile?.full_name?.charAt(0) || 'И'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{worker.worker_profile?.full_name || 'Исполнитель'}</p>
+                              <p className="text-xs text-muted-foreground">{worker.worker_profile?.phone || '—'}</p>
+                            </div>
+                            <User className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-72">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">{worker.worker_profile?.full_name || 'Исполнитель'}</h4>
+                            <div className="text-sm space-y-1">
+                              <p><span className="text-muted-foreground">Телефон:</span> {worker.worker_profile?.phone || '—'}</p>
+                              <p><span className="text-muted-foreground">Город:</span> {worker.worker_profile?.city || '—'}</p>
+                              <p><span className="text-muted-foreground">Опыт:</span> {worker.worker_profile?.experience || '—'}</p>
+                              <p><span className="text-muted-foreground">Рейтинг:</span> {worker.worker_profile?.rating || 0}</p>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    ))}
+                  </div>
                 </div>
               )}
 
