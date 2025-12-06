@@ -51,6 +51,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          block_reason: string | null
           city: string | null
           company: string | null
           created_at: string
@@ -67,6 +68,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          block_reason?: string | null
           city?: string | null
           company?: string | null
           created_at?: string
@@ -83,6 +85,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          block_reason?: string | null
           city?: string | null
           company?: string | null
           created_at?: string
