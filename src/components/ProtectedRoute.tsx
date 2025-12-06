@@ -10,6 +10,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { user, role, loading } = useAuth();
 
+  // Show loading while checking auth state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -21,12 +22,26 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
     );
   }
 
+  // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!role || !allowedRoles.includes(role)) {
-    // Redirect to appropriate dashboard based on role
+  // If user exists but role is not yet loaded, wait for it
+  if (!role) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground">Загрузка профиля...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has required role
+  if (!allowedRoles.includes(role)) {
+    // Redirect to appropriate dashboard based on actual role
     if (role === 'hr') return <Navigate to="/hr/dashboard" replace />;
     if (role === 'worker') return <Navigate to="/worker/vacancies" replace />;
     if (role === 'admin') return <Navigate to="/admin/dashboard" replace />;
