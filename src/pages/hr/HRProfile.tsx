@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, User } from 'lucide-react';
+import { AvatarUpload } from '@/components/AvatarUpload';
+import { Loader2, Save } from 'lucide-react';
 
 const HRProfile: React.FC = () => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     full_name: '',
     company: '',
@@ -28,6 +30,7 @@ const HRProfile: React.FC = () => {
         phone: profile.phone || '',
         email: profile.email || '',
       });
+      setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile]);
 
@@ -75,9 +78,17 @@ const HRProfile: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Личные данные
+            <CardTitle className="flex items-center gap-4">
+              {user && (
+                <AvatarUpload
+                  userId={user.id}
+                  currentAvatarUrl={avatarUrl}
+                  userName={formData.full_name}
+                  onAvatarChange={setAvatarUrl}
+                  size="lg"
+                />
+              )}
+              <span>Личные данные</span>
             </CardTitle>
           </CardHeader>
           <CardContent>

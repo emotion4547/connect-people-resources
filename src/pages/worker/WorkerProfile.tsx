@@ -8,13 +8,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Save, User } from 'lucide-react';
+import { AvatarUpload } from '@/components/AvatarUpload';
+import { Save } from 'lucide-react';
 
 const WorkerProfile: React.FC = () => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -34,6 +36,7 @@ const WorkerProfile: React.FC = () => {
         preferredSchedule: profile.preferred_schedule || '',
         preferredPositions: profile.preferred_positions?.join(', ') || '',
       });
+      setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile]);
 
@@ -99,9 +102,15 @@ const WorkerProfile: React.FC = () => {
         <Card className="shadow-card">
           <CardHeader>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
-              </div>
+              {user && (
+                <AvatarUpload
+                  userId={user.id}
+                  currentAvatarUrl={avatarUrl}
+                  userName={formData.fullName}
+                  onAvatarChange={setAvatarUrl}
+                  size="lg"
+                />
+              )}
               <div>
                 <CardTitle className="text-2xl">Моя анкета</CardTitle>
                 <CardDescription>

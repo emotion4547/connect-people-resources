@@ -43,25 +43,43 @@ const WorkerResponses: React.FC = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First get responses
+      const { data: responsesData, error: responsesError } = await supabase
         .from('responses')
-        .select(`
-          id,
-          status,
-          created_at,
-          request_id,
-          requests (
-            position,
-            start_date,
-            address,
-            pay
-          )
-        `)
+        .select('id, status, created_at, request_id')
         .eq('worker_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setResponses(data || []);
+      if (responsesError) throw responsesError;
+
+      if (!responsesData?.length) {
+        setResponses([]);
+        setLoading(false);
+        return;
+      }
+
+      // Then get request details separately
+      const requestIds = responsesData.map(r => r.request_id);
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('requests')
+        .select('id, position, start_date, address, pay')
+        .in('id', requestIds);
+
+      if (requestsError) throw requestsError;
+
+      // Combine data
+      const requestsMap = new Map(requestsData?.map(r => [r.id, r]) || []);
+      const combinedData = responsesData.map(response => ({
+        ...response,
+        requests: requestsMap.get(response.request_id) || {
+          position: 'Неизвестно',
+          start_date: new Date().toISOString(),
+          address: '-',
+          pay: null,
+        },
+      }));
+
+      setResponses(combinedData);
     } catch (error) {
       console.error('Error fetching responses:', error);
     } finally {
