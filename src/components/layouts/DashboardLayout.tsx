@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Home,
   FileText,
@@ -138,6 +138,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
             className="flex items-center gap-3 mb-3 p-2 -m-2 rounded-xl hover:bg-sidebar-accent/50 transition-colors cursor-pointer"
           >
             <Avatar className="w-10 h-10 border-2 border-secondary">
+              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || 'Аватар'} />
               <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
                 {getInitials()}
               </AvatarFallback>
