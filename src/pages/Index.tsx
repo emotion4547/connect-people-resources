@@ -29,35 +29,35 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-28 pb-20 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 animate-fade-in">
-        <div className="container mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="pt-24 sm:pt-28 pb-12 sm:pb-20 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 animate-fade-in overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Text Block */}
             <div className="text-center lg:text-left relative z-10">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2 sm:px-0">
                 Аутстаффинг персонала{" "}
                 <span className="text-primary">в один клик</span>
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 px-2 sm:px-0">
                 Онлайн‑сервис «ЛЮДИ И РЕСУРСЫ», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
               </p>
               
-              <div className="flex flex-col gap-3 sm:gap-4 justify-center lg:justify-start mb-6">
-                <Link to="/login?role=hr" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Rocket className="w-5 h-5 mr-2 flex-shrink-0" />
-                    <span className="truncate">Найти людей для сети (для HR)</span>
+              <div className="flex flex-col gap-3 justify-center items-center lg:items-start mb-4 sm:mb-6 px-2 sm:px-0">
+                <Link to="/login?role=hr" className="w-full max-w-xs sm:max-w-sm">
+                  <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                    <span>Найти людей для сети</span>
                   </Button>
                 </Link>
-                <Link to="/login?role=worker" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full border-2 border-secondary bg-white text-secondary hover:bg-secondary hover:text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <HardHat className="w-5 h-5 mr-2 flex-shrink-0" />
-                    <span className="truncate">Найти смену (для исполнителей)</span>
+                <Link to="/login?role=worker" className="w-full max-w-xs sm:max-w-sm">
+                  <Button size="lg" variant="outline" className="w-full border-2 border-secondary bg-white text-secondary hover:bg-secondary hover:text-white px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <HardHat className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                    <span>Найти смену</span>
                   </Button>
                 </Link>
               </div>
               
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground px-4 sm:px-0">
                 Без звонков по базе и бесконечных переписок — всё в одном личном кабинете.
               </p>
             </div>
