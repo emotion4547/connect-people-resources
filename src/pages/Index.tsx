@@ -356,15 +356,15 @@ const Index = () => {
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
             {/* For HR */}
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
               <div className="flex items-center gap-3 mb-4">
                 <Building2 className="w-8 h-8 text-white" />
                 <h3 className="text-xl font-bold text-white">Для HR</h3>
               </div>
-              <p className="text-white/80 mb-6">
+              <p className="text-white/80 mb-6 flex-1">
                 Подключите сервис к вашей сети и протестируйте его на одном объекте или пилотном проекте.
               </p>
-              <Link to="/login?role=hr">
+              <Link to="/login?role=hr" className="mt-auto">
                 <Button size="lg" className="w-full bg-white text-primary hover:bg-white/90 rounded-xl">
                   Запросить демонстрацию для HR
                 </Button>
@@ -372,15 +372,15 @@ const Index = () => {
             </div>
             
             {/* For Workers */}
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
               <div className="flex items-center gap-3 mb-4">
                 <HardHat className="w-8 h-8 text-secondary" />
                 <h3 className="text-xl font-bold text-white">Для исполнителей</h3>
               </div>
-              <p className="text-white/80 mb-6">
+              <p className="text-white/80 mb-6 flex-1">
                 Создайте анкету и получите первые предложения по сменам.
               </p>
-              <Link to="/login?role=worker">
+              <Link to="/login?role=worker" className="mt-auto">
                 <Button size="lg" className="w-full bg-secondary text-white hover:bg-secondary/90 rounded-xl">
                   Стать исполнителем
                 </Button>
