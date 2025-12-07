@@ -1,17 +1,21 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
   Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
   FileText, Send, CheckCircle, ClipboardList, Bell, 
   UserCheck, History, BarChart3, MessageSquare, Eye,
-  Building2, Warehouse, Store, Quote
+  Building2, Warehouse, Store, Quote, ZoomIn, X
 } from "lucide-react";
 import screenshotHR from "@/assets/screenshot-hr-dashboard.png";
 import screenshotWorker from "@/assets/screenshot-worker-dashboard.png";
 import screenshotAdmin from "@/assets/screenshot-admin-panel.png";
 
 const Index = () => {
+  const [selectedScreenshot, setSelectedScreenshot] = useState<{ src: string; title: string } | null>(null);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -339,12 +343,18 @@ const Index = () => {
               <Card key={index} className="bg-card border-border hover:shadow-xl transition-all duration-300 overflow-hidden group">
                 <CardContent className="p-0">
                   {/* Screenshot preview */}
-                  <div className="h-32 sm:h-40 md:h-48 overflow-hidden">
+                  <div 
+                    className="h-32 sm:h-40 md:h-48 overflow-hidden relative cursor-pointer"
+                    onClick={() => setSelectedScreenshot({ src: cabinet.screenshot, title: cabinet.title })}
+                  >
                     <img 
                       src={cabinet.screenshot} 
                       alt={cabinet.title}
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     />
+                    <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
+                      <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
+                    </div>
                   </div>
                   <div className="p-4 sm:p-5 md:p-6">
                     <div className="flex items-center gap-2 mb-1 sm:mb-2">
@@ -359,6 +369,30 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Screenshot Modal */}
+      <Dialog open={!!selectedScreenshot} onOpenChange={() => setSelectedScreenshot(null)}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background/95 backdrop-blur-sm border-border">
+          <div className="relative">
+            <button
+              onClick={() => setSelectedScreenshot(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-background/80 hover:bg-background flex items-center justify-center transition-colors shadow-lg"
+            >
+              <X className="w-5 h-5 text-foreground" />
+            </button>
+            {selectedScreenshot && (
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-foreground mb-3">{selectedScreenshot.title}</h3>
+                <img 
+                  src={selectedScreenshot.src} 
+                  alt={selectedScreenshot.title}
+                  className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Final CTA */}
       <section className="py-12 sm:py-20 px-4 bg-gradient-to-br from-primary via-primary/95 to-primary/90 overflow-hidden">
