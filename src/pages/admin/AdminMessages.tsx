@@ -11,6 +11,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useAuth } from '@/contexts/AuthContext';
+import TypingIndicator from '@/components/chat/TypingIndicator';
+import ChatAttachments, { Attachment } from '@/components/chat/ChatAttachments';
+import MessageAttachments from '@/components/chat/MessageAttachments';
+import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 
 interface Chat {
   id: string;
@@ -36,9 +41,11 @@ interface Message {
   message: string;
   sender_type: 'user' | 'admin';
   created_at: string;
+  attachments?: Attachment[];
 }
 
 const AdminMessages: React.FC = () => {
+  const { user } = useAuth();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -48,7 +55,14 @@ const AdminMessages: React.FC = () => {
   const [linkedRequest, setLinkedRequest] = useState<Request | null>(null);
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { isOtherTyping, sendTyping, sendStopTyping } = useTypingIndicator({
+    chatId: selectedChat?.id || null,
+    userId: user?.id || null,
+    userType: 'admin',
+  });
 
   // Filters
   const [userTypeFilter, setUserTypeFilter] = useState<string>('all');
@@ -60,7 +74,13 @@ const AdminMessages: React.FC = () => {
     if (!selectedChat) return;
     const channel = supabase.channel(`admin-chat-${selectedChat.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${selectedChat.id}` },
-        (payload) => setMessages((prev) => [...prev, payload.new as Message]))
+        (payload) => {
+          const newMsg = payload.new as any;
+          setMessages((prev) => [...prev, {
+            ...newMsg,
+            attachments: Array.isArray(newMsg.attachments) ? newMsg.attachments : [],
+          }]);
+        })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [selectedChat]);
@@ -90,9 +110,18 @@ const AdminMessages: React.FC = () => {
   const selectChat = async (chat: Chat) => {
     setSelectedChat(chat);
     setLinkedRequest(null);
+    setAttachments([]);
     
     const { data } = await supabase.from('chat_messages').select('*').eq('chat_id', chat.id).order('created_at', { ascending: true });
-    setMessages(data || []);
+    // Map data to proper Message type with attachments
+    const mappedMessages: Message[] = (data || []).map((msg: any) => ({
+      id: msg.id,
+      message: msg.message,
+      sender_type: msg.sender_type,
+      created_at: msg.created_at,
+      attachments: Array.isArray(msg.attachments) ? msg.attachments : [],
+    }));
+    setMessages(mappedMessages);
 
     // Fetch linked request if exists
     if (chat.request_id) {
@@ -116,11 +145,25 @@ const AdminMessages: React.FC = () => {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedChat) return;
+    if ((!newMessage.trim() && attachments.length === 0) || !selectedChat) return;
     setSending(true);
-    await supabase.from('chat_messages').insert({ chat_id: selectedChat.id, message: newMessage.trim(), sender_type: 'admin' });
+    sendStopTyping();
+    
+    await supabase.from('chat_messages').insert({ 
+      chat_id: selectedChat.id, 
+      message: newMessage.trim() || ' ', 
+      sender_type: 'admin' as const,
+      attachments: attachments.length > 0 ? JSON.parse(JSON.stringify(attachments)) : [],
+    });
+    
     setNewMessage('');
+    setAttachments([]);
     setSending(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    sendTyping();
   };
 
   const handleDeleteMessage = async (messageId: string) => {
@@ -350,7 +393,13 @@ const AdminMessages: React.FC = () => {
                             ? "bg-primary text-primary-foreground rounded-br-sm" 
                             : "bg-muted rounded-bl-sm"
                         )}>
-                          <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                          {msg.message.trim() && (
+                            <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                          )}
+                          <MessageAttachments 
+                            attachments={msg.attachments || []} 
+                            isOwnMessage={msg.sender_type === 'admin'} 
+                          />
                           <p className={cn(
                             "text-xs mt-1", 
                             msg.sender_type === 'admin' ? "text-primary-foreground/70" : "text-muted-foreground"
@@ -391,22 +440,45 @@ const AdminMessages: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  <TypingIndicator isTyping={isOtherTyping} />
                   <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
-                <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
-                  <Input 
-                    placeholder="Написать ответ..." 
-                    value={newMessage} 
-                    onChange={(e) => setNewMessage(e.target.value)} 
-                    disabled={sending} 
-                    className="flex-1" 
-                  />
-                  <Button type="submit" disabled={!newMessage.trim() || sending}>
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
+                <div className="p-4 border-t space-y-2">
+                  {attachments.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {attachments.map((att, index) => (
+                        <div key={index} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-1.5 text-sm flex-shrink-0">
+                          <span className="max-w-[100px] truncate">{att.name}</span>
+                          <button type="button" onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))} className="p-0.5 hover:bg-destructive/20 rounded">
+                            <Trash2 className="w-3 h-3 text-destructive" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <form onSubmit={sendMessage} className="flex gap-2">
+                    {user && (
+                      <ChatAttachments
+                        attachments={attachments}
+                        setAttachments={setAttachments}
+                        userId={user.id}
+                        disabled={sending}
+                      />
+                    )}
+                    <Input 
+                      placeholder="Написать ответ..." 
+                      value={newMessage} 
+                      onChange={handleInputChange} 
+                      disabled={sending} 
+                      className="flex-1" 
+                    />
+                    <Button type="submit" disabled={(!newMessage.trim() && attachments.length === 0) || sending}>
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </form>
+                </div>
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">

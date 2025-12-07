@@ -7,16 +7,21 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, CheckCircle, FileText, MapPin, Calendar, Briefcase } from 'lucide-react';
+import { Send, CheckCircle, FileText, MapPin, Calendar, Briefcase, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import TypingIndicator from '@/components/chat/TypingIndicator';
+import ChatAttachments, { Attachment } from '@/components/chat/ChatAttachments';
+import MessageAttachments from '@/components/chat/MessageAttachments';
+import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 
 interface Message {
   id: string;
   message: string;
   sender_type: 'user' | 'admin';
   created_at: string;
+  attachments?: Attachment[];
 }
 
 interface LinkedRequest {
@@ -38,7 +43,14 @@ const WorkerSupport: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [linkedRequest, setLinkedRequest] = useState<LinkedRequest | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { isOtherTyping, sendTyping, sendStopTyping } = useTypingIndicator({
+    chatId,
+    userId: user?.id || null,
+    userType: 'user',
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -68,8 +80,14 @@ const WorkerSupport: React.FC = () => {
           filter: `chat_id=eq.${chatId}`,
         },
         (payload) => {
-          const newMsg = payload.new as Message;
-          setMessages((prev) => [...prev, newMsg]);
+          const newMsg = payload.new as any;
+          setMessages((prev) => [...prev, {
+            id: newMsg.id,
+            message: newMsg.message,
+            sender_type: newMsg.sender_type,
+            created_at: newMsg.created_at,
+            attachments: Array.isArray(newMsg.attachments) ? newMsg.attachments : [],
+          }]);
         }
       )
       .subscribe();
@@ -157,7 +175,14 @@ const WorkerSupport: React.FC = () => {
         .eq('chat_id', existingChat.id)
         .order('created_at', { ascending: true });
 
-      setMessages(chatMessages || []);
+      const mappedMessages: Message[] = (chatMessages || []).map((msg: any) => ({
+        id: msg.id,
+        message: msg.message,
+        sender_type: msg.sender_type,
+        created_at: msg.created_at,
+        attachments: Array.isArray(msg.attachments) ? msg.attachments : [],
+      }));
+      setMessages(mappedMessages);
     } catch (error) {
       console.error('Error initializing chat:', error);
     } finally {
@@ -167,23 +192,31 @@ const WorkerSupport: React.FC = () => {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !chatId) return;
+    if ((!newMessage.trim() && attachments.length === 0) || !chatId) return;
 
     setSending(true);
+    sendStopTyping();
     try {
       const { error } = await supabase.from('chat_messages').insert({
         chat_id: chatId,
-        message: newMessage.trim(),
-        sender_type: 'user',
+        message: newMessage.trim() || ' ',
+        sender_type: 'user' as const,
+        attachments: attachments.length > 0 ? JSON.parse(JSON.stringify(attachments)) : [],
       });
 
       if (error) throw error;
       setNewMessage('');
+      setAttachments([]);
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
       setSending(false);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    sendTyping();
   };
 
   const getStatusBadge = (status: string) => {
@@ -264,7 +297,13 @@ const WorkerSupport: React.FC = () => {
                           : "bg-muted rounded-bl-sm mr-auto"
                       )}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                      {msg.message.trim() && (
+                        <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                      )}
+                      <MessageAttachments 
+                        attachments={msg.attachments || []} 
+                        isOwnMessage={msg.sender_type === 'user'} 
+                      />
                       <p className={cn(
                         "text-xs mt-1",
                         msg.sender_type === 'user' ? "text-primary-foreground/70" : "text-muted-foreground"
@@ -284,21 +323,44 @@ const WorkerSupport: React.FC = () => {
                   </p>
                 </div>
               )}
+              <TypingIndicator isTyping={isOtherTyping} />
               <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
-              <Input
-                placeholder="Написать сообщение..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                disabled={sending}
-                className="flex-1"
-              />
-              <Button type="submit" disabled={!newMessage.trim() || sending}>
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
+            <div className="p-4 border-t space-y-2">
+              {attachments.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {attachments.map((att, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-1.5 text-sm flex-shrink-0">
+                      <span className="max-w-[100px] truncate">{att.name}</span>
+                      <button type="button" onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))} className="p-0.5 hover:bg-destructive/20 rounded">
+                        <Trash2 className="w-3 h-3 text-destructive" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <form onSubmit={sendMessage} className="flex gap-2">
+                {user && (
+                  <ChatAttachments
+                    attachments={attachments}
+                    setAttachments={setAttachments}
+                    userId={user.id}
+                    disabled={sending}
+                  />
+                )}
+                <Input
+                  placeholder="Написать сообщение..."
+                  value={newMessage}
+                  onChange={handleInputChange}
+                  disabled={sending}
+                  className="flex-1"
+                />
+                <Button type="submit" disabled={(!newMessage.trim() && attachments.length === 0) || sending}>
+                  <Send className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
           </CardContent>
         </Card>
       </div>

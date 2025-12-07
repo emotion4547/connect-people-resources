@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       chat_messages: {
         Row: {
+          attachments: Json | null
           chat_id: string
           created_at: string
           id: string
@@ -24,6 +25,7 @@ export type Database = {
           sender_type: Database["public"]["Enums"]["sender_type"]
         }
         Insert: {
+          attachments?: Json | null
           chat_id: string
           created_at?: string
           id?: string
@@ -32,6 +34,7 @@ export type Database = {
           sender_type: Database["public"]["Enums"]["sender_type"]
         }
         Update: {
+          attachments?: Json | null
           chat_id?: string
           created_at?: string
           id?: string
