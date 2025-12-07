@@ -15,13 +15,13 @@ const Index = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-white" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">ЛЮДИ И РЕСУРСЫ</span>
+            <span className="text-base sm:text-xl font-bold text-foreground truncate">ЛЮДИ И РЕСУРСЫ</span>
           </div>
           <Link to="/login">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white flex-shrink-0">
               Войти
             </Button>
           </Link>
@@ -34,30 +34,30 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Block */}
             <div className="text-center lg:text-left relative z-10">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
                 Аутстаффинг персонала{" "}
                 <span className="text-primary">в один клик</span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0">
                 Онлайн‑сервис «ЛЮДИ И РЕСУРСЫ», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-6">
-                <Link to="/login?role=hr">
-                  <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Rocket className="w-5 h-5 mr-2" />
-                    Найти людей для сети (для HR)
+              <div className="flex flex-col gap-3 sm:gap-4 justify-center lg:justify-start mb-6">
+                <Link to="/login?role=hr" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Rocket className="w-5 h-5 mr-2 flex-shrink-0" />
+                    <span className="truncate">Найти людей для сети (для HR)</span>
                   </Button>
                 </Link>
-                <Link to="/login?role=worker">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-secondary bg-white text-secondary hover:bg-secondary hover:text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <HardHat className="w-5 h-5 mr-2" />
-                    Найти смену (для исполнителей)
+                <Link to="/login?role=worker" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full border-2 border-secondary bg-white text-secondary hover:bg-secondary hover:text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <HardHat className="w-5 h-5 mr-2 flex-shrink-0" />
+                    <span className="truncate">Найти смену (для исполнителей)</span>
                   </Button>
                 </Link>
               </div>
               
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Без звонков по базе и бесконечных переписок — всё в одном личном кабинете.
               </p>
             </div>
@@ -108,10 +108,10 @@ const Index = () => {
             <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-primary" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground">Для HR федеральных сетей</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Для HR федеральных сетей</h3>
                 </div>
                 
                 <div className="space-y-5">
@@ -139,10 +139,10 @@ const Index = () => {
             <Card className="bg-card border-border hover:border-secondary/50 transition-all duration-300 hover:shadow-xl">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
-                    <HardHat className="w-6 h-6 text-secondary" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <HardHat className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground">Для исполнителей</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Для исполнителей</h3>
                 </div>
                 
                 <div className="space-y-5">
@@ -167,14 +167,14 @@ const Index = () => {
             </Card>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/login?role=hr">
-              <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
+            <Link to="/login?role=hr" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
                 Перейти в кабинет HR
               </Button>
             </Link>
-            <Link to="/login?role=worker">
-              <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary hover:text-white">
+            <Link to="/login?role=worker" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-white">
                 Перейти в кабинет исполнителя
               </Button>
             </Link>
@@ -271,15 +271,15 @@ const Index = () => {
           </h2>
           
           {/* Stats */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 mb-16">
             {[
               { value: "до 70%", label: "заявок закрываются в срок" },
               { value: "1000+", label: "исполнителей в базе по всей России" },
               { value: "~2 мин", label: "на создание заявки" }
             ].map((stat, index) => (
-              <div key={index} className="text-center p-8 bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
-                <p className="text-muted-foreground">{stat.label}</p>
+              <div key={index} className="text-center p-6 sm:p-8 bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
+                <p className="text-sm sm:text-base text-muted-foreground">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -395,30 +395,30 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-foreground">
+      <footer className="py-8 sm:py-12 px-4 bg-foreground">
         <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">ЛЮДИ И РЕСУРСЫ</span>
+              <span className="text-lg sm:text-xl font-bold text-white">ЛЮДИ И РЕСУРСЫ</span>
             </div>
-            <div className="flex items-center gap-6 text-white/60 text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm">
               <div className="flex items-center gap-2">
-                <Warehouse className="w-4 h-4" />
+                <Warehouse className="w-4 h-4 flex-shrink-0" />
                 <span>Склады</span>
               </div>
               <div className="flex items-center gap-2">
-                <Store className="w-4 h-4" />
+                <Store className="w-4 h-4 flex-shrink-0" />
                 <span>Магазины</span>
               </div>
               <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4" />
+                <Building2 className="w-4 h-4 flex-shrink-0" />
                 <span>Сортировочные центры</span>
               </div>
             </div>
-            <p className="text-white/60 text-sm">
+            <p className="text-white/60 text-xs sm:text-sm">
               © 2025 ЛЮДИ И РЕСУРСЫ. Все права защищены.
             </p>
           </div>

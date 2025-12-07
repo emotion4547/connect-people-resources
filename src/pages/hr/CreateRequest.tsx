@@ -388,8 +388,8 @@ const CreateRequest: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button type="submit" className="btn-hover gap-2 flex-1" disabled={loading}>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Button type="submit" className="btn-hover gap-2 flex-1 order-1 sm:order-none" disabled={loading}>
                     {loading ? (
                       <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                     ) : (
@@ -401,7 +401,7 @@ const CreateRequest: React.FC = () => {
                     type="button"
                     variant="outline"
                     onClick={() => navigate('/hr/requests')}
-                    className="gap-2"
+                    className="gap-2 order-2 sm:order-none"
                   >
                     <X className="w-4 h-4" />
                     Отмена

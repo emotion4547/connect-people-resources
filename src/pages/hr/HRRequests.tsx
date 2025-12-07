@@ -227,9 +227,9 @@ const HRRequests: React.FC = () => {
     <DashboardLayout role="hr">
       <div className="space-y-6 animate-slide-up">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-3xl font-bold">Мои заявки</h1>
-          <Link to="/hr/create-request">
-            <Button className="btn-hover gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">Мои заявки</h1>
+          <Link to="/hr/create-request" className="w-full sm:w-auto">
+            <Button className="btn-hover gap-2 w-full sm:w-auto">
               <PlusCircle className="w-4 h-4" />
               Создать заявку
             </Button>
@@ -238,29 +238,33 @@ const HRRequests: React.FC = () => {
 
         {/* Filters */}
         <Card className="p-4">
-          <div className="flex flex-wrap gap-4 items-end">
-            <div className="flex flex-wrap gap-2">
-              {statusFilters.map((filter) => (
-                <Button
-                  key={filter.id}
-                  variant={activeFilter === filter.id ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setActiveFilter(filter.id)}
-                  className="rounded-full"
-                >
-                  {filter.label}
-                </Button>
-              ))}
+          <div className="space-y-4">
+            {/* Status filters - scrollable on mobile */}
+            <div className="overflow-x-auto pb-2 -mx-4 px-4">
+              <div className="flex gap-2 min-w-max">
+                {statusFilters.map((filter) => (
+                  <Button
+                    key={filter.id}
+                    variant={activeFilter === filter.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setActiveFilter(filter.id)}
+                    className="rounded-full text-xs sm:text-sm whitespace-nowrap"
+                  >
+                    {filter.label}
+                  </Button>
+                ))}
+              </div>
             </div>
             
-            <div className="flex gap-2 items-center">
+            {/* Date and pay filters - stack on mobile */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-end">
               <div>
                 <Label className="text-xs">Дата от</Label>
                 <Input
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-36 h-8"
+                  className="h-9 text-sm"
                 />
               </div>
               <div>
@@ -269,7 +273,7 @@ const HRRequests: React.FC = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="w-36 h-8"
+                  className="h-9 text-sm"
                 />
               </div>
               <div>
@@ -278,17 +282,16 @@ const HRRequests: React.FC = () => {
                   placeholder="Поиск..."
                   value={payFilter}
                   onChange={(e) => setPayFilter(e.target.value)}
-                  className="w-28 h-8"
+                  className="h-9 text-sm"
                 />
               </div>
+              {hasFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 h-9">
+                  <X className="w-3 h-3" />
+                  Сбросить
+                </Button>
+              )}
             </div>
-            
-            {hasFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
-                <X className="w-3 h-3" />
-                Сбросить
-              </Button>
-            )}
           </div>
         </Card>
 

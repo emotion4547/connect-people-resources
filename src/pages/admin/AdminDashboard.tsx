@@ -102,8 +102,8 @@ const AdminDashboard: React.FC = () => {
     <DashboardLayout role="admin">
       <div className="space-y-6 animate-slide-up">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Панель администратора</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Панель администратора</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Обзор текущей активности системы
           </p>
         </div>
@@ -149,21 +149,21 @@ const AdminDashboard: React.FC = () => {
                     className="flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <span className="font-medium truncate">{request.position}</span>
                         {getUrgencyBadge(request.daysUntil)}
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
+                          <Calendar className="w-3 h-3 flex-shrink-0" />
                           {format(new Date(request.start_date), 'd MMMM', { locale: ru })}
                         </span>
-                        <span className="flex items-center gap-1 truncate">
-                          <MapPin className="w-3 h-3" />
-                          {request.address}
+                        <span className="flex items-center gap-1 truncate max-w-[120px] sm:max-w-none">
+                          <MapPin className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{request.address}</span>
                         </span>
                         <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
+                          <Users className="w-3 h-3 flex-shrink-0" />
                           {request.quantity} чел.
                         </span>
                       </div>
@@ -189,21 +189,21 @@ const AdminDashboard: React.FC = () => {
             <CardTitle>Быстрые действия</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Link to="/admin/requests" className="p-4 bg-muted rounded-xl hover:bg-muted/80 transition-colors">
-                <FileText className="w-8 h-8 text-primary mb-2" />
-                <p className="font-medium">Обработать заявки</p>
-                <p className="text-sm text-muted-foreground">Новые заявки ждут обработки</p>
+                <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-primary mb-2" />
+                <p className="font-medium text-sm sm:text-base">Обработать заявки</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Новые заявки ждут обработки</p>
               </Link>
               <Link to="/admin/messages" className="p-4 bg-muted rounded-xl hover:bg-muted/80 transition-colors">
-                <Mail className="w-8 h-8 text-secondary mb-2" />
-                <p className="font-medium">Ответить на сообщения</p>
-                <p className="text-sm text-muted-foreground">Есть непрочитанные обращения</p>
+                <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-secondary mb-2" />
+                <p className="font-medium text-sm sm:text-base">Ответить на сообщения</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Есть непрочитанные обращения</p>
               </Link>
               <Link to="/admin/settings" className="p-4 bg-muted rounded-xl hover:bg-muted/80 transition-colors">
-                <Users className="w-8 h-8 text-status-success mb-2" />
-                <p className="font-medium">Настроить webhook</p>
-                <p className="text-sm text-muted-foreground">Автопубликация в соцсети</p>
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-status-success mb-2" />
+                <p className="font-medium text-sm sm:text-base">Настроить webhook</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Автопубликация в соцсети</p>
               </Link>
             </div>
           </CardContent>

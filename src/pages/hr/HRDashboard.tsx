@@ -72,10 +72,10 @@ const HRDashboard: React.FC = () => {
       <div className="space-y-6">
         {/* Welcome */}
         <div className="animate-slide-up">
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">
             Добро пожаловать, {profile?.company || profile?.full_name || 'Пользователь'}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Управляйте заявками на персонал в одном месте
           </p>
         </div>
