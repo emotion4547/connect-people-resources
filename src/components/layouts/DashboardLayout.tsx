@@ -2,8 +2,10 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   Home,
   FileText,
@@ -25,6 +27,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+  showUnread?: boolean;
 }
 
 interface DashboardLayoutProps {
@@ -37,14 +40,14 @@ const hrNavItems: NavItem[] = [
   { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
   { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
   { label: 'Шаблоны', href: '/hr/templates', icon: <Copy className="w-5 h-5" /> },
-  { label: 'Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" />, showUnread: true },
 ];
 
 const workerNavItems: NavItem[] = [
   { label: 'Моя анкета', href: '/worker/profile', icon: <User className="w-5 h-5" /> },
   { label: 'Доступные смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
   { label: 'Мои отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
-  { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" />, showUnread: true },
 ];
 
 const adminNavItems: NavItem[] = [
@@ -53,7 +56,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Исполнители', href: '/admin/workers', icon: <Users className="w-5 h-5" /> },
   { label: 'Пользователи', href: '/admin/users', icon: <User className="w-5 h-5" /> },
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
-  { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
+  { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" />, showUnread: true },
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
@@ -61,6 +64,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, signOut, role: userRole } = useAuth();
+  const { unreadCount } = useUnreadMessages();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems = role === 'hr' ? hrNavItems : role === 'worker' ? workerNavItems : adminNavItems;
@@ -118,14 +122,22 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
               to={item.href}
               onClick={() => setMobileMenuOpen(false)}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative",
                 location.pathname === item.href
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "hover:bg-sidebar-accent/50 text-sidebar-foreground/80"
               )}
             >
               <span className="text-secondary">{item.icon}</span>
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium flex-1">{item.label}</span>
+              {item.showUnread && unreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="min-w-[20px] h-5 flex items-center justify-center text-xs font-bold animate-pulse"
+                >
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Badge>
+              )}
             </Link>
           ))}
         </nav>
