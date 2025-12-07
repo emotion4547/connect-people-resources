@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, CheckCircle, FileText } from 'lucide-react';
+import { Send, CheckCircle, FileText, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -38,6 +39,7 @@ const HRSupport: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [requestInfo, setRequestInfo] = useState<RequestInfo | null>(null);
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -164,6 +166,24 @@ const HRSupport: React.FC = () => {
     }
   };
 
+  const handleDeleteMessage = async (messageId: string) => {
+    setDeletingMessageId(messageId);
+    try {
+      const { error } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (error) throw error;
+      
+      setMessages(messages.filter(m => m.id !== messageId));
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    } finally {
+      setDeletingMessageId(null);
+    }
+  };
+
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
       new: 'Новая',
@@ -220,26 +240,57 @@ const HRSupport: React.FC = () => {
                   <div
                     key={msg.id}
                     className={cn(
-                      "flex animate-slide-in-right",
+                      "flex animate-slide-in-right group",
                       msg.sender_type === 'user' ? "justify-end" : "justify-start"
                     )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <div
-                      className={cn(
-                        "max-w-[80%] rounded-2xl px-4 py-2",
-                        msg.sender_type === 'user'
-                          ? "bg-primary text-primary-foreground rounded-br-sm"
-                          : "bg-muted rounded-bl-sm"
+                    <div className="relative">
+                      <div
+                        className={cn(
+                          "max-w-[80%] rounded-2xl px-4 py-2",
+                          msg.sender_type === 'user'
+                            ? "bg-primary text-primary-foreground rounded-br-sm"
+                            : "bg-muted rounded-bl-sm"
+                        )}
+                      >
+                        <p className="text-sm">{msg.message}</p>
+                        <p className={cn(
+                          "text-xs mt-1",
+                          msg.sender_type === 'user' ? "text-primary-foreground/70" : "text-muted-foreground"
+                        )}>
+                          {format(new Date(msg.created_at), 'HH:mm')}
+                        </p>
+                      </div>
+                      {msg.sender_type === 'user' && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded"
+                              disabled={deletingMessageId === msg.id}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Удалить сообщение?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Это действие нельзя отменить.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Отмена</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteMessage(msg.id)}
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Удалить
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       )}
-                    >
-                      <p className="text-sm">{msg.message}</p>
-                      <p className={cn(
-                        "text-xs mt-1",
-                        msg.sender_type === 'user' ? "text-primary-foreground/70" : "text-muted-foreground"
-                      )}>
-                        {format(new Date(msg.created_at), 'HH:mm')}
-                      </p>
                     </div>
                   </div>
                 ))

@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar } from 'lucide-react';
+import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -54,6 +55,7 @@ const AdminRequests: React.FC = () => {
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [selectedWorkerToAssign, setSelectedWorkerToAssign] = useState<string>('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -255,6 +257,32 @@ const AdminRequests: React.FC = () => {
     }
   };
 
+  const handleDeleteRequest = async (requestId: string) => {
+    setDeletingId(requestId);
+    try {
+      // First delete related responses
+      await supabase.from('responses').delete().eq('request_id', requestId);
+      
+      // Then delete the request
+      const { error } = await supabase.from('requests').delete().eq('id', requestId);
+
+      if (error) throw error;
+
+      setRequests(requests.filter(r => r.id !== requestId));
+      
+      if (selectedRequest?.id === requestId) {
+        setSelectedRequest(null);
+      }
+
+      toast({ title: 'Заявка удалена' });
+    } catch (error) {
+      console.error('Error deleting request:', error);
+      toast({ title: 'Ошибка удаления', variant: 'destructive' });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
       new: { label: 'Новая', className: 'bg-status-orange/20 text-status-orange' },
@@ -364,9 +392,40 @@ const AdminRequests: React.FC = () => {
                         <td className="py-4 px-4 text-sm">{format(new Date(request.start_date), 'd MMM', { locale: ru })}</td>
                         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
                         <td className="py-4 px-4">
-                          <Button variant="ghost" size="sm" onClick={() => handleViewDetails(request)}>
-                            <Eye className="w-4 h-4 mr-1" /> Детали
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => handleViewDetails(request)}>
+                              <Eye className="w-4 h-4 mr-1" /> Детали
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  disabled={deletingId === request.id}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Удалить заявку?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Это действие нельзя отменить. Заявка и все связанные отклики будут удалены.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Отмена</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteRequest(request.id)}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Удалить
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </td>
                       </tr>
                     ))}
