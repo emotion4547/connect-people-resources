@@ -228,7 +228,7 @@ const WorkerVacancies: React.FC = () => {
                 className={`card-hover animate-float-up stagger-${(index % 5) + 1} border-secondary/20`}
                 style={{ opacity: 0 }}
               >
-                <CardContent className="pt-6">
+                <CardContent className="pt-6 h-full flex flex-col">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -274,14 +274,16 @@ const WorkerVacancies: React.FC = () => {
                   </div>
 
                   {/* Requirements */}
-                  {vacancy.requirements && (
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {vacancy.requirements}
-                    </p>
-                  )}
+                  <div className="flex-1">
+                    {vacancy.requirements && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {vacancy.requirements}
+                      </p>
+                    )}
+                  </div>
 
                   {/* Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-4">
                     <Button
                       className="flex-1 btn-hover"
                       disabled={appliedIds.has(vacancy.id) || applyingId === vacancy.id}
