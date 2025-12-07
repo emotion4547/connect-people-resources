@@ -245,16 +245,19 @@ const HRSupport: React.FC = () => {
                     )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <div className="relative">
+                    <div className={cn(
+                      "relative max-w-[80%]",
+                      msg.sender_type === 'user' ? "ml-auto" : "mr-auto"
+                    )}>
                       <div
                         className={cn(
-                          "max-w-[80%] rounded-2xl px-4 py-2",
+                          "rounded-2xl px-4 py-2 break-words",
                           msg.sender_type === 'user'
                             ? "bg-primary text-primary-foreground rounded-br-sm"
                             : "bg-muted rounded-bl-sm"
                         )}
                       >
-                        <p className="text-sm">{msg.message}</p>
+                        <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
                         <p className={cn(
                           "text-xs mt-1",
                           msg.sender_type === 'user' ? "text-primary-foreground/70" : "text-muted-foreground"
