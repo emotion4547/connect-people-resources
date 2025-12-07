@@ -163,8 +163,8 @@ const WorkerVacancies: React.FC = () => {
         {/* Filters */}
         <Card>
           <CardContent className="p-4">
-            <div className="flex flex-wrap gap-4 items-end">
-              <div className="flex-1 min-w-[200px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="sm:col-span-2 lg:col-span-1">
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Поиск</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -176,7 +176,7 @@ const WorkerVacancies: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="w-[180px]">
+              <div>
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Должность</label>
                 <Select value={positionFilter} onValueChange={setPositionFilter}>
                   <SelectTrigger>
@@ -190,7 +190,7 @@ const WorkerVacancies: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="w-[180px]">
+              <div>
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Дата</label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -203,10 +203,12 @@ const WorkerVacancies: React.FC = () => {
                 </div>
               </div>
               {hasActiveFilters && (
-                <Button variant="outline" onClick={resetFilters} className="gap-2">
-                  <RotateCcw className="w-4 h-4" />
-                  Сбросить
-                </Button>
+                <div className="flex items-end">
+                  <Button variant="outline" onClick={resetFilters} className="w-full gap-2">
+                    <RotateCcw className="w-4 h-4" />
+                    Сбросить
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>

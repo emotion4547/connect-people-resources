@@ -101,7 +101,7 @@ const WorkerProfile: React.FC = () => {
       <div className="max-w-2xl mx-auto animate-slide-up">
         <Card className="shadow-card">
           <CardHeader>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
               {user && (
                 <AvatarUpload
                   userId={user.id}
@@ -112,7 +112,7 @@ const WorkerProfile: React.FC = () => {
                 />
               )}
               <div>
-                <CardTitle className="text-2xl">Моя анкета</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">Моя анкета</CardTitle>
                 <CardDescription>
                   Заполните профиль для получения предложений о работе
                 </CardDescription>
