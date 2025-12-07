@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { X, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Base64 encoded notification sound
+const NOTIFICATION_SOUND = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNGbTmAAAAAAD/+9DEAAAGAAGn9AAAIgAANP8AAARMQAAAAAAANIAAAAATDEEFQ5AgDA4IAEHC4IBg+D5d0IAgCH2e7u8IAgCAIffy4Pv//y4IB99/EBd3Lv//BAHwQBB3d3d3d3d3d3d3d3d3d3d3d3d3dAAAAAAAAEYJhkIIIYYZBgIIIYA=';
 
 interface NotificationData {
   id: string;
@@ -20,6 +23,20 @@ const MessageNotifications: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio
+  useEffect(() => {
+    audioRef.current = new Audio(NOTIFICATION_SOUND);
+    audioRef.current.volume = 0.6;
+  }, []);
+
+  const playSound = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     if (!user || !role) return;
@@ -80,6 +97,7 @@ const MessageNotifications: React.FC = () => {
               timestamp: new Date(newMessage.created_at),
             };
 
+            playSound();
             setNotifications(prev => [...prev, notification]);
           } else {
             // HR or Worker - show admin messages
@@ -108,6 +126,7 @@ const MessageNotifications: React.FC = () => {
               timestamp: new Date(newMessage.created_at),
             };
 
+            playSound();
             setNotifications(prev => [...prev, notification]);
           }
         }
