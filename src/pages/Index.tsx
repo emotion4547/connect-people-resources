@@ -7,6 +7,9 @@ import {
   UserCheck, History, BarChart3, MessageSquare, Eye,
   Building2, Warehouse, Store, Quote
 } from "lucide-react";
+import screenshotHR from "@/assets/screenshot-hr-dashboard.png";
+import screenshotWorker from "@/assets/screenshot-worker-dashboard.png";
+import screenshotAdmin from "@/assets/screenshot-admin-panel.png";
 
 const Index = () => {
   return (
@@ -315,29 +318,39 @@ const Index = () => {
                 title: "Кабинет HR", 
                 desc: "Доска заявок с фильтрами, статусами и быстрым созданием новых запросов.",
                 icon: Building2,
-                color: "primary"
+                color: "primary",
+                screenshot: screenshotHR
               },
               { 
                 title: "Кабинет исполнителя", 
                 desc: "Список смен с понятной ставкой и возможностью откликнуться в один клик.",
                 icon: HardHat,
-                color: "secondary"
+                color: "secondary",
+                screenshot: screenshotWorker
               },
               { 
                 title: "Панель администратора", 
                 desc: "Подбор исполнителей, контроль выходов и поддержка пользователей.",
                 icon: Shield,
-                color: "primary"
+                color: "primary",
+                screenshot: screenshotAdmin
               }
             ].map((cabinet, index) => (
               <Card key={index} className="bg-card border-border hover:shadow-xl transition-all duration-300 overflow-hidden group">
                 <CardContent className="p-0">
-                  {/* Preview placeholder */}
-                  <div className={`h-32 sm:h-40 md:h-48 bg-gradient-to-br ${cabinet.color === 'primary' ? 'from-primary/10 to-primary/5' : 'from-secondary/10 to-secondary/5'} flex items-center justify-center`}>
-                    <cabinet.icon className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${cabinet.color === 'primary' ? 'text-primary/30' : 'text-secondary/30'} group-hover:scale-110 transition-transform duration-300`} />
+                  {/* Screenshot preview */}
+                  <div className="h-32 sm:h-40 md:h-48 overflow-hidden">
+                    <img 
+                      src={cabinet.screenshot} 
+                      alt={cabinet.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
                   <div className="p-4 sm:p-5 md:p-6">
-                    <h3 className="text-base sm:text-lg md:text-xl font-semibold text-foreground mb-1 sm:mb-2">{cabinet.title}</h3>
+                    <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                      <cabinet.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${cabinet.color === 'primary' ? 'text-primary' : 'text-secondary'}`} />
+                      <h3 className="text-base sm:text-lg md:text-xl font-semibold text-foreground">{cabinet.title}</h3>
+                    </div>
                     <p className="text-xs sm:text-sm text-muted-foreground">{cabinet.desc}</p>
                   </div>
                 </CardContent>
