@@ -175,10 +175,10 @@ const Login: React.FC = () => {
         <Card className="shadow-card border-secondary/20">
           <CardHeader className="text-center pb-4">
             <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-foreground font-bold text-xl">ЛР</span>
+              <span className="text-primary-foreground font-bold text-xl">РВ</span>
             </div>
             <CardTitle className="text-2xl">
-              {isSignUp ? 'Регистрация' : 'Вход'} в "ЛЮДИ И РЕСУРСЫ"
+              {isSignUp ? 'Регистрация' : 'Вход'} в «Работа для Всех»
             </CardTitle>
             <CardDescription>
               {isSignUp ? 'Создайте аккаунт для начала работы' : 'Войдите в свой аккаунт'}

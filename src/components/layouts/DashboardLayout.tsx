@@ -108,9 +108,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
         <div className="p-6 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-              <span className="text-secondary-foreground font-bold text-lg">ЛР</span>
+              <span className="text-secondary-foreground font-bold text-lg">РВ</span>
             </div>
-            <span className="font-bold text-lg">ЛЮДИ И РЕСУРСЫ</span>
+            <span className="font-bold text-lg">Работа для Всех</span>
           </Link>
         </div>
 
