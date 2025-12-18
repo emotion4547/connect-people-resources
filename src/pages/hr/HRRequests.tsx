@@ -12,10 +12,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User } from 'lucide-react';
+import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
+import { WorkerRating } from '@/components/WorkerRating';
 
 interface Request {
   id: string;
@@ -65,6 +66,11 @@ const HRRequests: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [assignedWorkers, setAssignedWorkers] = useState<Response[]>([]);
+  
+  // Rating state
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [workersToRate, setWorkersToRate] = useState<Response[]>([]);
+  const [currentRatingIndex, setCurrentRatingIndex] = useState(0);
   
   // Additional filters
   const [dateFrom, setDateFrom] = useState('');
@@ -124,12 +130,20 @@ const HRRequests: React.FC = () => {
   const handleConfirmCompletion = async (requestId: string) => {
     setConfirmingId(requestId);
     try {
+      // First, update the request status
       const { error } = await supabase
         .from('requests')
         .update({ status: 'completed' as any })
         .eq('id', requestId);
 
       if (error) throw error;
+
+      // Update responses status to completed
+      await supabase
+        .from('responses')
+        .update({ status: 'completed' as any })
+        .eq('request_id', requestId)
+        .eq('status', 'assigned');
 
       setRequests(requests.map(r =>
         r.id === requestId ? { ...r, status: 'completed' } : r
@@ -143,6 +157,30 @@ const HRRequests: React.FC = () => {
         title: 'Заявка подтверждена',
         description: 'Заявка отмечена как выполненная',
       });
+
+      // Get assigned workers for rating
+      const { data: assignedForRating } = await supabase
+        .from('responses')
+        .select('id, worker_id, status')
+        .eq('request_id', requestId)
+        .eq('status', 'completed');
+
+      if (assignedForRating && assignedForRating.length > 0) {
+        const workerIds = assignedForRating.map(r => r.worker_id);
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, phone, city, experience, rating')
+          .in('user_id', workerIds);
+
+        const workersWithProfiles = assignedForRating.map(resp => ({
+          ...resp,
+          worker_profile: profiles?.find(p => p.user_id === resp.worker_id)
+        }));
+
+        setWorkersToRate(workersWithProfiles);
+        setCurrentRatingIndex(0);
+        setShowRatingDialog(true);
+      }
     } catch (error) {
       console.error('Error confirming request:', error);
       toast({
@@ -152,6 +190,60 @@ const HRRequests: React.FC = () => {
       });
     } finally {
       setConfirmingId(null);
+    }
+  };
+
+  const handleRateWorker = async (rating: number, comment: string) => {
+    const worker = workersToRate[currentRatingIndex];
+    if (!worker) return;
+
+    try {
+      // Get current profile to calculate new average rating
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('rating')
+        .eq('user_id', worker.worker_id)
+        .maybeSingle();
+
+      // Calculate new rating (simple average for now, can be improved)
+      const currentRating = profile?.rating || 0;
+      const newRating = currentRating === 0 ? rating : (currentRating + rating) / 2;
+
+      await supabase
+        .from('profiles')
+        .update({ rating: Math.round(newRating * 10) / 10 })
+        .eq('user_id', worker.worker_id);
+
+      toast({
+        title: 'Оценка сохранена',
+        description: `Рейтинг ${worker.worker_profile?.full_name || 'исполнителя'} обновлён`,
+      });
+
+      // Move to next worker or close dialog
+      if (currentRatingIndex < workersToRate.length - 1) {
+        setCurrentRatingIndex(currentRatingIndex + 1);
+      } else {
+        setShowRatingDialog(false);
+        setWorkersToRate([]);
+        setCurrentRatingIndex(0);
+      }
+    } catch (error) {
+      console.error('Error rating worker:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось сохранить оценку',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleSkipRating = () => {
+    if (currentRatingIndex < workersToRate.length - 1) {
+      setCurrentRatingIndex(currentRatingIndex + 1);
+    } else {
+      setShowRatingDialog(false);
+      setWorkersToRate([]);
+      setCurrentRatingIndex(0);
     }
   };
 
@@ -474,7 +566,22 @@ const HRRequests: React.FC = () => {
                               <p><span className="text-muted-foreground">Телефон:</span> {worker.worker_profile?.phone || '—'}</p>
                               <p><span className="text-muted-foreground">Город:</span> {worker.worker_profile?.city || '—'}</p>
                               <p><span className="text-muted-foreground">Опыт:</span> {worker.worker_profile?.experience || '—'}</p>
-                              <p><span className="text-muted-foreground">Рейтинг:</span> {worker.worker_profile?.rating || 0}</p>
+                              <p className="flex items-center gap-1">
+                                <span className="text-muted-foreground">Рейтинг:</span>
+                                <span className="flex items-center">
+                                  {[1, 2, 3, 4, 5].map(star => (
+                                    <Star
+                                      key={star}
+                                      className={`w-3 h-3 ${
+                                        star <= Math.round(worker.worker_profile?.rating || 0)
+                                          ? 'fill-secondary text-secondary'
+                                          : 'text-muted-foreground/30'
+                                      }`}
+                                    />
+                                  ))}
+                                  <span className="ml-1 text-xs">({(worker.worker_profile?.rating || 0).toFixed(1)})</span>
+                                </span>
+                              </p>
                             </div>
                           </div>
                         </PopoverContent>
@@ -504,6 +611,28 @@ const HRRequests: React.FC = () => {
                 </div>
               )}
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Rating Dialog */}
+      <Dialog open={showRatingDialog} onOpenChange={setShowRatingDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Оценка исполнителя</DialogTitle>
+            <DialogDescription>
+              {workersToRate.length > 1 && (
+                <span>{currentRatingIndex + 1} из {workersToRate.length}</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          {workersToRate[currentRatingIndex] && (
+            <WorkerRating
+              workerName={workersToRate[currentRatingIndex].worker_profile?.full_name || 'Исполнитель'}
+              currentRating={workersToRate[currentRatingIndex].worker_profile?.rating || 0}
+              onSubmit={handleRateWorker}
+              onSkip={handleSkipRating}
+            />
           )}
         </DialogContent>
       </Dialog>
