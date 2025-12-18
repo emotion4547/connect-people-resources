@@ -157,10 +157,14 @@ const Login: React.FC = () => {
         const { error } = await signIn(email, password);
 
         if (error) {
+          const msg = error.message || "";
           toast({
-            title: 'Ошибка входа',
-            description: 'Неверный email или пароль',
-            variant: 'destructive',
+            title: "Ошибка входа",
+            description: msg.toLowerCase().includes("email") && msg.toLowerCase().includes("confirm")
+              ? "Email не подтверждён. Проверьте почту и перейдите по ссылке из письма."
+              : msg || "Неверный email или пароль",
+            variant: "destructive",
+            duration: 10000,
           });
           return;
         }
