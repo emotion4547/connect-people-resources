@@ -449,6 +449,17 @@ const Index = () => {
                 <span>Сортировочные центры</span>
               </div>
             </div>
+            
+            {/* Legal links */}
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm">
+              <Link to="/privacy" className="hover:text-white transition-colors">
+                Политика конфиденциальности
+              </Link>
+              <Link to="/terms" className="hover:text-white transition-colors">
+                Условия использования
+              </Link>
+            </div>
+            
             <p className="text-white/60 text-xs sm:text-sm">
               © 2025 РАБОТА ДЛЯ ВСЕХ. Все права защищены.
             </p>
