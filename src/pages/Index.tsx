@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PageMeta from "@/components/PageMeta";
+import ScrollReveal from "@/components/ScrollReveal";
 import logo from "@/assets/logo.png";
 import {
   Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
@@ -103,13 +104,16 @@ const Index = () => {
       {/* How it Works - Two Columns */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Как работает «РАБОТА ДЛЯ ВСЕХ»
-          </h2>
+          <ScrollReveal animation="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+              Как работает «РАБОТА ДЛЯ ВСЕХ»
+            </h2>
+          </ScrollReveal>
           
           <div className="grid lg:grid-cols-2 gap-8 mb-12">
             {/* HR Column */}
-            <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+            <ScrollReveal animation="fade-right" delay={100}>
+              <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl h-full">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -138,9 +142,11 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ScrollReveal>
 
             {/* Workers Column */}
-            <Card className="bg-card border-border hover:border-secondary/50 transition-all duration-300 hover:shadow-xl">
+            <ScrollReveal animation="fade-left" delay={200}>
+            <Card className="bg-card border-border hover:border-secondary/50 transition-all duration-300 hover:shadow-xl h-full">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -169,6 +175,7 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ScrollReveal>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
@@ -189,9 +196,11 @@ const Index = () => {
       {/* Benefits for HR */}
       <section className="py-20 px-4 bg-primary/5">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Почему HR выбирают «РАБОТА ДЛЯ ВСЕХ»
-          </h2>
+          <ScrollReveal animation="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+              Почему HR выбирают «РАБОТА ДЛЯ ВСЕХ»
+            </h2>
+          </ScrollReveal>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[
@@ -202,18 +211,19 @@ const Index = () => {
               { icon: BarChart3, title: "История и аналитика", desc: "История заявок и базовая аналитика по точкам и датам." },
               { icon: Shield, title: "Надёжность", desc: "Проверенные исполнители с рейтингом и историей." }
             ].map((benefit, index) => (
-              <div 
-                key={index}
-                className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <benefit.icon className="w-6 h-6 text-primary" />
+              <ScrollReveal key={index} animation="zoom-in" delay={index * 100}>
+                <div 
+                  className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 h-full"
+                >
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <benefit.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">{benefit.title}</h4>
+                    <p className="text-sm text-muted-foreground">{benefit.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">{benefit.title}</h4>
-                  <p className="text-sm text-muted-foreground">{benefit.desc}</p>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
           
@@ -230,9 +240,11 @@ const Index = () => {
       {/* Benefits for Workers */}
       <section className="py-20 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Почему исполнителям удобно работать через «РАБОТА ДЛЯ ВСЕХ»
-          </h2>
+          <ScrollReveal animation="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+              Почему исполнителям удобно работать через «РАБОТА ДЛЯ ВСЕХ»
+            </h2>
+          </ScrollReveal>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[
@@ -242,18 +254,19 @@ const Index = () => {
               { icon: MapPin, title: "Удобный график", desc: "Можно выбирать удобный график и локации." },
               { icon: History, title: "История смен", desc: "Видна история уже отработанных смен." }
             ].map((benefit, index) => (
-              <div 
-                key={index}
-                className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <benefit.icon className="w-6 h-6 text-secondary" />
+              <ScrollReveal key={index} animation="zoom-in" delay={index * 100}>
+                <div 
+                  className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300 h-full"
+                >
+                  <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <benefit.icon className="w-6 h-6 text-secondary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">{benefit.title}</h4>
+                    <p className="text-sm text-muted-foreground">{benefit.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">{benefit.title}</h4>
-                  <p className="text-sm text-muted-foreground">{benefit.desc}</p>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
           
@@ -270,9 +283,11 @@ const Index = () => {
       {/* Social Proof & Numbers */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Сервис, который упрощает жизнь и HR, и исполнителям
-          </h2>
+          <ScrollReveal animation="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+              Сервис, который упрощает жизнь и HR, и исполнителям
+            </h2>
+          </ScrollReveal>
           
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 mb-16">
@@ -281,37 +296,43 @@ const Index = () => {
               { value: "1000+", label: "исполнителей в базе по всей России" },
               { value: "~2 мин", label: "на создание заявки" }
             ].map((stat, index) => (
-              <div key={index} className="text-center p-6 sm:p-8 bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300">
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
-                <p className="text-sm sm:text-base text-muted-foreground">{stat.label}</p>
-              </div>
+              <ScrollReveal key={index} animation="fade-up" delay={index * 150}>
+                <div className="text-center p-6 sm:p-8 bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
+                  <p className="text-sm sm:text-base text-muted-foreground">{stat.label}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
           
           {/* Quote */}
-          <div className="max-w-3xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardContent className="p-8">
-                <Quote className="w-10 h-10 text-secondary/30 mb-4" />
-                <blockquote className="text-xl text-foreground mb-4 italic">
-                  «Мы перестали держать десятки чатов — всё, что связано со сменами, теперь в "РАБОТА ДЛЯ ВСЕХ".»
-                </blockquote>
-                <p className="text-muted-foreground">— HR-менеджер федеральной сети</p>
-              </CardContent>
-            </Card>
-          </div>
+          <ScrollReveal animation="zoom-in" delay={300}>
+            <div className="max-w-3xl mx-auto">
+              <Card className="bg-card border-border">
+                <CardContent className="p-8">
+                  <Quote className="w-10 h-10 text-secondary/30 mb-4" />
+                  <blockquote className="text-xl text-foreground mb-4 italic">
+                    «Мы перестали держать десятки чатов — всё, что связано со сменами, теперь в "РАБОТА ДЛЯ ВСЕХ".»
+                  </blockquote>
+                  <p className="text-muted-foreground">— HR-менеджер федеральной сети</p>
+                </CardContent>
+              </Card>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* How the Service Looks */}
       <section className="py-20 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-6">
-            Понятные кабинеты для всех участников процесса
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-            У каждой роли — свой удобный интерфейс с нужными функциями
-          </p>
+          <ScrollReveal animation="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-6">
+              Понятные кабинеты для всех участников процесса
+            </h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              У каждой роли — свой удобный интерфейс с нужными функциями
+            </p>
+          </ScrollReveal>
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -334,18 +355,20 @@ const Index = () => {
                 color: "primary"
               }
             ].map((cabinet, index) => (
-              <Card key={index} className="bg-card border-border hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                <CardContent className="p-0">
-                  {/* Preview placeholder */}
-                  <div className={`h-48 bg-gradient-to-br ${cabinet.color === 'primary' ? 'from-primary/10 to-primary/5' : 'from-secondary/10 to-secondary/5'} flex items-center justify-center`}>
-                    <cabinet.icon className={`w-16 h-16 ${cabinet.color === 'primary' ? 'text-primary/30' : 'text-secondary/30'} group-hover:scale-110 transition-transform duration-300`} />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">{cabinet.title}</h3>
-                    <p className="text-muted-foreground">{cabinet.desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <ScrollReveal key={index} animation="fade-up" delay={index * 150}>
+                <Card className="bg-card border-border hover:shadow-xl transition-all duration-300 overflow-hidden group h-full">
+                  <CardContent className="p-0">
+                    {/* Preview placeholder */}
+                    <div className={`h-48 bg-gradient-to-br ${cabinet.color === 'primary' ? 'from-primary/10 to-primary/5' : 'from-secondary/10 to-secondary/5'} flex items-center justify-center`}>
+                      <cabinet.icon className={`w-16 h-16 ${cabinet.color === 'primary' ? 'text-primary/30' : 'text-secondary/30'} group-hover:scale-110 transition-transform duration-300`} />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold text-foreground mb-2">{cabinet.title}</h3>
+                      <p className="text-muted-foreground">{cabinet.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -354,42 +377,48 @@ const Index = () => {
       {/* Final CTA */}
       <section className="py-20 px-4 bg-gradient-to-br from-primary via-primary/95 to-primary/90">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
-            Начните пользоваться «РАБОТА ДЛЯ ВСЕХ» уже сегодня
-          </h2>
+          <ScrollReveal animation="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
+              Начните пользоваться «РАБОТА ДЛЯ ВСЕХ» уже сегодня
+            </h2>
+          </ScrollReveal>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
             {/* For HR */}
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-4">
-                <Building2 className="w-8 h-8 text-white" />
-                <h3 className="text-xl font-bold text-white">Для HR</h3>
+            <ScrollReveal animation="fade-right" delay={100}>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <Building2 className="w-8 h-8 text-white" />
+                  <h3 className="text-xl font-bold text-white">Для HR</h3>
+                </div>
+                <p className="text-white/80 mb-6 flex-1">
+                  Подключите сервис к вашей сети и протестируйте его на одном объекте или пилотном проекте.
+                </p>
+                <Link to="/login?role=hr" className="mt-auto">
+                  <Button size="lg" className="w-full bg-white text-primary hover:bg-white/90 rounded-xl">
+                    Запросить демонстрацию для HR
+                  </Button>
+                </Link>
               </div>
-              <p className="text-white/80 mb-6 flex-1">
-                Подключите сервис к вашей сети и протестируйте его на одном объекте или пилотном проекте.
-              </p>
-              <Link to="/login?role=hr" className="mt-auto">
-                <Button size="lg" className="w-full bg-white text-primary hover:bg-white/90 rounded-xl">
-                  Запросить демонстрацию для HR
-                </Button>
-              </Link>
-            </div>
+            </ScrollReveal>
             
             {/* For Workers */}
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-4">
-                <HardHat className="w-8 h-8 text-secondary" />
-                <h3 className="text-xl font-bold text-white">Для исполнителей</h3>
+            <ScrollReveal animation="fade-left" delay={200}>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <HardHat className="w-8 h-8 text-secondary" />
+                  <h3 className="text-xl font-bold text-white">Для исполнителей</h3>
+                </div>
+                <p className="text-white/80 mb-6 flex-1">
+                  Создайте анкету и получите первые предложения по сменам.
+                </p>
+                <Link to="/login?role=worker" className="mt-auto">
+                  <Button size="lg" className="w-full bg-secondary text-white hover:bg-secondary/90 rounded-xl">
+                    Стать исполнителем
+                  </Button>
+                </Link>
               </div>
-              <p className="text-white/80 mb-6 flex-1">
-                Создайте анкету и получите первые предложения по сменам.
-              </p>
-              <Link to="/login?role=worker" className="mt-auto">
-                <Button size="lg" className="w-full bg-secondary text-white hover:bg-secondary/90 rounded-xl">
-                  Стать исполнителем
-                </Button>
-              </Link>
-            </div>
+            </ScrollReveal>
           </div>
           
           <p className="text-white/60 text-sm max-w-2xl mx-auto">
