@@ -11,8 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, Users, UserPlus, Search, RotateCcw, Ban, CheckCircle, Star, Save, Pencil } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
+import { Eye, Users, UserPlus, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
 
 interface Worker {
   id: string;
@@ -27,7 +26,6 @@ interface Worker {
   is_active: boolean;
   rating: number;
   block_reason: string | null;
-  admin_notes: string | null;
 }
 
 const AdminWorkers: React.FC = () => {
@@ -46,12 +44,6 @@ const AdminWorkers: React.FC = () => {
     phone: '',
     city: '',
   });
-
-  // Edit rating and notes
-  const [isEditingRating, setIsEditingRating] = useState(false);
-  const [editRating, setEditRating] = useState(0);
-  const [editNotes, setEditNotes] = useState('');
-  const [savingWorker, setSavingWorker] = useState(false);
 
   // Filters
   const [searchFilter, setSearchFilter] = useState('');
@@ -121,57 +113,10 @@ const AdminWorkers: React.FC = () => {
 
   const hasActiveFilters = searchFilter || cityFilter || statusFilter !== 'all';
 
-  const handleOpenWorkerDetails = (worker: Worker) => {
-    setSelectedWorker(worker);
-    setEditRating(worker.rating || 0);
-    setEditNotes(worker.admin_notes || '');
-    setIsEditingRating(false);
-  };
-
   const handleOpenBlockDialog = (worker: Worker) => {
     setSelectedWorker(worker);
     setBlockReason(worker.block_reason || '');
     setShowBlockDialog(true);
-  };
-
-  const handleSaveWorkerDetails = async () => {
-    if (!selectedWorker) return;
-
-    setSavingWorker(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          rating: editRating,
-          admin_notes: editNotes.trim() || null,
-        })
-        .eq('id', selectedWorker.id);
-
-      if (error) throw error;
-
-      setWorkers(workers.map(w =>
-        w.id === selectedWorker.id 
-          ? { ...w, rating: editRating, admin_notes: editNotes.trim() || null } 
-          : w
-      ));
-
-      setSelectedWorker({ ...selectedWorker, rating: editRating, admin_notes: editNotes.trim() || null });
-      setIsEditingRating(false);
-
-      toast({
-        title: 'Сохранено',
-        description: 'Данные исполнителя обновлены',
-      });
-    } catch (error) {
-      console.error('Error saving worker details:', error);
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось сохранить изменения',
-        variant: 'destructive',
-      });
-    } finally {
-      setSavingWorker(false);
-    }
   };
 
   const handleBlockWorker = async () => {
@@ -386,7 +331,7 @@ const AdminWorkers: React.FC = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleOpenWorkerDetails(worker)}
+                              onClick={() => setSelectedWorker(worker)}
                               className="gap-1"
                             >
                               <Eye className="w-4 h-4" />
@@ -425,7 +370,7 @@ const AdminWorkers: React.FC = () => {
 
       {/* Details Dialog */}
       <Dialog open={!!selectedWorker && !showBlockDialog} onOpenChange={() => setSelectedWorker(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Карточка исполнителя</DialogTitle>
           </DialogHeader>
@@ -447,6 +392,10 @@ const AdminWorkers: React.FC = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Город</p>
                   <p className="font-medium">{selectedWorker.city || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Рейтинг</p>
+                  <p className="font-medium text-secondary">{(selectedWorker.rating || 0).toFixed(1)} / 5.0</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">График</p>
@@ -476,116 +425,6 @@ const AdminWorkers: React.FC = () => {
                 <div className="p-3 bg-destructive/10 rounded-lg">
                   <p className="text-sm font-medium text-destructive mb-1">Причина блокировки:</p>
                   <p className="text-sm">{selectedWorker.block_reason}</p>
-                </div>
-              )}
-
-              {/* Rating Section */}
-              <div className="pt-4 border-t space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-secondary" />
-                    <p className="text-sm font-medium">Рейтинг</p>
-                  </div>
-                  {!isEditingRating ? (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setIsEditingRating(true)}
-                      className="gap-1"
-                    >
-                      <Pencil className="w-3 h-3" />
-                      Редактировать
-                    </Button>
-                  ) : null}
-                </div>
-                
-                {isEditingRating ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        value={[editRating]}
-                        onValueChange={(value) => setEditRating(value[0])}
-                        max={5}
-                        min={0}
-                        step={0.1}
-                        className="flex-1"
-                      />
-                      <span className="text-lg font-bold text-secondary w-12 text-right">
-                        {editRating.toFixed(1)}
-                      </span>
-                    </div>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setEditRating(star)}
-                          className="p-1 hover:scale-110 transition-transform"
-                        >
-                          <Star 
-                            className={`w-5 h-5 ${star <= editRating ? 'text-secondary fill-secondary' : 'text-muted-foreground'}`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-0.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star 
-                          key={star}
-                          className={`w-4 h-4 ${star <= (selectedWorker.rating || 0) ? 'text-secondary fill-secondary' : 'text-muted-foreground'}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="font-medium text-secondary">{(selectedWorker.rating || 0).toFixed(1)} / 5.0</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Admin Notes Section */}
-              <div className="space-y-2">
-                <Label htmlFor="adminNotes" className="flex items-center gap-2">
-                  <Pencil className="w-3 h-3" />
-                  Заметки администратора
-                </Label>
-                <Textarea
-                  id="adminNotes"
-                  placeholder="Добавьте комментарий об исполнителе..."
-                  value={editNotes}
-                  onChange={(e) => {
-                    setEditNotes(e.target.value);
-                    if (!isEditingRating) setIsEditingRating(true);
-                  }}
-                  rows={3}
-                  className="resize-none"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Эти заметки видны только администраторам
-                </p>
-              </div>
-
-              {isEditingRating && (
-                <div className="flex gap-2 justify-end">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setIsEditingRating(false);
-                      setEditRating(selectedWorker.rating || 0);
-                      setEditNotes(selectedWorker.admin_notes || '');
-                    }}
-                  >
-                    Отмена
-                  </Button>
-                  <Button 
-                    onClick={handleSaveWorkerDetails}
-                    disabled={savingWorker}
-                    className="gap-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    {savingWorker ? 'Сохранение...' : 'Сохранить'}
-                  </Button>
                 </div>
               )}
 

@@ -1,21 +1,14 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
   Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
   FileText, Send, CheckCircle, ClipboardList, Bell, 
   UserCheck, History, BarChart3, MessageSquare, Eye,
-  Building2, Warehouse, Store, Quote, ZoomIn, X
+  Building2, Warehouse, Store, Quote
 } from "lucide-react";
-import screenshotHR from "@/assets/screenshot-hr-dashboard.png";
-import screenshotWorker from "@/assets/screenshot-worker-dashboard.png";
-import screenshotAdmin from "@/assets/screenshot-admin-panel.png";
 
 const Index = () => {
-  const [selectedScreenshot, setSelectedScreenshot] = useState<{ src: string; title: string } | null>(null);
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -25,7 +18,7 @@ const Index = () => {
             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <span className="text-base sm:text-xl font-bold text-foreground truncate">Работа для Всех</span>
+            <span className="text-base sm:text-xl font-bold text-foreground truncate">ЛЮДИ И РЕСУРСЫ</span>
           </div>
           <Link to="/login">
             <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white flex-shrink-0">
@@ -46,7 +39,7 @@ const Index = () => {
                 <span className="text-primary">в один клик</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 px-2 sm:px-0">
-                Онлайн‑сервис «Работа для Всех», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
+                Онлайн‑сервис «ЛЮДИ И РЕСУРСЫ», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
               </p>
               
               <div className="flex flex-col gap-3 justify-center items-center lg:items-start mb-4 sm:mb-6 px-2 sm:px-0">
@@ -104,37 +97,37 @@ const Index = () => {
       </section>
 
       {/* How it Works - Two Columns */}
-      <section className="py-12 sm:py-20 px-4 bg-muted/30 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
-            Как работает «Работа для Всех»
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+            Как работает «ЛЮДИ И РЕСУРСЫ»
           </h2>
           
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-8 mb-8 sm:mb-12">
+          <div className="grid lg:grid-cols-2 gap-8 mb-12">
             {/* HR Column */}
             <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
-              <CardContent className="p-4 sm:p-6 md:p-8">
-                <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-5 h-5 text-primary" />
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Для HR федеральных сетей</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Для HR федеральных сетей</h3>
                 </div>
                 
-                <div className="space-y-3 sm:space-y-5">
+                <div className="space-y-5">
                   {[
                     { icon: ClipboardList, text: "Создаёте заявку на нужные даты и объект за пару минут." },
                     { icon: Send, text: "Сервис автоматически рассылает её исполнителям и публикует в Telegram и VK." },
                     { icon: UserCheck, text: "Менеджер аутстаффинговой компании подбирает людей и подтверждает выход." },
                     { icon: Eye, text: "Вы в личном кабинете видите статусы и понимаете, кто и когда выйдет на смену." }
                   ].map((step, index) => (
-                    <div key={index} className="flex items-start gap-3 sm:gap-4">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-primary font-bold text-sm sm:text-base">{index + 1}</span>
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary font-bold">{index + 1}</span>
                       </div>
-                      <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                        <step.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <p className="text-sm sm:text-base text-muted-foreground">{step.text}</p>
+                      <div className="flex items-center gap-3 flex-1">
+                        <step.icon className="w-5 h-5 text-primary flex-shrink-0" />
+                        <p className="text-muted-foreground">{step.text}</p>
                       </div>
                     </div>
                   ))}
@@ -144,28 +137,28 @@ const Index = () => {
 
             {/* Workers Column */}
             <Card className="bg-card border-border hover:border-secondary/50 transition-all duration-300 hover:shadow-xl">
-              <CardContent className="p-4 sm:p-6 md:p-8">
-                <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <HardHat className="w-5 h-5 text-secondary" />
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <HardHat className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
                   </div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Для исполнителей</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Для исполнителей</h3>
                 </div>
                 
-                <div className="space-y-3 sm:space-y-5">
+                <div className="space-y-5">
                   {[
                     { icon: FileText, text: "Регистрируетесь и заполняете простую анкету без резюме." },
                     { icon: Bell, text: "Получаете подходящие смены по городу, графику и ставке." },
                     { icon: CheckCircle, text: "Откликаетесь в один клик и получаете подтверждение в личном кабинете." },
                     { icon: History, text: "Выходите на смену и видите историю отработанных смен и оплат." }
                   ].map((step, index) => (
-                    <div key={index} className="flex items-start gap-3 sm:gap-4">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-secondary font-bold text-sm sm:text-base">{index + 1}</span>
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-secondary font-bold">{index + 1}</span>
                       </div>
-                      <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                        <step.icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0 mt-0.5" />
-                        <p className="text-sm sm:text-base text-muted-foreground">{step.text}</p>
+                      <div className="flex items-center gap-3 flex-1">
+                        <step.icon className="w-5 h-5 text-secondary flex-shrink-0" />
+                        <p className="text-muted-foreground">{step.text}</p>
                       </div>
                     </div>
                   ))}
@@ -174,14 +167,14 @@ const Index = () => {
             </Card>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link to="/login?role=hr" className="w-full max-w-xs sm:w-auto">
-              <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white text-sm sm:text-base">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
+            <Link to="/login?role=hr" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
                 Перейти в кабинет HR
               </Button>
             </Link>
-            <Link to="/login?role=worker" className="w-full max-w-xs sm:w-auto">
-              <Button variant="outline" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-white text-sm sm:text-base">
+            <Link to="/login?role=worker" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-white">
                 Перейти в кабинет исполнителя
               </Button>
             </Link>
@@ -190,13 +183,13 @@ const Index = () => {
       </section>
 
       {/* Benefits for HR */}
-      <section className="py-12 sm:py-20 px-4 bg-primary/5 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
-            Почему HR выбирают «Работа для Всех»
+      <section className="py-20 px-4 bg-primary/5">
+        <div className="container mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+            Почему HR выбирают «ЛЮДИ И РЕСУРСЫ»
           </h2>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[
               { icon: Zap, title: "Быстрое закрытие заявок", desc: "Готовая база исполнителей и автопубликации в соцсети." },
               { icon: ClipboardList, title: "Единый личный кабинет", desc: "Вместо мессенджеров, таблиц и личных контактов." },
@@ -207,23 +200,23 @@ const Index = () => {
             ].map((benefit, index) => (
               <div 
                 key={index}
-                className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+                className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <benefit.icon className="w-6 h-6 text-primary" />
                 </div>
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-sm sm:text-base text-foreground mb-1">{benefit.title}</h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{benefit.desc}</p>
+                <div>
+                  <h4 className="font-semibold text-foreground mb-1">{benefit.title}</h4>
+                  <p className="text-sm text-muted-foreground">{benefit.desc}</p>
                 </div>
               </div>
             ))}
           </div>
           
-          <div className="text-center px-4">
-            <Link to="/login?role=hr" className="inline-block w-full max-w-xs sm:w-auto">
-              <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                Посмотреть кабинет HR
+          <div className="text-center">
+            <Link to="/login?role=hr">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Посмотреть, как работает кабинет HR
               </Button>
             </Link>
           </div>
@@ -231,13 +224,13 @@ const Index = () => {
       </section>
 
       {/* Benefits for Workers */}
-      <section className="py-12 sm:py-20 px-4 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
-            Почему исполнителям удобно работать через «Работа для Всех»
+      <section className="py-20 px-4">
+        <div className="container mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+            Почему исполнителям удобно работать через «ЛЮДИ И РЕСУРСЫ»
           </h2>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[
               { icon: FileText, title: "Понятные смены", desc: "Где работать, сколько часов и сколько платят." },
               { icon: CheckCircle, title: "Без резюме", desc: "Без резюме и сложных анкет — достаточно базовой информации." },
@@ -247,22 +240,22 @@ const Index = () => {
             ].map((benefit, index) => (
               <div 
                 key={index}
-                className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-card border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300"
+                className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300"
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+                <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <benefit.icon className="w-6 h-6 text-secondary" />
                 </div>
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-sm sm:text-base text-foreground mb-1">{benefit.title}</h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{benefit.desc}</p>
+                <div>
+                  <h4 className="font-semibold text-foreground mb-1">{benefit.title}</h4>
+                  <p className="text-sm text-muted-foreground">{benefit.desc}</p>
                 </div>
               </div>
             ))}
           </div>
           
-          <div className="text-center px-4">
-            <Link to="/login?role=worker" className="inline-block w-full max-w-xs sm:w-auto">
-              <Button size="lg" className="w-full bg-secondary hover:bg-secondary/90 text-white px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <div className="text-center">
+            <Link to="/login?role=worker">
+              <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 Создать анкету исполнителя
               </Button>
             </Link>
@@ -271,174 +264,162 @@ const Index = () => {
       </section>
 
       {/* Social Proof & Numbers */}
-      <section className="py-12 sm:py-20 px-4 bg-muted/30 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
             Сервис, который упрощает жизнь и HR, и исполнителям
           </h2>
           
           {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 mb-16">
             {[
-              { number: "70%", label: "заявок закрываются в срок" },
-              { number: "1000+", label: "исполнителей в базе по России" },
-              { number: "~2 мин", label: "на создание заявки" },
-              { number: "99%", label: "показатель выхода на смены" }
+              { value: "до 70%", label: "заявок закрываются в срок" },
+              { value: "1000+", label: "исполнителей в базе по всей России" },
+              { value: "~2 мин", label: "на создание заявки" }
             ].map((stat, index) => (
-              <div key={index} className="text-center p-4 sm:p-6">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 sm:mb-2">{stat.number}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
+              <div key={index} className="text-center p-6 sm:p-8 bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
+                <p className="text-sm sm:text-base text-muted-foreground">{stat.label}</p>
               </div>
             ))}
           </div>
           
-          {/* Testimonial */}
+          {/* Quote */}
           <div className="max-w-3xl mx-auto">
-            <Card className="bg-card border-border p-4 sm:p-8">
-              <CardContent className="p-0">
-                <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-secondary/30 mb-3 sm:mb-4" />
-                <p className="text-base sm:text-lg md:text-xl text-foreground mb-4 sm:mb-6 leading-relaxed">
-                  «Мы перестали держать десятки чатов в WhatsApp. Всё, что связано со сменами, теперь в "Работа для Всех". Сбережения на время координации — огромные.»
-                </p>
-                <p className="text-sm sm:text-base text-muted-foreground">— HR-менеджер федеральной сети</p>
+            <Card className="bg-card border-border">
+              <CardContent className="p-8">
+                <Quote className="w-10 h-10 text-secondary/30 mb-4" />
+                <blockquote className="text-xl text-foreground mb-4 italic">
+                  «Мы перестали держать десятки чатов — всё, что связано со сменами, теперь в "ЛЮДИ И РЕСУРСЫ".»
+                </blockquote>
+                <p className="text-muted-foreground">— HR-менеджер федеральной сети</p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Screenshots Section */}
-      <section className="py-12 sm:py-20 px-4 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-3 sm:mb-4 px-2">
-            Как выглядит сервис
+      {/* How the Service Looks */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-6">
+            Понятные кабинеты для всех участников процесса
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground text-center mb-8 sm:mb-12 px-4">
-            Кабинет HR, кабинет исполнителя и панель администратора
+          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+            У каждой роли — свой удобный интерфейс с нужными функциями
           </p>
           
-          <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { src: screenshotHR, title: "Кабинет HR", desc: "Доска заявок с фильтрами, статусами, быстрое создание новых смен и список откликнувшихся исполнителей." },
-              { src: screenshotWorker, title: "Кабинет исполнителя", desc: "Лента доступных смен с видимыми ставками. Откликнуться — один клик. Поддержка пользователей." },
-              { src: screenshotAdmin, title: "Панель администратора", desc: "Выбор исполнителей, контроль явки, работа с обращениями пользователей и управление системой." }
-            ].map((screenshot, index) => (
-              <div 
-                key={index} 
-                className="group relative cursor-pointer"
-                onClick={() => setSelectedScreenshot({ src: screenshot.src, title: screenshot.title })}
-              >
-                <div className="bg-card rounded-xl sm:rounded-2xl border border-border overflow-hidden hover:border-primary/30 hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-video overflow-hidden bg-muted">
-                    <img 
-                      src={screenshot.src} 
-                      alt={screenshot.title}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors duration-300 flex items-center justify-center">
-                      <ZoomIn className="w-8 h-8 sm:w-10 sm:h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
-                    </div>
+              { 
+                title: "Кабинет HR", 
+                desc: "Доска заявок с фильтрами, статусами и быстрым созданием новых запросов.",
+                icon: Building2,
+                color: "primary"
+              },
+              { 
+                title: "Кабинет исполнителя", 
+                desc: "Список смен с понятной ставкой и возможностью откликнуться в один клик.",
+                icon: HardHat,
+                color: "secondary"
+              },
+              { 
+                title: "Панель администратора", 
+                desc: "Подбор исполнителей, контроль выходов и поддержка пользователей.",
+                icon: Shield,
+                color: "primary"
+              }
+            ].map((cabinet, index) => (
+              <Card key={index} className="bg-card border-border hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                <CardContent className="p-0">
+                  {/* Preview placeholder */}
+                  <div className={`h-48 bg-gradient-to-br ${cabinet.color === 'primary' ? 'from-primary/10 to-primary/5' : 'from-secondary/10 to-secondary/5'} flex items-center justify-center`}>
+                    <cabinet.icon className={`w-16 h-16 ${cabinet.color === 'primary' ? 'text-primary/30' : 'text-secondary/30'} group-hover:scale-110 transition-transform duration-300`} />
                   </div>
-                  <div className="p-3 sm:p-4">
-                    <h3 className="font-semibold text-sm sm:text-base text-foreground mb-1 sm:mb-2">{screenshot.title}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">{screenshot.desc}</p>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{cabinet.title}</h3>
+                    <p className="text-muted-foreground">{cabinet.desc}</p>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
-
-      {/* Screenshot Modal */}
-      <Dialog open={!!selectedScreenshot} onOpenChange={() => setSelectedScreenshot(null)}>
-        <DialogContent className="max-w-[95vw] sm:max-w-5xl p-0 bg-background border-border">
-          <div className="relative">
-            <button
-              onClick={() => setSelectedScreenshot(null)}
-              className="absolute right-2 top-2 sm:right-4 sm:top-4 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-background/80 hover:bg-background rounded-full flex items-center justify-center transition-colors"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
-            </button>
-            {selectedScreenshot && (
-              <div className="p-2 sm:p-4">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-4 pr-10 sm:pr-12">{selectedScreenshot.title}</h3>
-                <img 
-                  src={selectedScreenshot.src} 
-                  alt={selectedScreenshot.title}
-                  className="w-full h-auto rounded-lg"
-                />
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Final CTA */}
-      <section className="py-12 sm:py-20 px-4 bg-primary overflow-hidden">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 px-2">
-            Начните прямо сейчас
+      <section className="py-20 px-4 bg-gradient-to-br from-primary via-primary/95 to-primary/90">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
+            Начните пользоваться «ЛЮДИ И РЕСУРСЫ» уже сегодня
           </h2>
-          <p className="text-sm sm:text-base md:text-lg text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
-            Подключите сервис к вашей сети или создайте анкету, чтобы получать первые предложения уже на этой неделе.
-          </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-            <Link to="/login?role=hr" className="w-full max-w-xs sm:w-auto">
-              <Button size="lg" className="w-full bg-white text-primary hover:bg-white/90 px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                Запросить демонстрацию
-              </Button>
-            </Link>
-            <Link to="/login?role=worker" className="w-full max-w-xs sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-primary px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                Стать исполнителем
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Target Audience */}
-      <section className="py-12 sm:py-16 px-4 bg-muted/30 overflow-hidden">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-foreground mb-6 sm:mb-8 px-2">
-            Для каких объектов подходит сервис
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground text-center mb-6 sm:mb-10 max-w-2xl mx-auto px-4">
-            Склады, сортировочные центры, магазины и другие объекты, где важна скорость и надёжность выхода людей на смену.
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-            {[
-              { icon: Warehouse, label: "Склады" },
-              { icon: Store, label: "Магазины" },
-              { icon: Building2, label: "Сортировочные центры" }
-            ].map((item, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 bg-card border border-border rounded-full hover:border-primary/30 transition-colors"
-              >
-                <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                <span className="text-sm sm:text-base text-foreground">{item.label}</span>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+            {/* For HR */}
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-4">
+                <Building2 className="w-8 h-8 text-white" />
+                <h3 className="text-xl font-bold text-white">Для HR</h3>
               </div>
-            ))}
+              <p className="text-white/80 mb-6 flex-1">
+                Подключите сервис к вашей сети и протестируйте его на одном объекте или пилотном проекте.
+              </p>
+              <Link to="/login?role=hr" className="mt-auto">
+                <Button size="lg" className="w-full bg-white text-primary hover:bg-white/90 rounded-xl">
+                  Запросить демонстрацию для HR
+                </Button>
+              </Link>
+            </div>
+            
+            {/* For Workers */}
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-left flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-4">
+                <HardHat className="w-8 h-8 text-secondary" />
+                <h3 className="text-xl font-bold text-white">Для исполнителей</h3>
+              </div>
+              <p className="text-white/80 mb-6 flex-1">
+                Создайте анкету и получите первые предложения по сменам.
+              </p>
+              <Link to="/login?role=worker" className="mt-auto">
+                <Button size="lg" className="w-full bg-secondary text-white hover:bg-secondary/90 rounded-xl">
+                  Стать исполнителем
+                </Button>
+              </Link>
+            </div>
           </div>
+          
+          <p className="text-white/60 text-sm max-w-2xl mx-auto">
+            «ЛЮДИ И РЕСУРСЫ» создан специально для работы с неквалифицированным персоналом: склады, сортировочные центры, магазины и другие объекты, где важна скорость и надёжность выхода людей на смену.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 bg-card border-t border-border">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+      <footer className="py-8 sm:py-12 px-4 bg-foreground">
+        <div className="container mx-auto">
+          <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-sm sm:text-base font-bold text-foreground">Работа для Всех</span>
+              <span className="text-lg sm:text-xl font-bold text-white">ЛЮДИ И РЕСУРСЫ</span>
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground text-center">
-              © 2025 Работа для Всех. Все права защищены.
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <Warehouse className="w-4 h-4 flex-shrink-0" />
+                <span>Склады</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Store className="w-4 h-4 flex-shrink-0" />
+                <span>Магазины</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 flex-shrink-0" />
+                <span>Сортировочные центры</span>
+              </div>
+            </div>
+            <p className="text-white/60 text-xs sm:text-sm">
+              © 2025 ЛЮДИ И РЕСУРСЫ. Все права защищены.
             </p>
           </div>
         </div>

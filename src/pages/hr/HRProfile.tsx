@@ -11,7 +11,7 @@ import { AvatarUpload } from '@/components/AvatarUpload';
 import { Loader2, Save } from 'lucide-react';
 
 const HRProfile: React.FC = () => {
-  const { user, profile, refetchProfile } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -51,8 +51,6 @@ const HRProfile: React.FC = () => {
 
       if (error) throw error;
 
-      await refetchProfile();
-
       toast({
         title: 'Профиль обновлён',
         description: 'Ваши данные успешно сохранены.',
@@ -87,7 +85,6 @@ const HRProfile: React.FC = () => {
                   currentAvatarUrl={avatarUrl}
                   userName={formData.full_name}
                   onAvatarChange={setAvatarUrl}
-                  onUploadComplete={refetchProfile}
                   size="lg"
                 />
               )}

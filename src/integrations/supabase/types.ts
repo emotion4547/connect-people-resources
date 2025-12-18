@@ -16,7 +16,6 @@ export type Database = {
     Tables: {
       chat_messages: {
         Row: {
-          attachments: Json | null
           chat_id: string
           created_at: string
           id: string
@@ -25,7 +24,6 @@ export type Database = {
           sender_type: Database["public"]["Enums"]["sender_type"]
         }
         Insert: {
-          attachments?: Json | null
           chat_id: string
           created_at?: string
           id?: string
@@ -34,7 +32,6 @@ export type Database = {
           sender_type: Database["public"]["Enums"]["sender_type"]
         }
         Update: {
-          attachments?: Json | null
           chat_id?: string
           created_at?: string
           id?: string
@@ -54,7 +51,6 @@ export type Database = {
       }
       profiles: {
         Row: {
-          admin_notes: string | null
           avatar_url: string | null
           block_reason: string | null
           city: string | null
@@ -73,7 +69,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          admin_notes?: string | null
           avatar_url?: string | null
           block_reason?: string | null
           city?: string | null
@@ -92,7 +87,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          admin_notes?: string | null
           avatar_url?: string | null
           block_reason?: string | null
           city?: string | null

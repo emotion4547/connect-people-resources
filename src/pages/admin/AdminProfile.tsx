@@ -12,7 +12,7 @@ import { Loader2, Save, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const AdminProfile: React.FC = () => {
-  const { user, profile, refetchProfile } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -48,8 +48,6 @@ const AdminProfile: React.FC = () => {
         .eq('user_id', user.id);
 
       if (error) throw error;
-
-      await refetchProfile();
 
       toast({
         title: 'Профиль обновлён',
@@ -91,7 +89,6 @@ const AdminProfile: React.FC = () => {
                   currentAvatarUrl={avatarUrl}
                   userName={formData.full_name}
                   onAvatarChange={setAvatarUrl}
-                  onUploadComplete={refetchProfile}
                   size="lg"
                 />
               )}

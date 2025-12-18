@@ -39,44 +39,6 @@ const Login: React.FC = () => {
   const { user, role, loading: authLoading, signIn, signUp } = useAuth();
   const { toast } = useToast();
 
-  // Diagnostics: show which header contains non-Latin1 chars
-  useEffect(() => {
-    const debugHeaders = new URLSearchParams(window.location.search).has("debugHeaders");
-    if (!debugHeaders) return;
-
-    const onHeader = (e: Event) => {
-      const ce = e as CustomEvent<{ header?: string }>;
-      const headerName = ce.detail?.header;
-      if (headerName) {
-        toast({
-          title: "Техническая ошибка",
-          description: `Найден заголовок с кириллицей/не-ASCII: ${headerName}`,
-          variant: "destructive",
-          duration: 15000,
-        });
-      }
-    };
-
-    const onFetchError = (e: Event) => {
-      const ce = e as CustomEvent<{ message?: string }>;
-      if (ce.detail?.message?.includes("non ISO-8859-1")) {
-        toast({
-          title: "Ошибка регистрации",
-          description: "Техническая проблема с кодировкой (не-ASCII в заголовках).",
-          variant: "destructive",
-          duration: 15000,
-        });
-      }
-    };
-
-    window.addEventListener("lovable-non-latin1-header", onHeader as EventListener);
-    window.addEventListener("lovable-fetch-error", onFetchError as EventListener);
-    return () => {
-      window.removeEventListener("lovable-non-latin1-header", onHeader as EventListener);
-      window.removeEventListener("lovable-fetch-error", onFetchError as EventListener);
-    };
-  }, [toast]);
-
   // Redirect authenticated users based on their role
   useEffect(() => {
     if (!authLoading && user && role) {
@@ -149,23 +111,17 @@ const Login: React.FC = () => {
 
         toast({
           title: 'Регистрация успешна!',
-          description: 'На вашу почту отправлено письмо для подтверждения. Проверьте почту и перейдите по ссылке.',
-          duration: 10000,
+          description: 'Добро пожаловать в систему',
         });
-        // Don't redirect - user needs to confirm email first
-        return;
+        // Redirect will happen via useEffect when role is loaded
       } else {
         const { error } = await signIn(email, password);
 
         if (error) {
-          const msg = error.message || "";
           toast({
-            title: "Ошибка входа",
-            description: msg.toLowerCase().includes("email") && msg.toLowerCase().includes("confirm")
-              ? "Email не подтверждён. Проверьте почту и перейдите по ссылке из письма."
-              : msg || "Неверный email или пароль",
-            variant: "destructive",
-            duration: 10000,
+            title: 'Ошибка входа',
+            description: 'Неверный email или пароль',
+            variant: 'destructive',
           });
           return;
         }
@@ -219,10 +175,10 @@ const Login: React.FC = () => {
         <Card className="shadow-card border-secondary/20">
           <CardHeader className="text-center pb-4">
             <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-foreground font-bold text-xl">РВ</span>
+              <span className="text-primary-foreground font-bold text-xl">ЛР</span>
             </div>
             <CardTitle className="text-2xl">
-              {isSignUp ? 'Регистрация' : 'Вход'} в «Работа для Всех»
+              {isSignUp ? 'Регистрация' : 'Вход'} в "ЛЮДИ И РЕСУРСЫ"
             </CardTitle>
             <CardDescription>
               {isSignUp ? 'Создайте аккаунт для начала работы' : 'Войдите в свой аккаунт'}
@@ -336,7 +292,7 @@ const Login: React.FC = () => {
               </Button>
             </form>
 
-            <div className="mt-6 text-center space-y-2">
+            <div className="mt-6 text-center">
               <button
                 type="button"
                 onClick={() => {
@@ -347,13 +303,6 @@ const Login: React.FC = () => {
               >
                 {isSignUp ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
               </button>
-              {!isSignUp && (
-                <div>
-                  <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
-                    Забыли пароль?
-                  </Link>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>

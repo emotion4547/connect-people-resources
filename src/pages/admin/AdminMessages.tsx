@@ -6,16 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, Mail, User, FileText, MapPin, Calendar, RotateCcw, Trash2 } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Send, Mail, User, FileText, MapPin, Calendar, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { useAuth } from '@/contexts/AuthContext';
-import TypingIndicator from '@/components/chat/TypingIndicator';
-import ChatAttachments, { Attachment } from '@/components/chat/ChatAttachments';
-import MessageAttachments from '@/components/chat/MessageAttachments';
-import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 
 interface Chat {
   id: string;
@@ -41,11 +35,9 @@ interface Message {
   message: string;
   sender_type: 'user' | 'admin';
   created_at: string;
-  attachments?: Attachment[];
 }
 
 const AdminMessages: React.FC = () => {
-  const { user } = useAuth();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -53,16 +45,7 @@ const AdminMessages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [linkedRequest, setLinkedRequest] = useState<Request | null>(null);
-  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
-  const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const { isOtherTyping, sendTyping, sendStopTyping } = useTypingIndicator({
-    chatId: selectedChat?.id || null,
-    userId: user?.id || null,
-    userType: 'admin',
-  });
 
   // Filters
   const [userTypeFilter, setUserTypeFilter] = useState<string>('all');
@@ -74,13 +57,7 @@ const AdminMessages: React.FC = () => {
     if (!selectedChat) return;
     const channel = supabase.channel(`admin-chat-${selectedChat.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${selectedChat.id}` },
-        (payload) => {
-          const newMsg = payload.new as any;
-          setMessages((prev) => [...prev, {
-            ...newMsg,
-            attachments: Array.isArray(newMsg.attachments) ? newMsg.attachments : [],
-          }]);
-        })
+        (payload) => setMessages((prev) => [...prev, payload.new as Message]))
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [selectedChat]);
@@ -110,18 +87,9 @@ const AdminMessages: React.FC = () => {
   const selectChat = async (chat: Chat) => {
     setSelectedChat(chat);
     setLinkedRequest(null);
-    setAttachments([]);
     
     const { data } = await supabase.from('chat_messages').select('*').eq('chat_id', chat.id).order('created_at', { ascending: true });
-    // Map data to proper Message type with attachments
-    const mappedMessages: Message[] = (data || []).map((msg: any) => ({
-      id: msg.id,
-      message: msg.message,
-      sender_type: msg.sender_type,
-      created_at: msg.created_at,
-      attachments: Array.isArray(msg.attachments) ? msg.attachments : [],
-    }));
-    setMessages(mappedMessages);
+    setMessages(data || []);
 
     // Fetch linked request if exists
     if (chat.request_id) {
@@ -145,67 +113,11 @@ const AdminMessages: React.FC = () => {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim() && attachments.length === 0) || !selectedChat) return;
+    if (!newMessage.trim() || !selectedChat) return;
     setSending(true);
-    sendStopTyping();
-    
-    await supabase.from('chat_messages').insert({ 
-      chat_id: selectedChat.id, 
-      message: newMessage.trim() || ' ', 
-      sender_type: 'admin' as const,
-      attachments: attachments.length > 0 ? JSON.parse(JSON.stringify(attachments)) : [],
-    });
-    
+    await supabase.from('chat_messages').insert({ chat_id: selectedChat.id, message: newMessage.trim(), sender_type: 'admin' });
     setNewMessage('');
-    setAttachments([]);
     setSending(false);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewMessage(e.target.value);
-    sendTyping();
-  };
-
-  const handleDeleteMessage = async (messageId: string) => {
-    setDeletingMessageId(messageId);
-    try {
-      const { error } = await supabase
-        .from('chat_messages')
-        .delete()
-        .eq('id', messageId);
-
-      if (error) throw error;
-      
-      setMessages(messages.filter(m => m.id !== messageId));
-    } catch (error) {
-      console.error('Error deleting message:', error);
-    } finally {
-      setDeletingMessageId(null);
-    }
-  };
-
-  const handleDeleteChat = async (chatId: string) => {
-    setDeletingChatId(chatId);
-    try {
-      // First delete all messages in the chat
-      await supabase.from('chat_messages').delete().eq('chat_id', chatId);
-      
-      // Then delete the chat
-      const { error } = await supabase.from('support_chats').delete().eq('id', chatId);
-
-      if (error) throw error;
-      
-      setChats(chats.filter(c => c.id !== chatId));
-      
-      if (selectedChat?.id === chatId) {
-        setSelectedChat(null);
-        setMessages([]);
-      }
-    } catch (error) {
-      console.error('Error deleting chat:', error);
-    } finally {
-      setDeletingChatId(null);
-    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -257,70 +169,42 @@ const AdminMessages: React.FC = () => {
               ) : filteredChats.length > 0 ? (
                 <div className="divide-y">
                   {filteredChats.map((chat) => (
-                    <div key={chat.id} className="relative group">
-                      <button 
-                        onClick={() => selectChat(chat)} 
-                        className={cn(
-                          "w-full p-4 text-left hover:bg-muted/50 transition-colors", 
-                          selectedChat?.id === chat.id && "bg-muted"
-                        )}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0", 
-                            chat.user_type === 'hr' ? "bg-primary/20" : "bg-secondary/20"
-                          )}>
-                            <User className={cn("w-5 h-5", chat.user_type === 'hr' ? "text-primary" : "text-secondary")} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="font-medium truncate">{chat.full_name || chat.email || 'Пользователь'}</p>
-                              {chat.unread_count > 0 && (
-                                <Badge className="bg-destructive text-destructive-foreground flex-shrink-0">
-                                  {chat.unread_count}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground truncate">
-                              {chat.user_type === 'hr' ? chat.company || 'HR' : 'Исполнитель'}
-                            </p>
-                            {chat.request_id && (
-                              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                <FileText className="w-3 h-3" />
-                                <span>К заявке</span>
-                              </div>
+                    <button 
+                      key={chat.id} 
+                      onClick={() => selectChat(chat)} 
+                      className={cn(
+                        "w-full p-4 text-left hover:bg-muted/50 transition-colors", 
+                        selectedChat?.id === chat.id && "bg-muted"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0", 
+                          chat.user_type === 'hr' ? "bg-primary/20" : "bg-secondary/20"
+                        )}>
+                          <User className={cn("w-5 h-5", chat.user_type === 'hr' ? "text-primary" : "text-secondary")} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="font-medium truncate">{chat.full_name || chat.email || 'Пользователь'}</p>
+                            {chat.unread_count > 0 && (
+                              <Badge className="bg-destructive text-destructive-foreground flex-shrink-0">
+                                {chat.unread_count}
+                              </Badge>
                             )}
                           </div>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {chat.user_type === 'hr' ? chat.company || 'HR' : 'Исполнитель'}
+                          </p>
+                          {chat.request_id && (
+                            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                              <FileText className="w-3 h-3" />
+                              <span>К заявке</span>
+                            </div>
+                          )}
                         </div>
-                      </button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button
-                            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-destructive/10 rounded"
-                            disabled={deletingChatId === chat.id}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Удалить чат?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Это действие нельзя отменить. Чат и все сообщения будут удалены.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Отмена</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteChat(chat.id)}
-                              className="bg-destructive hover:bg-destructive/90"
-                            >
-                              Удалить
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
               ) : (
@@ -382,103 +266,39 @@ const AdminMessages: React.FC = () => {
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {messages.map((msg) => (
-                    <div key={msg.id} className={cn("flex group", msg.sender_type === 'admin' ? "justify-end" : "justify-start")}>
+                    <div key={msg.id} className={cn("flex", msg.sender_type === 'admin' ? "justify-end" : "justify-start")}>
                       <div className={cn(
-                        "relative max-w-[70%]",
-                        msg.sender_type === 'admin' ? "ml-auto" : "mr-auto"
+                        "max-w-[70%] rounded-2xl px-4 py-2", 
+                        msg.sender_type === 'admin' 
+                          ? "bg-primary text-primary-foreground rounded-br-sm" 
+                          : "bg-muted rounded-bl-sm"
                       )}>
-                        <div className={cn(
-                          "rounded-2xl px-4 py-2 break-words", 
-                          msg.sender_type === 'admin' 
-                            ? "bg-primary text-primary-foreground rounded-br-sm" 
-                            : "bg-muted rounded-bl-sm"
+                        <p className="text-sm">{msg.message}</p>
+                        <p className={cn(
+                          "text-xs mt-1", 
+                          msg.sender_type === 'admin' ? "text-primary-foreground/70" : "text-muted-foreground"
                         )}>
-                          {msg.message.trim() && (
-                            <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
-                          )}
-                          <MessageAttachments 
-                            attachments={msg.attachments || []} 
-                            isOwnMessage={msg.sender_type === 'admin'} 
-                          />
-                          <p className={cn(
-                            "text-xs mt-1", 
-                            msg.sender_type === 'admin' ? "text-primary-foreground/70" : "text-muted-foreground"
-                          )}>
-                            {format(new Date(msg.created_at), 'HH:mm')}
-                          </p>
-                        </div>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button
-                              className={cn(
-                                "absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded",
-                                msg.sender_type === 'admin' ? "-left-8" : "-right-8"
-                              )}
-                              disabled={deletingMessageId === msg.id}
-                            >
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Удалить сообщение?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Это действие нельзя отменить.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Отмена</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteMessage(msg.id)}
-                                className="bg-destructive hover:bg-destructive/90"
-                              >
-                                Удалить
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                          {format(new Date(msg.created_at), 'HH:mm')}
+                        </p>
                       </div>
                     </div>
                   ))}
-                  <TypingIndicator isTyping={isOtherTyping} />
                   <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
-                <div className="p-4 border-t space-y-2">
-                  {attachments.length > 0 && (
-                    <div className="flex gap-2 overflow-x-auto pb-2">
-                      {attachments.map((att, index) => (
-                        <div key={index} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-1.5 text-sm flex-shrink-0">
-                          <span className="max-w-[100px] truncate">{att.name}</span>
-                          <button type="button" onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))} className="p-0.5 hover:bg-destructive/20 rounded">
-                            <Trash2 className="w-3 h-3 text-destructive" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <form onSubmit={sendMessage} className="flex gap-2">
-                    {user && (
-                      <ChatAttachments
-                        attachments={attachments}
-                        setAttachments={setAttachments}
-                        userId={user.id}
-                        disabled={sending}
-                      />
-                    )}
-                    <Input 
-                      placeholder="Написать ответ..." 
-                      value={newMessage} 
-                      onChange={handleInputChange} 
-                      disabled={sending} 
-                      className="flex-1" 
-                    />
-                    <Button type="submit" disabled={(!newMessage.trim() && attachments.length === 0) || sending}>
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </form>
-                </div>
+                <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
+                  <Input 
+                    placeholder="Написать ответ..." 
+                    value={newMessage} 
+                    onChange={(e) => setNewMessage(e.target.value)} 
+                    disabled={sending} 
+                    className="flex-1" 
+                  />
+                  <Button type="submit" disabled={!newMessage.trim() || sending}>
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </form>
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">

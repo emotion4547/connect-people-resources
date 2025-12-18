@@ -7,22 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, CheckCircle, FileText, Trash2 } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Send, CheckCircle, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import TypingIndicator from '@/components/chat/TypingIndicator';
-import ChatAttachments, { Attachment } from '@/components/chat/ChatAttachments';
-import MessageAttachments from '@/components/chat/MessageAttachments';
-import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 
 interface Message {
   id: string;
   message: string;
   sender_type: 'user' | 'admin';
   created_at: string;
-  attachments?: Attachment[];
 }
 
 interface RequestInfo {
@@ -44,15 +38,7 @@ const HRSupport: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [requestInfo, setRequestInfo] = useState<RequestInfo | null>(null);
-  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const { isOtherTyping, sendTyping, sendStopTyping } = useTypingIndicator({
-    chatId,
-    userId: user?.id || null,
-    userType: 'user',
-  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -82,14 +68,8 @@ const HRSupport: React.FC = () => {
           filter: `chat_id=eq.${chatId}`,
         },
         (payload) => {
-          const newMsg = payload.new as any;
-          setMessages((prev) => [...prev, {
-            id: newMsg.id,
-            message: newMsg.message,
-            sender_type: newMsg.sender_type,
-            created_at: newMsg.created_at,
-            attachments: Array.isArray(newMsg.attachments) ? newMsg.attachments : [],
-          }]);
+          const newMsg = payload.new as Message;
+          setMessages((prev) => [...prev, newMsg]);
         }
       )
       .subscribe();
@@ -155,14 +135,7 @@ const HRSupport: React.FC = () => {
         .eq('chat_id', existingChat.id)
         .order('created_at', { ascending: true });
 
-      const mappedMessages: Message[] = (chatMessages || []).map((msg: any) => ({
-        id: msg.id,
-        message: msg.message,
-        sender_type: msg.sender_type,
-        created_at: msg.created_at,
-        attachments: Array.isArray(msg.attachments) ? msg.attachments : [],
-      }));
-      setMessages(mappedMessages);
+      setMessages(chatMessages || []);
     } catch (error) {
       console.error('Error initializing chat:', error);
     } finally {
@@ -172,48 +145,22 @@ const HRSupport: React.FC = () => {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim() && attachments.length === 0) || !chatId) return;
+    if (!newMessage.trim() || !chatId) return;
 
     setSending(true);
-    sendStopTyping();
     try {
       const { error } = await supabase.from('chat_messages').insert({
         chat_id: chatId,
-        message: newMessage.trim() || ' ',
-        sender_type: 'user' as const,
-        attachments: attachments.length > 0 ? JSON.parse(JSON.stringify(attachments)) : [],
+        message: newMessage.trim(),
+        sender_type: 'user',
       });
 
       if (error) throw error;
       setNewMessage('');
-      setAttachments([]);
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
       setSending(false);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewMessage(e.target.value);
-    sendTyping();
-  };
-
-  const handleDeleteMessage = async (messageId: string) => {
-    setDeletingMessageId(messageId);
-    try {
-      const { error } = await supabase
-        .from('chat_messages')
-        .delete()
-        .eq('id', messageId);
-
-      if (error) throw error;
-      
-      setMessages(messages.filter(m => m.id !== messageId));
-    } catch (error) {
-      console.error('Error deleting message:', error);
-    } finally {
-      setDeletingMessageId(null);
     }
   };
 
@@ -273,66 +220,26 @@ const HRSupport: React.FC = () => {
                   <div
                     key={msg.id}
                     className={cn(
-                      "flex animate-slide-in-right group",
+                      "flex animate-slide-in-right",
                       msg.sender_type === 'user' ? "justify-end" : "justify-start"
                     )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <div className={cn(
-                      "relative max-w-[80%]",
-                      msg.sender_type === 'user' ? "ml-auto" : "mr-auto"
-                    )}>
-                      <div
-                        className={cn(
-                          "rounded-2xl px-4 py-2 break-words",
-                          msg.sender_type === 'user'
-                            ? "bg-primary text-primary-foreground rounded-br-sm"
-                            : "bg-muted rounded-bl-sm"
-                        )}
-                      >
-                        {msg.message.trim() && (
-                          <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
-                        )}
-                        <MessageAttachments 
-                          attachments={msg.attachments || []} 
-                          isOwnMessage={msg.sender_type === 'user'} 
-                        />
-                        <p className={cn(
-                          "text-xs mt-1",
-                          msg.sender_type === 'user' ? "text-primary-foreground/70" : "text-muted-foreground"
-                        )}>
-                          {format(new Date(msg.created_at), 'HH:mm')}
-                        </p>
-                      </div>
-                      {msg.sender_type === 'user' && (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button
-                              className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded"
-                              disabled={deletingMessageId === msg.id}
-                            >
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Удалить сообщение?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Это действие нельзя отменить.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Отмена</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteMessage(msg.id)}
-                                className="bg-destructive hover:bg-destructive/90"
-                              >
-                                Удалить
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                    <div
+                      className={cn(
+                        "max-w-[80%] rounded-2xl px-4 py-2",
+                        msg.sender_type === 'user'
+                          ? "bg-primary text-primary-foreground rounded-br-sm"
+                          : "bg-muted rounded-bl-sm"
                       )}
+                    >
+                      <p className="text-sm">{msg.message}</p>
+                      <p className={cn(
+                        "text-xs mt-1",
+                        msg.sender_type === 'user' ? "text-primary-foreground/70" : "text-muted-foreground"
+                      )}>
+                        {format(new Date(msg.created_at), 'HH:mm')}
+                      </p>
                     </div>
                   </div>
                 ))
@@ -345,45 +252,22 @@ const HRSupport: React.FC = () => {
                   </p>
                 </div>
               )}
-              <TypingIndicator isTyping={isOtherTyping} />
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t space-y-2">
-              {attachments.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {attachments.map((att, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-1.5 text-sm flex-shrink-0">
-                      <span className="max-w-[100px] truncate">{att.name}</span>
-                      <button type="button" onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))} className="p-0.5 hover:bg-destructive/20 rounded">
-                        <Trash2 className="w-3 h-3 text-destructive" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <form onSubmit={sendMessage} className="flex gap-2">
-                {user && (
-                  <ChatAttachments
-                    attachments={attachments}
-                    setAttachments={setAttachments}
-                    userId={user.id}
-                    disabled={sending}
-                  />
-                )}
-                <Input
-                  placeholder="Написать сообщение..."
-                  value={newMessage}
-                  onChange={handleInputChange}
-                  disabled={sending}
-                  className="flex-1"
-                />
-                <Button type="submit" disabled={(!newMessage.trim() && attachments.length === 0) || sending}>
-                  <Send className="w-4 h-4" />
-                </Button>
-              </form>
-            </div>
+            <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
+              <Input
+                placeholder="Написать сообщение..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                disabled={sending}
+                className="flex-1"
+              />
+              <Button type="submit" disabled={!newMessage.trim() || sending}>
+                <Send className="w-4 h-4" />
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>

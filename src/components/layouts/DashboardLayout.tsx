@@ -2,10 +2,8 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Home,
   FileText,
@@ -27,7 +25,6 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
-  showUnread?: boolean;
 }
 
 interface DashboardLayoutProps {
@@ -40,14 +37,14 @@ const hrNavItems: NavItem[] = [
   { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
   { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
   { label: 'Шаблоны', href: '/hr/templates', icon: <Copy className="w-5 h-5" /> },
-  { label: 'Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" />, showUnread: true },
+  { label: 'Поддержка', href: '/hr/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
 
 const workerNavItems: NavItem[] = [
   { label: 'Моя анкета', href: '/worker/profile', icon: <User className="w-5 h-5" /> },
   { label: 'Доступные смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
   { label: 'Мои отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
-  { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" />, showUnread: true },
+  { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
 
 const adminNavItems: NavItem[] = [
@@ -56,7 +53,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Исполнители', href: '/admin/workers', icon: <Users className="w-5 h-5" /> },
   { label: 'Пользователи', href: '/admin/users', icon: <User className="w-5 h-5" /> },
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
-  { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" />, showUnread: true },
+  { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
@@ -64,7 +61,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, signOut, role: userRole } = useAuth();
-  const { unreadCount } = useUnreadMessages();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems = role === 'hr' ? hrNavItems : role === 'worker' ? workerNavItems : adminNavItems;
@@ -108,9 +104,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
         <div className="p-6 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-              <span className="text-secondary-foreground font-bold text-lg">РВ</span>
+              <span className="text-secondary-foreground font-bold text-lg">ЛР</span>
             </div>
-            <span className="font-bold text-lg">Работа для Всех</span>
+            <span className="font-bold text-lg">ЛЮДИ И РЕСУРСЫ</span>
           </Link>
         </div>
 
@@ -122,22 +118,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
               to={item.href}
               onClick={() => setMobileMenuOpen(false)}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative",
+                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                 location.pathname === item.href
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "hover:bg-sidebar-accent/50 text-sidebar-foreground/80"
               )}
             >
               <span className="text-secondary">{item.icon}</span>
-              <span className="font-medium flex-1">{item.label}</span>
-              {item.showUnread && unreadCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="min-w-[20px] h-5 flex items-center justify-center text-xs font-bold animate-pulse"
-                >
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </Badge>
-              )}
+              <span className="font-medium">{item.label}</span>
             </Link>
           ))}
         </nav>
@@ -150,7 +138,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
             className="flex items-center gap-3 mb-3 p-2 -m-2 rounded-xl hover:bg-sidebar-accent/50 transition-colors cursor-pointer"
           >
             <Avatar className="w-10 h-10 border-2 border-secondary">
-              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || 'Аватар'} />
               <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
                 {getInitials()}
               </AvatarFallback>

@@ -10,7 +10,6 @@ interface AvatarUploadProps {
   currentAvatarUrl?: string | null;
   userName?: string | null;
   onAvatarChange?: (url: string) => void;
-  onUploadComplete?: () => void;
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -37,7 +36,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   currentAvatarUrl,
   userName,
   onAvatarChange,
-  onUploadComplete,
   size = 'md',
 }) => {
   const { toast } = useToast();
@@ -108,7 +106,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       setAvatarUrl(publicUrl);
       onAvatarChange?.(publicUrl);
-      onUploadComplete?.();
 
       toast({
         title: 'Аватар обновлён',

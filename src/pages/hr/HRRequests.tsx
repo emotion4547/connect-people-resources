@@ -12,8 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User, Trash2 } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -65,7 +64,6 @@ const HRRequests: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [assignedWorkers, setAssignedWorkers] = useState<Response[]>([]);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   
   // Additional filters
   const [dateFrom, setDateFrom] = useState('');
@@ -153,39 +151,6 @@ const HRRequests: React.FC = () => {
       });
     } finally {
       setConfirmingId(null);
-    }
-  };
-
-  const handleDeleteRequest = async (requestId: string) => {
-    setDeletingId(requestId);
-    try {
-      // First delete related responses
-      await supabase.from('responses').delete().eq('request_id', requestId);
-      
-      // Then delete the request
-      const { error } = await supabase.from('requests').delete().eq('id', requestId);
-
-      if (error) throw error;
-
-      setRequests(requests.filter(r => r.id !== requestId));
-      
-      if (selectedRequest?.id === requestId) {
-        setSelectedRequest(null);
-      }
-
-      toast({
-        title: 'Заявка удалена',
-        description: 'Заявка успешно удалена',
-      });
-    } catch (error) {
-      console.error('Error deleting request:', error);
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось удалить заявку',
-        variant: 'destructive',
-      });
-    } finally {
-      setDeletingId(null);
     }
   };
 
@@ -398,35 +363,6 @@ const HRRequests: React.FC = () => {
                                 Подтвердить
                               </Button>
                             )}
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="gap-1 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  disabled={deletingId === request.id}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Удалить заявку?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Это действие нельзя отменить. Заявка и все связанные отклики будут удалены.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Отмена</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteRequest(request.id)}
-                                    className="bg-destructive hover:bg-destructive/90"
-                                  >
-                                    Удалить
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
                           </div>
                         </td>
                       </tr>

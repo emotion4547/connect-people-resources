@@ -12,7 +12,7 @@ import { AvatarUpload } from '@/components/AvatarUpload';
 import { Save } from 'lucide-react';
 
 const WorkerProfile: React.FC = () => {
-  const { user, profile, refetchProfile } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
@@ -80,8 +80,6 @@ const WorkerProfile: React.FC = () => {
 
       if (error) throw error;
 
-      await refetchProfile();
-
       toast({
         title: 'Профиль сохранен!',
         description: 'Ваши данные успешно обновлены',
@@ -110,7 +108,6 @@ const WorkerProfile: React.FC = () => {
                   currentAvatarUrl={avatarUrl}
                   userName={formData.fullName}
                   onAvatarChange={setAvatarUrl}
-                  onUploadComplete={refetchProfile}
                   size="lg"
                 />
               )}

@@ -4,14 +4,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle, Trash2 } from 'lucide-react';
+import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
 
 interface User {
   id: string;
@@ -32,9 +31,6 @@ const AdminUsers: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [newRole, setNewRole] = useState<string>('');
   const [showBlockDialog, setShowBlockDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [blockReason, setBlockReason] = useState('');
 
   // Filters
@@ -208,51 +204,6 @@ const AdminUsers: React.FC = () => {
     }
   };
 
-  const handleOpenDeleteDialog = (user: User) => {
-    setUserToDelete(user);
-    setShowDeleteDialog(true);
-  };
-
-  const handleDeleteUser = async () => {
-    if (!userToDelete) return;
-
-    setDeleting(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await supabase.functions.invoke('delete-user', {
-        body: { userId: userToDelete.user_id },
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message || 'Ошибка удаления');
-      }
-
-      if (response.data?.error) {
-        throw new Error(response.data.error);
-      }
-
-      setUsers(users.filter(u => u.user_id !== userToDelete.user_id));
-
-      toast({
-        title: 'Пользователь удален',
-        description: `${userToDelete.full_name || userToDelete.email} успешно удален из системы`,
-      });
-
-      setShowDeleteDialog(false);
-      setUserToDelete(null);
-    } catch (error: any) {
-      console.error('Error deleting user:', error);
-      toast({
-        title: 'Ошибка',
-        description: error.message || 'Не удалось удалить пользователя',
-        variant: 'destructive',
-      });
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   const getRoleLabel = (role: string) => {
     switch (role) {
       case 'admin': return 'Администратор';
@@ -377,14 +328,6 @@ const AdminUsers: React.FC = () => {
                             >
                               {user.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleOpenDeleteDialog(user)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -484,31 +427,6 @@ const AdminUsers: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Delete User Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Вы уверены, что хотите удалить пользователя <strong>{userToDelete?.full_name || userToDelete?.email}</strong>? 
-              Это действие необратимо. Все данные пользователя будут удалены.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setShowDeleteDialog(false); setUserToDelete(null); }}>
-              Отмена
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteUser}
-              disabled={deleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleting ? 'Удаление...' : 'Удалить'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </DashboardLayout>
   );
 };
