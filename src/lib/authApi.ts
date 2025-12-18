@@ -3,14 +3,6 @@ type AuthApiError = { message: string; status?: number };
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
-const authHeaders = () => ({
-  apikey: SUPABASE_ANON,
-  Authorization: `Bearer ${SUPABASE_ANON}`,
-  "Content-Type": "application/json",
-  // Force ASCII-only client info to avoid non-Latin1 header issues
-  "X-Client-Info": "web-auth",
-});
-
 export type AuthSessionPayload = {
   access_token: string;
   refresh_token: string;
@@ -18,31 +10,45 @@ export type AuthSessionPayload = {
   token_type?: string;
 };
 
+// Use XMLHttpRequest to bypass potential fetch header validation issues
+function xhrPost(url: string, body: string): Promise<{ status: number; text: string }> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("apikey", SUPABASE_ANON);
+    xhr.setRequestHeader("Authorization", "Bearer " + SUPABASE_ANON);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        resolve({ status: xhr.status, text: xhr.responseText });
+      }
+    };
+    xhr.onerror = () => reject(new Error("Network error"));
+    xhr.send(body);
+  });
+}
+
 export async function signUpWithApi(params: {
   email: string;
   password: string;
-}): Promise<{ data: { user?: { id: string; email?: string } } | null; error: AuthApiError | null }>{
+}): Promise<{ data: { user?: { id: string; email?: string } } | null; error: AuthApiError | null }> {
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify({
-        email: params.email,
-        password: params.password,
-      }),
-    });
+    const { status, text } = await xhrPost(
+      `${SUPABASE_URL}/auth/v1/signup`,
+      JSON.stringify({ email: params.email, password: params.password })
+    );
 
-    const json = await res.json().catch(() => ({} as any));
+    const json = text ? JSON.parse(text) : {};
 
-    if (!res.ok) {
+    if (status < 200 || status >= 300) {
       return {
         data: null,
-        error: { message: json?.msg || json?.message || "Signup failed", status: res.status },
+        error: { message: json?.msg || json?.message || json?.error_description || "Signup failed", status },
       };
     }
 
     return {
-      data: { user: json?.user ?? undefined },
+      data: { user: json?.user ?? json },
       error: null,
     };
   } catch (e) {
@@ -53,23 +59,19 @@ export async function signUpWithApi(params: {
 export async function signInWithPasswordApi(params: {
   email: string;
   password: string;
-}): Promise<{ data: AuthSessionPayload | null; error: AuthApiError | null }>{
+}): Promise<{ data: AuthSessionPayload | null; error: AuthApiError | null }> {
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify({
-        email: params.email,
-        password: params.password,
-      }),
-    });
+    const { status, text } = await xhrPost(
+      `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+      JSON.stringify({ email: params.email, password: params.password })
+    );
 
-    const json = await res.json().catch(() => ({} as any));
+    const json = text ? JSON.parse(text) : {};
 
-    if (!res.ok) {
+    if (status < 200 || status >= 300) {
       return {
         data: null,
-        error: { message: json?.error_description || json?.msg || json?.message || "Login failed", status: res.status },
+        error: { message: json?.error_description || json?.msg || json?.message || "Login failed", status },
       };
     }
 
@@ -86,3 +88,4 @@ export async function signInWithPasswordApi(params: {
     return { data: null, error: { message: e instanceof Error ? e.message : String(e) } };
   }
 }
+
