@@ -477,6 +477,9 @@ const Index = () => {
             
             {/* Legal links */}
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm">
+              <Link to="/contact" className="hover:text-white transition-colors">
+                Контакты
+              </Link>
               <Link to="/privacy" className="hover:text-white transition-colors">
                 Политика конфиденциальности
               </Link>
