@@ -2,9 +2,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// DEV-only diagnostics for "String contains non ISO-8859-1 code point".
-// Identifies which header/value contains non-Latin1 characters (without leaking secrets).
-if (import.meta.env.DEV && typeof window !== "undefined") {
+// Diagnostics for "String contains non ISO-8859-1 code point".
+// Enable by adding `?debugHeaders=1` to the URL.
+if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("debugHeaders")) {
   const hasNonLatin1 = (value: string) => {
     for (let i = 0; i < value.length; i++) {
       if (value.charCodeAt(i) > 255) return true;
