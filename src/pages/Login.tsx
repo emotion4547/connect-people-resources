@@ -39,9 +39,10 @@ const Login: React.FC = () => {
   const { user, role, loading: authLoading, signIn, signUp } = useAuth();
   const { toast } = useToast();
 
-  // DEV diagnostics: show which header contains non-Latin1 chars
+  // Diagnostics: show which header contains non-Latin1 chars
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    const debugHeaders = new URLSearchParams(window.location.search).has("debugHeaders");
+    if (!debugHeaders) return;
 
     const onHeader = (e: Event) => {
       const ce = e as CustomEvent<{ header?: string }>;
