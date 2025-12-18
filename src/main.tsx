@@ -52,14 +52,41 @@ if (import.meta.env.DEV && typeof window !== "undefined") {
     };
   }
 
-  // Also keep a fetch wrapper to surface the original error message.
+  // Also keep a fetch wrapper to surface the original error message and inspect RequestInit.headers.
   if (typeof window.fetch === "function") {
     const originalFetch = window.fetch.bind(window);
+
+    const getHeaderEntries = (h: RequestInit["headers"]) => {
+      const entries: Array<[string, string]> = [];
+      if (!h) return entries;
+      if (h instanceof Headers) {
+        h.forEach((v, k) => entries.push([k, v]));
+      } else if (Array.isArray(h)) {
+        for (const [k, v] of h) entries.push([String(k), String(v)]);
+      } else {
+        for (const [k, v] of Object.entries(h as Record<string, unknown>)) {
+          entries.push([String(k), String(v)]);
+        }
+      }
+      return entries;
+    };
+
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      // Inspect headers before the browser validates them
+      const entries = getHeaderEntries(init?.headers);
+      for (const [k, v] of entries) emit(k, v);
+
       try {
         return await originalFetch(input, init);
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
+
+        // If it's the Latin1 header error, inspect again (in case of late mutation)
+        if (message.includes("non ISO-8859-1")) {
+          const entries2 = getHeaderEntries(init?.headers);
+          for (const [k, v] of entries2) emit(k, v);
+        }
+
         window.dispatchEvent(new CustomEvent("lovable-fetch-error", { detail: { message } }));
         throw err;
       }
