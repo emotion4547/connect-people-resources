@@ -139,7 +139,9 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                      <p className="text-sm text-muted-foreground">support@rabotadlyavsekh.ru</p>
+                      <a href="mailto:oren.arhimed@mail.ru" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                        oren.arhimed@mail.ru
+                      </a>
                     </div>
                   </div>
                 </CardContent>
@@ -153,7 +155,9 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground mb-1">Телефон</h3>
-                      <p className="text-sm text-muted-foreground">+7 (800) 000-00-00</p>
+                      <a href="tel:+79228506001" className="text-sm text-muted-foreground hover:text-secondary transition-colors">
+                        +7 (922) 850-60-01
+                      </a>
                     </div>
                   </div>
                 </CardContent>
@@ -167,8 +171,29 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground mb-1">Адрес</h3>
-                      <p className="text-sm text-muted-foreground">Россия, Москва</p>
+                      <p className="text-sm text-muted-foreground">
+                        460026, Оренбургская обл.,<br />
+                        г. Оренбург, Центральный р-н,<br />
+                        ул. Одесская, д. 100
+                      </p>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Company Info */}
+              <Card className="bg-card border-border">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-foreground mb-4">Реквизиты</h3>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p><span className="text-foreground/80">Компания:</span> ООО «АРХИМЕД ЛИР»</p>
+                    <p><span className="text-foreground/80">ИНН:</span> 5610256637</p>
+                    <p><span className="text-foreground/80">КПП:</span> 5611001001</p>
+                    <p><span className="text-foreground/80">ОГРН:</span> 1255600003955</p>
+                    <p><span className="text-foreground/80">Банк:</span> АО «ТБанк»</p>
+                    <p><span className="text-foreground/80">БИК:</span> 044525974</p>
+                    <p><span className="text-foreground/80">К/с:</span> 30101810145250000974</p>
+                    <p><span className="text-foreground/80">Р/с:</span> 40702810910001902028</p>
                   </div>
                 </CardContent>
               </Card>
