@@ -22,7 +22,7 @@ const Index = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-contain flex-shrink-0" />
+            <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-full flex-shrink-0" />
             <span className="text-base sm:text-xl font-bold text-foreground truncate">РАБОТА ДЛЯ ВСЕХ</span>
           </div>
           <Link to="/login">
@@ -432,7 +432,7 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2">
-              <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+              <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-full" />
               <span className="text-lg sm:text-xl font-bold text-white">РАБОТА ДЛЯ ВСЕХ</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm">
