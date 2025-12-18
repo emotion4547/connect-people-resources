@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar } from 'lucide-react';
+import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
@@ -54,7 +55,8 @@ const AdminRequests: React.FC = () => {
   const [loadingResponses, setLoadingResponses] = useState(false);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-  const [selectedWorkerToAssign, setSelectedWorkerToAssign] = useState<string>('');
+  const [selectedWorkersToAssign, setSelectedWorkersToAssign] = useState<string[]>([]);
+  const [workerSearchFilter, setWorkerSearchFilter] = useState('');
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -224,36 +226,78 @@ const AdminRequests: React.FC = () => {
     }
   };
 
-  const handleAssignWorkerDirectly = async () => {
-    if (!selectedRequest || !selectedWorkerToAssign) return;
+  const handleAssignWorkersDirectly = async () => {
+    if (!selectedRequest || selectedWorkersToAssign.length === 0) return;
 
     try {
-      const existingResponse = responses.find(r => r.worker_id === selectedWorkerToAssign);
-      
-      if (existingResponse) {
-        await supabase
-          .from('responses')
-          .update({ status: 'assigned' as any })
-          .eq('id', existingResponse.id);
-      } else {
-        await supabase
-          .from('responses')
-          .insert({
-            request_id: selectedRequest.id,
-            worker_id: selectedWorkerToAssign,
-            status: 'assigned',
-          });
+      for (const workerId of selectedWorkersToAssign) {
+        const existingResponse = responses.find(r => r.worker_id === workerId);
+        
+        if (existingResponse) {
+          await supabase
+            .from('responses')
+            .update({ status: 'assigned' as any })
+            .eq('id', existingResponse.id);
+        } else {
+          await supabase
+            .from('responses')
+            .insert({
+              request_id: selectedRequest.id,
+              worker_id: workerId,
+              status: 'assigned',
+            });
+        }
       }
 
-      toast({ title: 'Исполнитель назначен' });
+      toast({ 
+        title: 'Исполнители назначены', 
+        description: `Назначено ${selectedWorkersToAssign.length} исполнител${selectedWorkersToAssign.length === 1 ? 'ь' : selectedWorkersToAssign.length < 5 ? 'я' : 'ей'}` 
+      });
       setShowAssignDialog(false);
-      setSelectedWorkerToAssign('');
+      setSelectedWorkersToAssign([]);
+      setWorkerSearchFilter('');
       
       await fetchResponses(selectedRequest.id);
     } catch (error) {
-      console.error('Error assigning worker:', error);
+      console.error('Error assigning workers:', error);
       toast({ title: 'Ошибка', variant: 'destructive' });
     }
+  };
+
+  const toggleWorkerSelection = (workerId: string) => {
+    setSelectedWorkersToAssign(prev => 
+      prev.includes(workerId) 
+        ? prev.filter(id => id !== workerId)
+        : [...prev, workerId]
+    );
+  };
+
+  const filteredWorkers = useMemo(() => {
+    if (!workerSearchFilter) return workers;
+    const search = workerSearchFilter.toLowerCase();
+    return workers.filter(w => 
+      w.full_name?.toLowerCase().includes(search) ||
+      w.city?.toLowerCase().includes(search) ||
+      w.phone?.includes(search)
+    );
+  }, [workers, workerSearchFilter]);
+
+  const selectAllFilteredWorkers = () => {
+    const allIds = filteredWorkers.map(w => w.user_id);
+    setSelectedWorkersToAssign(prev => {
+      const newSelection = [...prev];
+      allIds.forEach(id => {
+        if (!newSelection.includes(id)) {
+          newSelection.push(id);
+        }
+      });
+      return newSelection;
+    });
+  };
+
+  const deselectAllFilteredWorkers = () => {
+    const allIds = filteredWorkers.map(w => w.user_id);
+    setSelectedWorkersToAssign(prev => prev.filter(id => !allIds.includes(id)));
   };
 
   const getStatusBadge = (status: string) => {
@@ -423,9 +467,9 @@ const AdminRequests: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-medium">Отклики и назначения</p>
-                  <Button size="sm" variant="outline" onClick={() => setShowAssignDialog(true)} className="gap-1">
-                    <UserPlus className="w-4 h-4" />
-                    Назначить из списка
+                  <Button size="sm" variant="outline" onClick={() => { setShowAssignDialog(true); setSelectedWorkersToAssign([]); setWorkerSearchFilter(''); }} className="gap-1">
+                    <Users className="w-4 h-4" />
+                    Массовое назначение
                   </Button>
                 </div>
                 {loadingResponses ? (
@@ -459,29 +503,83 @@ const AdminRequests: React.FC = () => {
       </Dialog>
 
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Назначить исполнителя</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Массовое назначение исполнителей
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <Select value={selectedWorkerToAssign} onValueChange={setSelectedWorkerToAssign}>
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите исполнителя" />
-              </SelectTrigger>
-              <SelectContent>
-                {workers.map((worker) => (
-                  <SelectItem key={worker.user_id} value={worker.user_id}>
-                    {worker.full_name || 'Без имени'} {worker.city ? `(${worker.city})` : ''}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex gap-2 justify-end">
+          <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Поиск по имени, городу, телефону..."
+                value={workerSearchFilter}
+                onChange={(e) => setWorkerSearchFilter(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                Выбрано: <span className="font-medium text-foreground">{selectedWorkersToAssign.length}</span> из {filteredWorkers.length}
+              </span>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={selectAllFilteredWorkers}>
+                  Выбрать всех
+                </Button>
+                <Button variant="ghost" size="sm" onClick={deselectAllFilteredWorkers}>
+                  Снять выбор
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0 max-h-[300px] pr-2">
+              {filteredWorkers.length > 0 ? (
+                filteredWorkers.map((worker) => {
+                  const isSelected = selectedWorkersToAssign.includes(worker.user_id);
+                  const isAlreadyAssigned = responses.some(r => r.worker_id === worker.user_id && r.status === 'assigned');
+                  
+                  return (
+                    <div 
+                      key={worker.user_id} 
+                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        isSelected ? 'bg-primary/10 border-primary' : 'bg-muted/50 border-transparent hover:bg-muted'
+                      } ${isAlreadyAssigned ? 'opacity-50' : ''}`}
+                      onClick={() => !isAlreadyAssigned && toggleWorkerSelection(worker.user_id)}
+                    >
+                      <Checkbox 
+                        checked={isSelected} 
+                        disabled={isAlreadyAssigned}
+                        onCheckedChange={() => !isAlreadyAssigned && toggleWorkerSelection(worker.user_id)}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{worker.full_name || 'Без имени'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {worker.city || 'Город не указан'} • {worker.phone || 'Телефон не указан'}
+                        </p>
+                      </div>
+                      {isAlreadyAssigned && (
+                        <Badge className="bg-status-success/20 text-status-success">Назначен</Badge>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Исполнители не найдены
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2 justify-end pt-2 border-t">
               <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
                 Отмена
               </Button>
-              <Button onClick={handleAssignWorkerDirectly} disabled={!selectedWorkerToAssign}>
-                Назначить
+              <Button onClick={handleAssignWorkersDirectly} disabled={selectedWorkersToAssign.length === 0} className="gap-2">
+                <UserPlus className="w-4 h-4" />
+                Назначить ({selectedWorkersToAssign.length})
               </Button>
             </div>
           </div>
