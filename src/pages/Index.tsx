@@ -488,6 +488,12 @@ const Index = () => {
               </Link>
             </div>
             
+            {/* Company info */}
+            <div className="text-white/40 text-xs space-y-1">
+              <p>ООО «АРХИМЕД ЛИР» | ИНН: 5610256637 | ОГРН: 1255600003955</p>
+              <p>460026, Оренбургская обл., г. Оренбург, ул. Одесская, д. 100</p>
+            </div>
+            
             <p className="text-white/60 text-xs sm:text-sm">
               © 2025 РАБОТА ДЛЯ ВСЕХ. Все права защищены.
             </p>
