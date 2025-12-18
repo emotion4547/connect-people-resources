@@ -85,16 +85,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Ensure redirect URL is ASCII-safe (encode any special characters)
+    const redirectUrl = encodeURI(`${window.location.origin}/`);
     
-    // Only pass ASCII-safe data in metadata (role)
-    // full_name and company will be saved via database trigger on profile creation
+    // Only pass ASCII-safe data in metadata (role is always 'hr', 'worker', or 'admin')
+    // full_name and company will be saved separately after signup
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: email.trim().toLowerCase(),
       password,
       options: {
         emailRedirectTo: redirectUrl,
-        data: { role: metadata.role },
+        data: { role: String(metadata.role) },
       },
     });
 
