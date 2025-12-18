@@ -126,7 +126,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
                 src={logo} 
                 alt="Работа для Всех" 
                 className={cn(
-                  "object-contain flex-shrink-0",
+                  "object-cover rounded-full flex-shrink-0",
                   collapsed ? "w-10 h-10" : "w-10 h-10"
                 )} 
               />
