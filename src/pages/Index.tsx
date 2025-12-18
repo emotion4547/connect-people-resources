@@ -1,451 +1,445 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
-  Users, Check, Wallet, Zap, BarChart3, 
-  ClipboardList, UserCheck, ChartLine, LayoutDashboard,
-  ArrowRight, Send
+  Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
+  FileText, Send, CheckCircle, ClipboardList, Bell, 
+  UserCheck, History, BarChart3, MessageSquare, Eye,
+  Building2, Warehouse, Store, Quote, ZoomIn, X
 } from "lucide-react";
-import screenshotWorker from "@/assets/screenshot-worker-dashboard.png";
 import screenshotHR from "@/assets/screenshot-hr-dashboard.png";
+import screenshotWorker from "@/assets/screenshot-worker-dashboard.png";
+import screenshotAdmin from "@/assets/screenshot-admin-panel.png";
 
 const Index = () => {
+  const [selectedScreenshot, setSelectedScreenshot] = useState<{ src: string; title: string } | null>(null);
+
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
-          {/* Logo */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-              <Users className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <span className="text-lg md:text-xl font-bold text-foreground">Работа для Всех</span>
+            <span className="text-base sm:text-xl font-bold text-foreground truncate">Работа для Всех</span>
           </div>
-          
-          {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#workers" className="text-foreground hover:text-primary hover:underline transition-colors">
-              Для исполнителей
-            </a>
-            <a href="#hr" className="text-foreground hover:text-accent hover:underline transition-colors">
-              Для HR
-            </a>
-          </nav>
-          
-          {/* Login Buttons */}
-          <div className="flex items-center gap-2 md:gap-3">
-            <Link to="/login?role=worker">
-              <button className="px-3 md:px-4 py-2 border-2 border-primary text-primary text-sm font-medium rounded-lg hover:bg-primary hover:text-white transition-all duration-200">
-                Вход
-              </button>
-            </Link>
-            <Link to="/login?role=hr" className="hidden sm:block">
-              <button className="px-3 md:px-4 py-2 border-2 border-accent text-foreground text-sm font-medium rounded-lg hover:bg-accent/10 transition-all duration-200">
-                Вход (HR)
-              </button>
-            </Link>
-          </div>
+          <Link to="/login">
+            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white flex-shrink-0">
+              Войти
+            </Button>
+          </Link>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="pt-20 md:pt-24 min-h-[600px] md:min-h-[calc(100vh-80px)] relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
-          {/* Left - Workers */}
-          <div id="workers" className="bg-background flex flex-col justify-center p-8 md:p-12 lg:p-16 relative">
-            <span className="lg:hidden section-label-worker mb-2">👤 Для исполнителей</span>
-            
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-4 md:mb-6 leading-tight">
-              Смены сегодня — оплата завтра
-            </h1>
-            
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6 md:mb-8 max-w-lg">
-              Без резюме, без собеседований. Выбирай смены, которые подходят именно тебе, откликайся одним кликом и получай подтверждение в личном кабинете.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link to="/login?role=worker" className="w-full sm:w-auto">
-                <button className="w-full cta-button-primary">
-                  Стать исполнителем
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
+      <section className="pt-24 sm:pt-28 pb-12 sm:pb-20 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 animate-fade-in overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Text Block */}
+            <div className="text-center lg:text-left relative z-10">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2 sm:px-0">
+                Аутстаффинг персонала{" "}
+                <span className="text-primary">в один клик</span>
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 px-2 sm:px-0">
+                Онлайн‑сервис «Работа для Всех», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
+              </p>
+              
+              <div className="flex flex-col gap-3 justify-center items-center lg:items-start mb-4 sm:mb-6 px-2 sm:px-0">
+                <Link to="/login?role=hr" className="w-full max-w-xs sm:max-w-sm">
+                  <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                    <span>Найти людей для сети</span>
+                  </Button>
+                </Link>
+                <Link to="/login?role=worker" className="w-full max-w-xs sm:max-w-sm">
+                  <Button size="lg" variant="outline" className="w-full border-2 border-secondary bg-white text-secondary hover:bg-secondary hover:text-white px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <HardHat className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                    <span>Найти смену</span>
+                  </Button>
+                </Link>
+              </div>
+              
+              <p className="text-xs sm:text-sm text-muted-foreground px-4 sm:px-0">
+                Без звонков по базе и бесконечных переписок — всё в одном личном кабинете.
+              </p>
             </div>
+            
+            {/* Illustration / Dashboard Preview */}
+            <div className="hidden lg:block relative z-0">
+              <div className="relative ml-4">
+                <div className="bg-card rounded-3xl shadow-2xl border border-border p-6 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-3 h-3 rounded-full bg-destructive"></div>
+                    <div className="w-3 h-3 rounded-full bg-secondary"></div>
+                    <div className="w-3 h-3 rounded-full bg-status-success"></div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="h-8 bg-primary/10 rounded-lg w-3/4"></div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="h-20 bg-primary/20 rounded-xl flex items-center justify-center">
+                        <FileText className="w-8 h-8 text-primary/60" />
+                      </div>
+                      <div className="h-20 bg-secondary/20 rounded-xl flex items-center justify-center">
+                        <Users className="w-8 h-8 text-secondary/60" />
+                      </div>
+                      <div className="h-20 bg-status-success/20 rounded-xl flex items-center justify-center">
+                        <CheckCircle className="w-8 h-8 text-status-success/60" />
+                      </div>
+                    </div>
+                    <div className="h-32 bg-muted rounded-xl"></div>
+                  </div>
+                </div>
+                <div className="absolute -top-4 right-4 bg-secondary text-white px-4 py-2 rounded-xl shadow-lg text-sm font-medium">
+                  Личный кабинет
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How it Works - Two Columns */}
+      <section className="py-12 sm:py-20 px-4 bg-muted/30 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
+            Как работает «Работа для Всех»
+          </h2>
+          
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-8 mb-8 sm:mb-12">
+            {/* HR Column */}
+            <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+              <CardContent className="p-4 sm:p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Для HR федеральных сетей</h3>
+                </div>
+                
+                <div className="space-y-3 sm:space-y-5">
+                  {[
+                    { icon: ClipboardList, text: "Создаёте заявку на нужные даты и объект за пару минут." },
+                    { icon: Send, text: "Сервис автоматически рассылает её исполнителям и публикует в Telegram и VK." },
+                    { icon: UserCheck, text: "Менеджер аутстаффинговой компании подбирает людей и подтверждает выход." },
+                    { icon: Eye, text: "Вы в личном кабинете видите статусы и понимаете, кто и когда выйдет на смену." }
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary font-bold text-sm sm:text-base">{index + 1}</span>
+                      </div>
+                      <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                        <step.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <p className="text-sm sm:text-base text-muted-foreground">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Workers Column */}
+            <Card className="bg-card border-border hover:border-secondary/50 transition-all duration-300 hover:shadow-xl">
+              <CardContent className="p-4 sm:p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <HardHat className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Для исполнителей</h3>
+                </div>
+                
+                <div className="space-y-3 sm:space-y-5">
+                  {[
+                    { icon: FileText, text: "Регистрируетесь и заполняете простую анкету без резюме." },
+                    { icon: Bell, text: "Получаете подходящие смены по городу, графику и ставке." },
+                    { icon: CheckCircle, text: "Откликаетесь в один клик и получаете подтверждение в личном кабинете." },
+                    { icon: History, text: "Выходите на смену и видите историю отработанных смен и оплат." }
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-secondary font-bold text-sm sm:text-base">{index + 1}</span>
+                      </div>
+                      <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                        <step.icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0 mt-0.5" />
+                        <p className="text-sm sm:text-base text-muted-foreground">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
           
-          {/* Right - HR */}
-          <div id="hr" className="bg-muted flex flex-col justify-center p-8 md:p-12 lg:p-16 relative">
-            <span className="lg:hidden section-label-hr mb-2">👔 Для HR</span>
-            
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 md:mb-6 leading-tight">
-              Закройте заявку за 24 часа
-            </h1>
-            
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6 md:mb-8 max-w-lg">
-              Готовая база исполнителей, автопубликация в соцсетях и полный контроль в одном личном кабинете. Вместо десятков чатов — одна удобная платформа.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link to="/login?role=hr" className="w-full sm:w-auto">
-                <button className="w-full cta-button-secondary">
-                  Запросить демонстрацию
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Link to="/login?role=hr" className="w-full max-w-xs sm:w-auto">
+              <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white text-sm sm:text-base">
+                Перейти в кабинет HR
+              </Button>
+            </Link>
+            <Link to="/login?role=worker" className="w-full max-w-xs sm:w-auto">
+              <Button variant="outline" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-white text-sm sm:text-base">
+                Перейти в кабинет исполнителя
+              </Button>
+            </Link>
           </div>
         </div>
-        
-        {/* Vertical Divider */}
-        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-primary/15 -translate-x-1/2" />
       </section>
 
-      {/* How it Works */}
-      <section className="section-padding bg-background relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Left - Workers */}
-            <div>
-              <span className="lg:hidden section-label-worker">👤 Для исполнителей</span>
-              <h2 className="heading-2 text-foreground mb-8 md:mb-10">Как это работает</h2>
-              
-              <div className="space-y-6">
-                {[
-                  { title: "Заполните анкету", desc: "Укажите своё имя, номер телефона и опыт. Никакого резюме — только нужная информация." },
-                  { title: "Смотрите смены", desc: "В личном кабинете видите ленту доступных смен по вашему городу, графику и ставке." },
-                  { title: "Откликнитесь", desc: "Нашли подходящую смену? Откликнитесь одним кликом. Система сразу вас зарегистрирует." },
-                  { title: "Выполните и получите оплату", desc: "Выходите на работу, отмечаете выполнение в кабинете, видите историю смен и оплат." }
-                ].map((step, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="step-number">{index + 1}</div>
-                    <div className="flex-1 pt-1">
-                      <h4 className="text-lg font-semibold text-foreground mb-1">{step.title}</h4>
-                      <p className="text-sm text-muted-foreground">{step.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Right - HR */}
-            <div>
-              <span className="lg:hidden section-label-hr">👔 Для HR</span>
-              <h2 className="heading-2 text-foreground mb-8 md:mb-10">Как это работает</h2>
-              
-              <div className="space-y-6">
-                {[
-                  { title: "Создайте заявку", desc: "За 2 минуты укажите дату, время, объект, должность и количество нужных людей." },
-                  { title: "Система рассылает", desc: "Заявка автоматически публикуется в Telegram, VK и отправляется подходящим исполнителям." },
-                  { title: "Менеджер подтверждает", desc: "Из откликнувшихся исполнителей выбираете нужных, менеджер подтверждает выход." },
-                  { title: "Контролируйте результат", desc: "В личном кабинете видите статусы по каждому исполнителю: кто согласился, кто выйдет, кто уже отработал." }
-                ].map((step, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="step-number-hr">{index + 1}</div>
-                    <div className="flex-1 pt-1">
-                      <h4 className="text-lg font-semibold text-foreground mb-1">{step.title}</h4>
-                      <p className="text-sm text-muted-foreground">{step.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Vertical Divider */}
-        <div className="hidden lg:block absolute left-1/2 top-16 bottom-16 w-px bg-border -translate-x-1/2" />
-      </section>
-
-      {/* Benefits */}
-      <section className="section-padding bg-muted relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Left - Workers */}
-            <div>
-              <span className="lg:hidden section-label-worker">👤 Для исполнителей</span>
-              <h2 className="heading-2 text-foreground mb-8 md:mb-10">Почему исполнители выбирают нас</h2>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { icon: Check, title: "Без резюме", desc: "Только базовая информация о себе. Ни сложных анкет, ни лишних вопросов." },
-                  { icon: Wallet, title: "Понятные ставки", desc: "Видишь сразу, сколько платят за смену и что нужно делать." },
-                  { icon: Zap, title: "Откликнись одним кликом", desc: "Выбрал смену — один клик, и ты в процессе. Никаких звонков и переписок." },
-                  { icon: BarChart3, title: "История и прозрачность", desc: "Видишь все свои смены, выплаты и рейтинг. Всё отслеживается в кабинете." }
-                ].map((benefit, index) => (
-                  <div key={index} className="benefit-card">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-3">
-                      <benefit.icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Right - HR */}
-            <div>
-              <span className="lg:hidden section-label-hr">👔 Для HR</span>
-              <h2 className="heading-2 text-foreground mb-8 md:mb-10">Почему HR выбирают нас</h2>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { icon: Check, title: "Быстрое закрытие заявок", desc: "До 70% заявок закрываются в срок благодаря готовой базе исполнителей и автопубликации." },
-                  { icon: Users, title: "Готовая база исполнителей", desc: "1000+ проверенных исполнителей по всей России. Рейтинги и история работ." },
-                  { icon: LayoutDashboard, title: "Полный контроль в одном месте", desc: "Вместо десятков чатов, таблиц и звонков — всё в одном личном кабинете с ясными статусами." },
-                  { icon: ChartLine, title: "Аналитика и история", desc: "Отслеживайте тренды по объектам, датам и исполнителям. Экспортируйте отчёты." }
-                ].map((benefit, index) => (
-                  <div key={index} className="benefit-card-hr">
-                    <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center mb-3">
-                      <benefit.icon className="w-5 h-5 text-accent" />
-                    </div>
-                    <h4 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Vertical Divider */}
-        <div className="hidden lg:block absolute left-1/2 top-16 bottom-16 w-px bg-border -translate-x-1/2" />
-      </section>
-
-      {/* Cabinets Preview */}
-      <section className="section-padding bg-background relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Left - Workers Cabinet */}
-            <div>
-              <span className="lg:hidden section-label-worker">👤 Для исполнителей</span>
-              <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-4">Ваш личный кабинет исполнителя</h3>
-              <p className="text-muted-foreground mb-6">
-                Лента доступных смен, быстрый отклик, история выполненных работ и заработков.
-              </p>
-              
-              <div className="cabinet-preview">
-                <img 
-                  src={screenshotWorker} 
-                  alt="Кабинет исполнителя" 
-                  className="w-full h-auto rounded-lg"
-                  loading="lazy"
-                />
-                <ul className="mt-4 space-y-2">
-                  {[
-                    "Лента доступных смен с фильтрами",
-                    "Быстрый отклик одной кнопкой",
-                    "Подтверждение выхода от HR",
-                    "История работ и выплат"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            
-            {/* Right - HR Cabinet */}
-            <div>
-              <span className="lg:hidden section-label-hr">👔 Для HR</span>
-              <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-4">Ваш личный кабинет HR</h3>
-              <p className="text-muted-foreground mb-6">
-                Доска заявок с фильтрами, создание новых смен за 2 минуты, список откликнувшихся исполнителей, полный контроль статусов.
-              </p>
-              
-              <div className="cabinet-preview">
-                <img 
-                  src={screenshotHR} 
-                  alt="Кабинет HR" 
-                  className="w-full h-auto rounded-lg"
-                  loading="lazy"
-                />
-                <ul className="mt-4 space-y-2">
-                  {[
-                    "Доска заявок с быстрым созданием",
-                    "Список откликнувшихся исполнителей",
-                    "Подтверждение выхода",
-                    "Статусы по каждому исполнителю"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="w-4 h-4 text-accent flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Vertical Divider */}
-        <div className="hidden lg:block absolute left-1/2 top-16 bottom-16 w-px bg-border -translate-x-1/2" />
-      </section>
-
-      {/* Statistics & Social Proof */}
-      <section className="section-padding bg-muted relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Left - Workers Stats */}
-            <div>
-              <span className="lg:hidden section-label-worker">👤 Для исполнителей</span>
-              
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div>
-                  <p className="stat-number-worker">1000+</p>
-                  <p className="text-sm text-muted-foreground mt-1">Исполнителей в базе по России</p>
+      {/* Benefits for HR */}
+      <section className="py-12 sm:py-20 px-4 bg-primary/5 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
+            Почему HR выбирают «Работа для Всех»
+          </h2>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+            {[
+              { icon: Zap, title: "Быстрое закрытие заявок", desc: "Готовая база исполнителей и автопубликации в соцсети." },
+              { icon: ClipboardList, title: "Единый личный кабинет", desc: "Вместо мессенджеров, таблиц и личных контактов." },
+              { icon: Eye, title: "Прозрачные статусы", desc: "По каждой заявке: от создания до выхода людей на смену." },
+              { icon: MessageSquare, title: "Меньше звонков", desc: "Меньше ручных звонков и переписок — больше контроля." },
+              { icon: BarChart3, title: "История и аналитика", desc: "История заявок и базовая аналитика по точкам и датам." },
+              { icon: Shield, title: "Надёжность", desc: "Проверенные исполнители с рейтингом и историей." }
+            ].map((benefit, index) => (
+              <div 
+                key={index}
+                className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                  <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
-                <div>
-                  <p className="stat-number-worker">~2 мин</p>
-                  <p className="text-sm text-muted-foreground mt-1">На регистрацию и анкету</p>
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm sm:text-base text-foreground mb-1">{benefit.title}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{benefit.desc}</p>
                 </div>
               </div>
-              
-              <div className="bg-background p-6 rounded-xl border border-border">
-                <p className="quote-text italic mb-4">
-                  "Просто создал профиль и сразу получил 3 предложения на завтра. Без никакой рутины."
+            ))}
+          </div>
+          
+          <div className="text-center px-4">
+            <Link to="/login?role=hr" className="inline-block w-full max-w-xs sm:w-auto">
+              <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Посмотреть кабинет HR
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits for Workers */}
+      <section className="py-12 sm:py-20 px-4 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
+            Почему исполнителям удобно работать через «Работа для Всех»
+          </h2>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+            {[
+              { icon: FileText, title: "Понятные смены", desc: "Где работать, сколько часов и сколько платят." },
+              { icon: CheckCircle, title: "Без резюме", desc: "Без резюме и сложных анкет — достаточно базовой информации." },
+              { icon: ClipboardList, title: "Всё в одном месте", desc: "Все отклики и подтверждения в одном личном кабинете." },
+              { icon: MapPin, title: "Удобный график", desc: "Можно выбирать удобный график и локации." },
+              { icon: History, title: "История смен", desc: "Видна история уже отработанных смен." }
+            ].map((benefit, index) => (
+              <div 
+                key={index}
+                className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-card border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                  <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm sm:text-base text-foreground mb-1">{benefit.title}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{benefit.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center px-4">
+            <Link to="/login?role=worker" className="inline-block w-full max-w-xs sm:w-auto">
+              <Button size="lg" className="w-full bg-secondary hover:bg-secondary/90 text-white px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Создать анкету исполнителя
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof & Numbers */}
+      <section className="py-12 sm:py-20 px-4 bg-muted/30 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-8 sm:mb-12 px-2">
+            Сервис, который упрощает жизнь и HR, и исполнителям
+          </h2>
+          
+          {/* Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 mb-12 sm:mb-16">
+            {[
+              { number: "70%", label: "заявок закрываются в срок" },
+              { number: "1000+", label: "исполнителей в базе по России" },
+              { number: "~2 мин", label: "на создание заявки" },
+              { number: "99%", label: "показатель выхода на смены" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center p-4 sm:p-6">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 sm:mb-2">{stat.number}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+          
+          {/* Testimonial */}
+          <div className="max-w-3xl mx-auto">
+            <Card className="bg-card border-border p-4 sm:p-8">
+              <CardContent className="p-0">
+                <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-secondary/30 mb-3 sm:mb-4" />
+                <p className="text-base sm:text-lg md:text-xl text-foreground mb-4 sm:mb-6 leading-relaxed">
+                  «Мы перестали держать десятки чатов в WhatsApp. Всё, что связано со сменами, теперь в "Работа для Всех". Сбережения на время координации — огромные.»
                 </p>
-                <p className="text-sm font-medium text-foreground">— Иван, исполнитель, Москва</p>
-              </div>
-            </div>
-            
-            {/* Right - HR Stats */}
-            <div>
-              <span className="lg:hidden section-label-hr">👔 Для HR</span>
-              
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div>
-                  <p className="stat-number-hr">70%</p>
-                  <p className="text-sm text-muted-foreground mt-1">Заявок закрываются в срок</p>
-                </div>
-                <div>
-                  <p className="stat-number-hr">99%</p>
-                  <p className="text-sm text-muted-foreground mt-1">Показатель выхода на смены</p>
-                </div>
-              </div>
-              
-              <div className="bg-background p-6 rounded-xl border border-border">
-                <p className="quote-text italic mb-4">
-                  "Перестали держать десятки чатов. Всё, что связано со сменами, теперь в «Работа для Всех». Сбережения на время координации — огромные."
-                </p>
-                <p className="text-sm font-medium text-foreground">— HR-менеджер федеральной сети</p>
-              </div>
-            </div>
+                <p className="text-sm sm:text-base text-muted-foreground">— HR-менеджер федеральной сети</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
-        
-        {/* Vertical Divider */}
-        <div className="hidden lg:block absolute left-1/2 top-16 bottom-16 w-px bg-border -translate-x-1/2" />
       </section>
+
+      {/* Screenshots Section */}
+      <section className="py-12 sm:py-20 px-4 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-3 sm:mb-4 px-2">
+            Как выглядит сервис
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground text-center mb-8 sm:mb-12 px-4">
+            Кабинет HR, кабинет исполнителя и панель администратора
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              { src: screenshotHR, title: "Кабинет HR", desc: "Доска заявок с фильтрами, статусами, быстрое создание новых смен и список откликнувшихся исполнителей." },
+              { src: screenshotWorker, title: "Кабинет исполнителя", desc: "Лента доступных смен с видимыми ставками. Откликнуться — один клик. Поддержка пользователей." },
+              { src: screenshotAdmin, title: "Панель администратора", desc: "Выбор исполнителей, контроль явки, работа с обращениями пользователей и управление системой." }
+            ].map((screenshot, index) => (
+              <div 
+                key={index} 
+                className="group relative cursor-pointer"
+                onClick={() => setSelectedScreenshot({ src: screenshot.src, title: screenshot.title })}
+              >
+                <div className="bg-card rounded-xl sm:rounded-2xl border border-border overflow-hidden hover:border-primary/30 hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-video overflow-hidden bg-muted">
+                    <img 
+                      src={screenshot.src} 
+                      alt={screenshot.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors duration-300 flex items-center justify-center">
+                      <ZoomIn className="w-8 h-8 sm:w-10 sm:h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
+                    </div>
+                  </div>
+                  <div className="p-3 sm:p-4">
+                    <h3 className="font-semibold text-sm sm:text-base text-foreground mb-1 sm:mb-2">{screenshot.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{screenshot.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Screenshot Modal */}
+      <Dialog open={!!selectedScreenshot} onOpenChange={() => setSelectedScreenshot(null)}>
+        <DialogContent className="max-w-[95vw] sm:max-w-5xl p-0 bg-background border-border">
+          <div className="relative">
+            <button
+              onClick={() => setSelectedScreenshot(null)}
+              className="absolute right-2 top-2 sm:right-4 sm:top-4 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-background/80 hover:bg-background rounded-full flex items-center justify-center transition-colors"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
+            </button>
+            {selectedScreenshot && (
+              <div className="p-2 sm:p-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-4 pr-10 sm:pr-12">{selectedScreenshot.title}</h3>
+                <img 
+                  src={selectedScreenshot.src} 
+                  alt={selectedScreenshot.title}
+                  className="w-full h-auto rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Final CTA */}
-      <section className="section-padding bg-[hsl(0,0%,10%)] relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Left - Workers */}
-            <div className="text-center lg:text-left">
-              <span className="lg:hidden inline-flex items-center gap-2 px-4 py-1.5 bg-primary/20 text-primary rounded-full text-sm font-medium mb-4">
-                👤 Для исполнителей
-              </span>
-              
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Готовы начать?</h2>
-              <p className="text-base text-gray-400 mb-6 max-w-md mx-auto lg:mx-0">
-                Создайте анкету прямо сейчас и получите первые предложения уже сегодня.
-              </p>
-              
-              <Link to="/login?role=worker" className="inline-block w-full sm:w-auto">
-                <button className="w-full sm:w-auto cta-button-primary px-10 py-4">
-                  Стать исполнителем
-                </button>
-              </Link>
-              
-              <p className="mt-4">
-                <Link to="/login?role=worker" className="text-sm text-primary hover:underline">
-                  Уже есть аккаунт? Войти
-                </Link>
-              </p>
-            </div>
-            
-            {/* Right - HR */}
-            <div className="text-center lg:text-left">
-              <span className="lg:hidden inline-flex items-center gap-2 px-4 py-1.5 bg-accent/20 text-accent rounded-full text-sm font-medium mb-4">
-                👔 Для HR
-              </span>
-              
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Готовы увеличить скорость?</h2>
-              <p className="text-base text-gray-400 mb-6 max-w-md mx-auto lg:mx-0">
-                Подключите сервис к вашей сети и протестируйте на одном объекте. Никаких долгих контрактов.
-              </p>
-              
-              <Link to="/login?role=hr" className="inline-block w-full sm:w-auto">
-                <button className="w-full sm:w-auto cta-button-secondary-dark px-10 py-4">
-                  Запросить демонстрацию
-                </button>
-              </Link>
-              
-              <p className="mt-4">
-                <Link to="/login?role=hr" className="text-sm text-accent hover:underline">
-                  Уже партнёр? Войти в кабинет
-                </Link>
-              </p>
-            </div>
+      <section className="py-12 sm:py-20 px-4 bg-primary overflow-hidden">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 px-2">
+            Начните прямо сейчас
+          </h2>
+          <p className="text-sm sm:text-base md:text-lg text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
+            Подключите сервис к вашей сети или создайте анкету, чтобы получать первые предложения уже на этой неделе.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+            <Link to="/login?role=hr" className="w-full max-w-xs sm:w-auto">
+              <Button size="lg" className="w-full bg-white text-primary hover:bg-white/90 px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Запросить демонстрацию
+              </Button>
+            </Link>
+            <Link to="/login?role=worker" className="w-full max-w-xs sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-primary px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Стать исполнителем
+              </Button>
+            </Link>
           </div>
         </div>
-        
-        {/* Vertical Divider */}
-        <div className="hidden lg:block absolute left-1/2 top-16 bottom-16 w-px bg-white/10 -translate-x-1/2" />
+      </section>
+
+      {/* Target Audience */}
+      <section className="py-12 sm:py-16 px-4 bg-muted/30 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-foreground mb-6 sm:mb-8 px-2">
+            Для каких объектов подходит сервис
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground text-center mb-6 sm:mb-10 max-w-2xl mx-auto px-4">
+            Склады, сортировочные центры, магазины и другие объекты, где важна скорость и надёжность выхода людей на смену.
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            {[
+              { icon: Warehouse, label: "Склады" },
+              { icon: Store, label: "Магазины" },
+              { icon: Building2, label: "Сортировочные центры" }
+            ].map((item, index) => (
+              <div 
+                key={index}
+                className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 bg-card border border-border rounded-full hover:border-primary/30 transition-colors"
+              >
+                <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span className="text-sm sm:text-base text-foreground">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[hsl(0,0%,10%)] border-t border-white/10 py-10 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Logo & Copyright */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-lg font-bold text-white">Работа для Всех</span>
+      <footer className="py-8 sm:py-12 px-4 bg-card border-t border-border">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
-              <p className="text-sm text-gray-500">© 2025 Работа для Всех. Все права защищены.</p>
-              
-              {/* Social Links */}
-              <div className="flex gap-3 mt-4">
-                <a href="#" className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center transition-colors">
-                  <Send className="w-5 h-5 text-gray-400" />
-                </a>
-              </div>
+              <span className="text-sm sm:text-base font-bold text-foreground">Работа для Всех</span>
             </div>
-            
-            {/* Workers Links */}
-            <div>
-              <h4 className="text-sm font-semibold text-white mb-4">Для исполнителей</h4>
-              <ul className="space-y-2">
-                <li><Link to="/login?role=worker" className="text-sm text-gray-400 hover:text-primary transition-colors">Регистрация</Link></li>
-                <li><Link to="/login?role=worker" className="text-sm text-gray-400 hover:text-primary transition-colors">Вход</Link></li>
-                <li><a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            
-            {/* HR Links */}
-            <div>
-              <h4 className="text-sm font-semibold text-white mb-4">Для HR</h4>
-              <ul className="space-y-2">
-                <li><Link to="/login?role=hr" className="text-sm text-gray-400 hover:text-accent transition-colors">Демонстрация</Link></li>
-                <li><Link to="/login?role=hr" className="text-sm text-gray-400 hover:text-accent transition-colors">Вход</Link></li>
-                <li><a href="#" className="text-sm text-gray-400 hover:text-accent transition-colors">Контакты</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          {/* Bottom Links */}
-          <div className="mt-8 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex gap-4">
-              <a href="#" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">О сервисе</a>
-              <a href="#" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Политика конфиденциальности</a>
-            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground text-center">
+              © 2025 Работа для Всех. Все права защищены.
+            </p>
           </div>
         </div>
       </footer>
