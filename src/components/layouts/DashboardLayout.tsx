@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   Tooltip,
   TooltipContent,
@@ -29,11 +30,14 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+  badge?: number;
 }
 
 interface DashboardLayoutProps {
@@ -77,11 +81,40 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
     return saved === 'true';
   });
 
+  // Fetch unread contact messages count for admin
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['unread-contact-messages'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('contact_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_read', false);
+      
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: role === 'admin',
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
   React.useEffect(() => {
     localStorage.setItem('sidebar-collapsed', String(collapsed));
   }, [collapsed]);
 
-  const navItems = role === 'hr' ? hrNavItems : role === 'worker' ? workerNavItems : adminNavItems;
+  // Add badge to admin nav items
+  const getNavItems = () => {
+    if (role === 'hr') return hrNavItems;
+    if (role === 'worker') return workerNavItems;
+    
+    return adminNavItems.map(item => {
+      if (item.href === '/admin/contact-messages' && unreadCount > 0) {
+        return { ...item, badge: unreadCount };
+      }
+      return item;
+    });
+  };
+
+  const navItems = getNavItems();
 
   const handleSignOut = async () => {
     await signOut();
@@ -137,27 +170,47 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
 
           {/* Navigation */}
           <nav className={cn("flex-1 p-2 space-y-1 overflow-y-auto", collapsed ? "px-1" : "p-4")}>
-            {navItems.map((item) => (
+          {navItems.map((item) => (
               <Tooltip key={item.href}>
                 <TooltipTrigger asChild>
                   <Link
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl transition-all duration-200",
+                      "flex items-center gap-3 rounded-xl transition-all duration-200 relative",
                       collapsed ? "px-3 py-3 justify-center" : "px-4 py-3",
                       location.pathname === item.href
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
                         : "hover:bg-sidebar-accent/50 text-sidebar-foreground/80"
                     )}
                   >
-                    <span className="text-secondary flex-shrink-0">{item.icon}</span>
-                    {!collapsed && <span className="font-medium">{item.label}</span>}
+                    <span className="text-secondary flex-shrink-0 relative">
+                      {item.icon}
+                      {item.badge && item.badge > 0 && collapsed && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center"
+                        >
+                          {item.badge > 99 ? '99+' : item.badge}
+                        </Badge>
+                      )}
+                    </span>
+                    {!collapsed && (
+                      <>
+                        <span className="font-medium flex-1">{item.label}</span>
+                        {item.badge && item.badge > 0 && (
+                          <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
+                            {item.badge > 99 ? '99+' : item.badge}
+                          </Badge>
+                        )}
+                      </>
+                    )}
                   </Link>
                 </TooltipTrigger>
                 {collapsed && (
                   <TooltipContent side="right">
                     {item.label}
+                    {item.badge && item.badge > 0 && ` (${item.badge})`}
                   </TooltipContent>
                 )}
               </Tooltip>
