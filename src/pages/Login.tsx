@@ -292,7 +292,7 @@ const Login: React.FC = () => {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center space-y-2">
               <button
                 type="button"
                 onClick={() => {
@@ -303,6 +303,13 @@ const Login: React.FC = () => {
               >
                 {isSignUp ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
               </button>
+              {!isSignUp && (
+                <div>
+                  <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
+                    Забыли пароль?
+                  </Link>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
