@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PageMeta from "@/components/PageMeta";
-import { 
+import logo from "@/assets/logo.png";
+import {
   Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
   FileText, Send, CheckCircle, ClipboardList, Bell, 
   UserCheck, History, BarChart3, MessageSquare, Eye,
@@ -20,9 +21,7 @@ const Index = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
+            <img src={logo} alt="Люди и Ресурсы" className="w-8 h-8 sm:w-10 sm:h-10 object-contain flex-shrink-0" />
             <span className="text-base sm:text-xl font-bold text-foreground truncate">ЛЮДИ И РЕСУРСЫ</span>
           </div>
           <Link to="/login">

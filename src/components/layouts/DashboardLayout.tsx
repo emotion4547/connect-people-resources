@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -121,12 +122,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
           {/* Logo */}
           <div className={cn("p-4 border-b border-sidebar-border", collapsed ? "px-2" : "p-6")}>
             <Link to="/" className="flex items-center gap-2">
-              <div className={cn(
-                "rounded-xl bg-secondary flex items-center justify-center flex-shrink-0",
-                collapsed ? "w-10 h-10" : "w-10 h-10"
-              )}>
-                <span className="text-secondary-foreground font-bold text-lg">ЛР</span>
-              </div>
+              <img 
+                src={logo} 
+                alt="Люди и Ресурсы" 
+                className={cn(
+                  "object-contain flex-shrink-0",
+                  collapsed ? "w-10 h-10" : "w-10 h-10"
+                )} 
+              />
               {!collapsed && <span className="font-bold text-lg">ЛЮДИ И РЕСУРСЫ</span>}
             </Link>
           </div>
