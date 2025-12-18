@@ -6,52 +6,52 @@
 
 @layer base {
   :root {
-    /* Brand colors */
-    --primary: 226 69% 49%;
+    /* Brand colors - Updated per ТЗ */
+    --primary: 229 58% 49%; /* #2d4ccd - синий */
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 41 38% 61%;
-    --secondary-foreground: 0 0% 20%;
+    --secondary: 0 0% 96%; /* #f5f5f5 - светло-серый фон */
+    --secondary-foreground: 0 0% 10%;
     
-    --background: 0 0% 100%;
-    --foreground: 0 0% 20%;
+    --accent: 42 37% 61%; /* #c6b272 - золотой */
+    --accent-foreground: 0 0% 10%;
+    
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 10%; /* #1a1a1a */
     
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 20%;
+    --card-foreground: 0 0% 10%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 20%;
+    --popover-foreground: 0 0% 10%;
     
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
-    
-    --accent: 41 38% 61%;
-    --accent-foreground: 0 0% 20%;
+    --muted: 0 0% 96%; /* #f5f5f5 */
+    --muted-foreground: 0 0% 40%; /* #666666 */
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 226 69% 49%;
+    --border: 0 0% 88%; /* #e0e0e0 */
+    --input: 0 0% 88%;
+    --ring: 229 58% 49%;
     
-    --radius: 1rem;
+    --radius: 0.5rem;
     
     /* Status colors */
     --status-gray: 0 0% 80%;
     --status-orange: 36 100% 49%;
-    --status-gold: 41 38% 61%;
+    --status-gold: 42 37% 61%;
     --status-success: 142 76% 36%;
     
     /* Sidebar */
-    --sidebar-background: 226 69% 49%;
+    --sidebar-background: 229 58% 49%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 226 69% 49%;
-    --sidebar-accent: 226 69% 55%;
+    --sidebar-primary-foreground: 229 58% 49%;
+    --sidebar-accent: 229 58% 55%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 226 69% 45%;
-    --sidebar-ring: 41 38% 61%;
+    --sidebar-border: 229 58% 45%;
+    --sidebar-ring: 42 37% 61%;
   }
 
   .dark {
@@ -64,16 +64,16 @@
     --popover: 222 47% 14%;
     --popover-foreground: 0 0% 98%;
     
-    --primary: 226 69% 55%;
+    --primary: 229 58% 55%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 41 38% 50%;
+    --secondary: 222 47% 15%;
     --secondary-foreground: 0 0% 100%;
     
     --muted: 222 47% 20%;
     --muted-foreground: 0 0% 65%;
     
-    --accent: 41 38% 50%;
+    --accent: 42 37% 55%;
     --accent-foreground: 0 0% 100%;
     
     --destructive: 0 62% 50%;
@@ -81,16 +81,16 @@
     
     --border: 222 47% 20%;
     --input: 222 47% 20%;
-    --ring: 226 69% 55%;
+    --ring: 229 58% 55%;
     
     --sidebar-background: 222 47% 14%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 226 69% 55%;
+    --sidebar-primary: 229 58% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 47% 20%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 222 47% 20%;
-    --sidebar-ring: 41 38% 61%;
+    --sidebar-ring: 42 37% 61%;
   }
 }
 
@@ -108,10 +108,124 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* CTA Button Primary (Blue - for Workers) */
+  .cta-button-primary {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white font-semibold rounded-lg transition-all duration-200;
+  }
+  
+  .cta-button-primary:hover {
+    background-color: hsl(229, 63%, 33%);
+    @apply shadow-lg;
+  }
+
+  /* CTA Button Secondary (Gold outline - for HR) */
+  .cta-button-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-accent bg-transparent text-foreground font-semibold rounded-lg transition-all duration-200;
+  }
+  
+  .cta-button-secondary:hover {
+    @apply bg-accent/10;
+  }
+
+  /* CTA Button Secondary on Dark */
+  .cta-button-secondary-dark {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-accent bg-transparent text-white font-semibold rounded-lg transition-all duration-200;
+  }
+  
+  .cta-button-secondary-dark:hover {
+    @apply bg-accent text-foreground;
+  }
+
+  /* Benefit Card - Worker */
+  .benefit-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-sm transition-all duration-200;
+  }
+  
+  .benefit-card:hover {
+    @apply border-primary shadow-md -translate-y-1;
+  }
+
+  /* Benefit Card - HR */
+  .benefit-card-hr {
+    @apply bg-card border border-border rounded-lg p-6 shadow-sm transition-all duration-200;
+  }
+  
+  .benefit-card-hr:hover {
+    @apply border-accent shadow-md -translate-y-1;
+  }
+
+  /* Step Number Circle - Worker */
+  .step-number {
+    @apply w-12 h-12 rounded-full bg-primary text-white font-bold text-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  /* Step Number Circle - HR */
+  .step-number-hr {
+    @apply w-12 h-12 rounded-full bg-accent text-white font-bold text-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  /* Section Labels for Mobile */
+  .section-label-worker {
+    @apply inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4;
+  }
+
+  .section-label-hr {
+    @apply inline-flex items-center gap-2 px-4 py-1.5 bg-accent/20 text-accent rounded-full text-sm font-medium mb-4;
+  }
+
+  /* Stat Numbers */
+  .stat-number-worker {
+    @apply text-4xl md:text-5xl font-bold text-primary;
+  }
+
+  .stat-number-hr {
+    @apply text-4xl md:text-5xl font-bold text-accent;
+  }
+
+  /* Quote Styling */
+  .quote-text {
+    @apply text-base text-muted-foreground leading-relaxed;
+  }
+
+  /* Cabinet Preview */
+  .cabinet-preview {
+    @apply border border-border rounded-xl overflow-hidden bg-muted p-4 md:p-6;
+  }
 }
 
 @layer utilities {
-  /* Animations */
+  /* Section Padding */
+  .section-padding {
+    @apply py-12 md:py-16 lg:py-20 px-4 md:px-6;
+  }
+
+  /* Heading Sizes */
+  .heading-1 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight;
+  }
+
+  .heading-2 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold leading-tight;
+  }
+
+  .heading-3 {
+    @apply text-xl md:text-2xl font-semibold;
+  }
+
+  .body-text {
+    @apply text-sm md:text-base text-muted-foreground leading-relaxed;
+  }
+}
+
+/* Animations */
+@layer utilities {
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
