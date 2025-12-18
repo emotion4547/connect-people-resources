@@ -224,6 +224,150 @@ const AdminDashboard: React.FC = () => {
           </Card>
         )}
 
+        {/* Weekly Activity Charts */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card className="animate-fade-in">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                Активность за неделю
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="h-[250px] bg-muted animate-shimmer rounded-lg" />
+              ) : (
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--status-success))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--status-success))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="date" 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                      allowDecimals={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="requests" 
+                      name="Создано заявок"
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      fillOpacity={1} 
+                      fill="url(#colorRequests)" 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="completed" 
+                      name="Выполнено"
+                      stroke="hsl(var(--status-success))" 
+                      strokeWidth={2}
+                      fillOpacity={1} 
+                      fill="url(#colorCompleted)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+              <div className="flex justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-primary" />
+                  <span className="text-sm text-muted-foreground">Создано заявок</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-status-success" />
+                  <span className="text-sm text-muted-foreground">Выполнено</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="animate-fade-in">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-secondary" />
+                Заявки по дням
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="h-[250px] bg-muted animate-shimmer rounded-lg" />
+              ) : (
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={chartData}>
+                    <XAxis 
+                      dataKey="date" 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                      allowDecimals={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
+                      cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
+                    />
+                    <Bar 
+                      dataKey="requests" 
+                      name="Заявки"
+                      fill="hsl(var(--primary))" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey="completed" 
+                      name="Выполнено"
+                      fill="hsl(var(--status-success))" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+              <div className="flex justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded bg-primary" />
+                  <span className="text-sm text-muted-foreground">Заявки</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded bg-status-success" />
+                  <span className="text-sm text-muted-foreground">Выполнено</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Quick actions */}
         <Card className="animate-fade-in">
           <CardHeader>
