@@ -153,7 +153,7 @@ const WorkerVacancies: React.FC = () => {
 
   return (
     <DashboardLayout role="worker">
-      <PageMeta title="Доступные смены" description="Найдите подходящие вакансии и смены в системе Люди и Ресурсы" />
+      <PageMeta title="Доступные смены" description="Найдите подходящие вакансии и смены в системе Работа для Всех" />
       <div className="space-y-6 animate-slide-up">
         <div>
           <h1 className="text-3xl font-bold mb-2">Доступные смены</h1>

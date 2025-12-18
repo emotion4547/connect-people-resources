@@ -124,13 +124,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
             <Link to="/" className="flex items-center gap-2">
               <img 
                 src={logo} 
-                alt="Люди и Ресурсы" 
+                alt="Работа для Всех" 
                 className={cn(
                   "object-contain flex-shrink-0",
                   collapsed ? "w-10 h-10" : "w-10 h-10"
                 )} 
               />
-              {!collapsed && <span className="font-bold text-lg">ЛЮДИ И РЕСУРСЫ</span>}
+              {!collapsed && <span className="font-bold text-lg">РАБОТА ДЛЯ ВСЕХ</span>}
             </Link>
           </div>
 

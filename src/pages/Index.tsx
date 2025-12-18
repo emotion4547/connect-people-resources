@@ -15,14 +15,14 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <PageMeta 
         title="Главная" 
-        description="Люди и Ресурсы — современная платформа для подбора временного персонала. Быстрый поиск исполнителей для HR и удобные смены для работников."
+        description="Работа для Всех — современная платформа для подбора временного персонала. Быстрый поиск исполнителей для HR и удобные смены для работников."
       />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Люди и Ресурсы" className="w-8 h-8 sm:w-10 sm:h-10 object-contain flex-shrink-0" />
-            <span className="text-base sm:text-xl font-bold text-foreground truncate">ЛЮДИ И РЕСУРСЫ</span>
+            <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-contain flex-shrink-0" />
+            <span className="text-base sm:text-xl font-bold text-foreground truncate">РАБОТА ДЛЯ ВСЕХ</span>
           </div>
           <Link to="/login">
             <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white flex-shrink-0">
@@ -43,7 +43,7 @@ const Index = () => {
                 <span className="text-primary">в один клик</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 px-2 sm:px-0">
-                Онлайн‑сервис «ЛЮДИ И РЕСУРСЫ», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
+                Онлайн‑сервис «РАБОТА ДЛЯ ВСЕХ», который помогает федеральным сетям быстро закрывать заявки на неквалифицированный персонал и даёт исполнителям простой способ находить смены с понятной оплатой.
               </p>
               
               <div className="flex flex-col gap-3 justify-center items-center lg:items-start mb-4 sm:mb-6 px-2 sm:px-0">
@@ -104,7 +104,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Как работает «ЛЮДИ И РЕСУРСЫ»
+            Как работает «РАБОТА ДЛЯ ВСЕХ»
           </h2>
           
           <div className="grid lg:grid-cols-2 gap-8 mb-12">
@@ -190,7 +190,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-primary/5">
         <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Почему HR выбирают «ЛЮДИ И РЕСУРСЫ»
+            Почему HR выбирают «РАБОТА ДЛЯ ВСЕХ»
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -231,7 +231,7 @@ const Index = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Почему исполнителям удобно работать через «ЛЮДИ И РЕСУРСЫ»
+            Почему исполнителям удобно работать через «РАБОТА ДЛЯ ВСЕХ»
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -294,7 +294,7 @@ const Index = () => {
               <CardContent className="p-8">
                 <Quote className="w-10 h-10 text-secondary/30 mb-4" />
                 <blockquote className="text-xl text-foreground mb-4 italic">
-                  «Мы перестали держать десятки чатов — всё, что связано со сменами, теперь в "ЛЮДИ И РЕСУРСЫ".»
+                  «Мы перестали держать десятки чатов — всё, что связано со сменами, теперь в "РАБОТА ДЛЯ ВСЕХ".»
                 </blockquote>
                 <p className="text-muted-foreground">— HR-менеджер федеральной сети</p>
               </CardContent>
@@ -355,7 +355,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-gradient-to-br from-primary via-primary/95 to-primary/90">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
-            Начните пользоваться «ЛЮДИ И РЕСУРСЫ» уже сегодня
+            Начните пользоваться «РАБОТА ДЛЯ ВСЕХ» уже сегодня
           </h2>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
@@ -393,7 +393,7 @@ const Index = () => {
           </div>
           
           <p className="text-white/60 text-sm max-w-2xl mx-auto">
-            «ЛЮДИ И РЕСУРСЫ» создан специально для работы с неквалифицированным персоналом: склады, сортировочные центры, магазины и другие объекты, где важна скорость и надёжность выхода людей на смену.
+            «РАБОТА ДЛЯ ВСЕХ» создан специально для работы с неквалифицированным персоналом: склады, сортировочные центры, магазины и другие объекты, где важна скорость и надёжность выхода людей на смену.
           </p>
         </div>
       </section>
@@ -403,10 +403,8 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex flex-col items-center gap-6 text-center">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <span className="text-lg sm:text-xl font-bold text-white">ЛЮДИ И РЕСУРСЫ</span>
+              <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+              <span className="text-lg sm:text-xl font-bold text-white">РАБОТА ДЛЯ ВСЕХ</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm">
               <div className="flex items-center gap-2">
@@ -423,7 +421,7 @@ const Index = () => {
               </div>
             </div>
             <p className="text-white/60 text-xs sm:text-sm">
-              © 2025 ЛЮДИ И РЕСУРСЫ. Все права защищены.
+              © 2025 РАБОТА ДЛЯ ВСЕХ. Все права защищены.
             </p>
           </div>
         </div>

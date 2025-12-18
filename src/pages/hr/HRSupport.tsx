@@ -179,7 +179,7 @@ const HRSupport: React.FC = () => {
 
   return (
     <DashboardLayout role="hr">
-      <PageMeta title="Поддержка" description="Чат с поддержкой системы Люди и Ресурсы" />
+      <PageMeta title="Поддержка" description="Чат с поддержкой системы Работа для Всех" />
       <div className="h-[calc(100vh-8rem)] flex flex-col animate-slide-up">
         <Card className="flex-1 flex flex-col">
           <CardHeader className="border-b">
