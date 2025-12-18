@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Briefcase, HardHat, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import PageMeta from '@/components/PageMeta';
+import logo from '@/assets/logo.png';
 
 type RoleType = 'hr' | 'worker';
 
@@ -179,9 +180,7 @@ const Login: React.FC = () => {
 
         <Card className="shadow-card border-secondary/20">
           <CardHeader className="text-center pb-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-foreground font-bold text-xl">ЛР</span>
-            </div>
+            <img src={logo} alt="Люди и Ресурсы" className="w-14 h-14 object-contain mx-auto mb-4" />
             <CardTitle className="text-2xl">
               {isSignUp ? 'Регистрация' : 'Вход'} в "ЛЮДИ И РЕСУРСЫ"
             </CardTitle>
