@@ -85,31 +85,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => {
-    // Ensure redirect URL is ASCII-safe (punycode hostname for .рф / Cyrillic domains)
-    const originUrl = new URL(window.location.origin);
-    const redirectUrl = `${originUrl.protocol}//${originUrl.host}/`;
-    // full_name and company will be saved separately after signup
+    // Minimal signup - no options at all to isolate the issue
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: { role: String(metadata.role) },
-      },
     });
 
-    // If signup successful, update profile with Cyrillic data
+    // If signup successful, save role and profile data manually
     if (!error && data.user) {
-      // Wait a moment for the trigger to create the profile
-      setTimeout(async () => {
-        await supabase
-          .from('profiles')
-          .update({
-            full_name: metadata.full_name,
-            company: metadata.company,
-          })
-          .eq('user_id', data.user!.id);
-      }, 1000);
+      // Insert role
+      await supabase.from('user_roles').insert({
+        user_id: data.user.id,
+        role: metadata.role,
+      });
+
+      // Update profile with user data
+      await supabase
+        .from('profiles')
+        .update({
+          full_name: metadata.full_name,
+          company: metadata.company,
+        })
+        .eq('user_id', data.user.id);
     }
     
     return { error };
