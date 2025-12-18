@@ -85,10 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => {
-    // Ensure redirect URL is ASCII-safe (encode any special characters)
-    const redirectUrl = encodeURI(`${window.location.origin}/`);
-    
-    // Only pass ASCII-safe data in metadata (role is always 'hr', 'worker', or 'admin')
+    // Ensure redirect URL is ASCII-safe (punycode hostname for .рф / Cyrillic domains)
+    const originUrl = new URL(window.location.origin);
+    const redirectUrl = `${originUrl.protocol}//${originUrl.host}/`;
     // full_name and company will be saved separately after signup
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
