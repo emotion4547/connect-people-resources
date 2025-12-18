@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { supabaseAuth } from '@/integrations/supabase/authClient';
 
 type AppRole = 'hr' | 'worker' | 'admin';
 
@@ -54,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
@@ -71,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabaseAuth.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -86,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => {
     // Minimal signup - no options at all to isolate the issue
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabaseAuth.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
     });
@@ -113,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabaseAuth.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
@@ -122,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await supabaseAuth.auth.signOut();
     setUser(null);
     setSession(null);
     setRole(null);
