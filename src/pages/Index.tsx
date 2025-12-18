@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import PageMeta from "@/components/PageMeta";
 import { 
   Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
   FileText, Send, CheckCircle, ClipboardList, Bell, 
@@ -11,6 +12,10 @@ import {
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta 
+        title="Главная" 
+        description="Люди и Ресурсы — современная платформа для подбора временного персонала. Быстрый поиск исполнителей для HR и удобные смены для работников."
+      />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

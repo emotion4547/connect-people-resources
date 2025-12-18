@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FileText, Clock, Users, Mail, AlertTriangle, MapPin, Calendar } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import PageMeta from '@/components/PageMeta';
 
 interface Stats {
   newRequests: number;
@@ -100,6 +101,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Панель администратора" description="Административная панель управления системой Люди и Ресурсы" />
       <div className="space-y-6 animate-slide-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Панель администратора</h1>
