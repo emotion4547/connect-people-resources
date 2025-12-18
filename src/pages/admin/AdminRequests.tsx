@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar, Users } from 'lucide-react';
+import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar, Users, Download, FileSpreadsheet } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
@@ -300,6 +300,96 @@ const AdminRequests: React.FC = () => {
     setSelectedWorkersToAssign(prev => prev.filter(id => !allIds.includes(id)));
   };
 
+  const getStatusLabel = (status: string): string => {
+    const labels: Record<string, string> = {
+      new: 'Новая',
+      in_progress: 'В работе',
+      assigned: 'Назначено',
+      pending_confirmation: 'Ожидает подтверждения',
+      completed: 'Выполнено',
+      cancelled: 'Отменена',
+    };
+    return labels[status] || status;
+  };
+
+  const exportToCSV = () => {
+    const headers = ['ID', 'Компания', 'Должность', 'Адрес', 'Дата начала', 'Дата окончания', 'Количество', 'Оплата', 'Статус'];
+    const rows = filteredRequests.map(r => [
+      r.id,
+      r.company || '-',
+      r.position,
+      r.address,
+      format(new Date(r.start_date), 'dd.MM.yyyy'),
+      format(new Date(r.end_date), 'dd.MM.yyyy'),
+      r.quantity.toString(),
+      r.pay || '-',
+      getStatusLabel(r.status),
+    ]);
+
+    const csvContent = [
+      headers.join(';'),
+      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(';'))
+    ].join('\n');
+
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `requests_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    toast({ title: 'Экспорт завершен', description: `Экспортировано ${filteredRequests.length} заявок` });
+  };
+
+  const exportToExcel = () => {
+    const headers = ['ID', 'Компания', 'Должность', 'Адрес', 'Дата начала', 'Дата окончания', 'Количество', 'Оплата', 'Статус'];
+    const rows = filteredRequests.map(r => [
+      r.id,
+      r.company || '-',
+      r.position,
+      r.address,
+      format(new Date(r.start_date), 'dd.MM.yyyy'),
+      format(new Date(r.end_date), 'dd.MM.yyyy'),
+      r.quantity,
+      r.pay || '-',
+      getStatusLabel(r.status),
+    ]);
+
+    // Create Excel XML format
+    let excelContent = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Styles>
+    <Style ss:ID="Header">
+      <Font ss:Bold="1"/>
+      <Interior ss:Color="#E0E0E0" ss:Pattern="Solid"/>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="Заявки">
+    <Table>
+      <Row>
+        ${headers.map(h => `<Cell ss:StyleID="Header"><Data ss:Type="String">${h}</Data></Cell>`).join('')}
+      </Row>
+      ${rows.map(row => `
+      <Row>
+        ${row.map((cell, i) => `<Cell><Data ss:Type="${typeof cell === 'number' ? 'Number' : 'String'}">${cell}</Data></Cell>`).join('')}
+      </Row>`).join('')}
+    </Table>
+  </Worksheet>
+</Workbook>`;
+
+    const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `requests_${format(new Date(), 'yyyy-MM-dd')}.xls`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    toast({ title: 'Экспорт завершен', description: `Экспортировано ${filteredRequests.length} заявок в Excel` });
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
       new: { label: 'Новая', className: 'bg-status-orange/20 text-status-orange' },
@@ -323,7 +413,19 @@ const AdminRequests: React.FC = () => {
     <DashboardLayout role="admin">
       <PageMeta title="Заявки" description="Управление заявками на персонал" />
       <div className="space-y-6 animate-slide-up">
-        <h1 className="text-3xl font-bold">Заявки</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold">Заявки</h1>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportToCSV} className="gap-2">
+              <Download className="w-4 h-4" />
+              CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportToExcel} className="gap-2">
+              <FileSpreadsheet className="w-4 h-4" />
+              Excel
+            </Button>
+          </div>
+        </div>
 
         {/* Filters */}
         <Card>
