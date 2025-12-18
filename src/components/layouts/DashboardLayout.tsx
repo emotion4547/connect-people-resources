@@ -63,6 +63,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Пользователи', href: '/admin/users', icon: <User className="w-5 h-5" /> },
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
   { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
+  { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
