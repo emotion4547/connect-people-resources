@@ -39,6 +39,43 @@ const Login: React.FC = () => {
   const { user, role, loading: authLoading, signIn, signUp } = useAuth();
   const { toast } = useToast();
 
+  // DEV diagnostics: show which header contains non-Latin1 chars
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+
+    const onHeader = (e: Event) => {
+      const ce = e as CustomEvent<{ header?: string }>;
+      const headerName = ce.detail?.header;
+      if (headerName) {
+        toast({
+          title: "Техническая ошибка",
+          description: `Найден заголовок с кириллицей/не-ASCII: ${headerName}`,
+          variant: "destructive",
+          duration: 15000,
+        });
+      }
+    };
+
+    const onFetchError = (e: Event) => {
+      const ce = e as CustomEvent<{ message?: string }>;
+      if (ce.detail?.message?.includes("non ISO-8859-1")) {
+        toast({
+          title: "Ошибка регистрации",
+          description: "Техническая проблема с кодировкой (не-ASCII в заголовках).",
+          variant: "destructive",
+          duration: 15000,
+        });
+      }
+    };
+
+    window.addEventListener("lovable-non-latin1-header", onHeader as EventListener);
+    window.addEventListener("lovable-fetch-error", onFetchError as EventListener);
+    return () => {
+      window.removeEventListener("lovable-non-latin1-header", onHeader as EventListener);
+      window.removeEventListener("lovable-fetch-error", onFetchError as EventListener);
+    };
+  }, [toast]);
+
   // Redirect authenticated users based on their role
   useEffect(() => {
     if (!authLoading && user && role) {
