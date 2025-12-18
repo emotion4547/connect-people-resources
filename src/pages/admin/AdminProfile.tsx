@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { Loader2, Save, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import PageMeta from '@/components/PageMeta';
 
 const AdminProfile: React.FC = () => {
   const { user, profile } = useAuth();
@@ -66,6 +67,7 @@ const AdminProfile: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Профиль администратора" description="Управление профилем администратора" />
       <div className="space-y-6 max-w-2xl animate-fade-in">
         <div className="flex items-center gap-3">
           <div>

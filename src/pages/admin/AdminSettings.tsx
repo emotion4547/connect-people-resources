@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Settings, Send, CheckCircle, XCircle, Code } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 interface WebhookSettings {
   id?: string;
@@ -151,6 +152,7 @@ const AdminSettings: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Настройки" description="Настройки системы Люди и Ресурсы" />
       <div className="max-w-2xl mx-auto space-y-6 animate-slide-up">
         <div>
           <h1 className="text-3xl font-bold mb-2">Настройки</h1>

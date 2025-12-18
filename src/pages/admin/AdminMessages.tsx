@@ -10,6 +10,7 @@ import { Send, Mail, User, FileText, MapPin, Calendar, RotateCcw } from 'lucide-
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import PageMeta from '@/components/PageMeta';
 
 interface Chat {
   id: string;
@@ -133,6 +134,7 @@ const AdminMessages: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Сообщения" description="Управление чатами поддержки" />
       <div className="h-[calc(100vh-8rem)] flex flex-col animate-slide-up">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold">Сообщения поддержки</h1>

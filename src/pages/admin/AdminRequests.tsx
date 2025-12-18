@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Eye, UserPlus, FileText, AlertCircle, Search, RotateCcw, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import PageMeta from '@/components/PageMeta';
 
 interface Request {
   id: string;
@@ -276,6 +277,7 @@ const AdminRequests: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Заявки" description="Управление заявками на персонал" />
       <div className="space-y-6 animate-slide-up">
         <h1 className="text-3xl font-bold">Заявки</h1>
 

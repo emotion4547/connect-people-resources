@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Send, X, Info, FileText, PenLine } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 interface Template {
   id: string;
@@ -181,6 +182,7 @@ const CreateRequest: React.FC = () => {
 
   return (
     <DashboardLayout role="hr">
+      <PageMeta title="Создать заявку" description="Создание новой заявки на персонал" />
       {/* Mode Selection Dialog */}
       <Dialog open={showModeDialog} onOpenChange={(open) => !open && navigate('/hr/requests')}>
         <DialogContent className="max-w-md">

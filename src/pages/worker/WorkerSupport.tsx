@@ -11,6 +11,7 @@ import { Send, CheckCircle, FileText, MapPin, Calendar, Briefcase } from 'lucide
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import PageMeta from '@/components/PageMeta';
 
 interface Message {
   id: string;
@@ -199,6 +200,7 @@ const WorkerSupport: React.FC = () => {
 
   return (
     <DashboardLayout role="worker">
+      <PageMeta title="Поддержка" description="Чат с поддержкой для исполнителей" />
       <div className="h-[calc(100vh-8rem)] flex flex-col animate-slide-up">
         <Card className="flex-1 flex flex-col">
           <CardHeader className="border-b">
