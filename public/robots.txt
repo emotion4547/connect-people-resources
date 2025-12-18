@@ -1,8 +1,17 @@
+# Работа для Всех - robots.txt
+# https://rabotadlyavsekh.ru
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
+
+User-agent: Yandex
+Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +21,10 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /hr/
+Disallow: /worker/
+
+# Sitemap location
+Sitemap: https://rabotadlyavsekh.ru/sitemap.xml
