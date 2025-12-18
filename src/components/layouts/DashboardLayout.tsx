@@ -70,7 +70,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   const navigate = useNavigate();
   const { profile, signOut, role: userRole } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    return saved === 'true';
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('sidebar-collapsed', String(collapsed));
+  }, [collapsed]);
 
   const navItems = role === 'hr' ? hrNavItems : role === 'worker' ? workerNavItems : adminNavItems;
 
