@@ -87,14 +87,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    // Only pass ASCII-safe data in metadata (role)
+    // full_name and company will be saved via database trigger on profile creation
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl,
-        data: metadata,
+        data: { role: metadata.role },
       },
     });
+
+    // If signup successful, update profile with Cyrillic data
+    if (!error && data.user) {
+      // Wait a moment for the trigger to create the profile
+      setTimeout(async () => {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: metadata.full_name,
+            company: metadata.company,
+          })
+          .eq('user_id', data.user!.id);
+      }, 1000);
+    }
     
     return { error };
   };
