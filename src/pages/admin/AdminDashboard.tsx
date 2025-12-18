@@ -4,16 +4,19 @@ import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, Clock, Users, Mail, AlertTriangle, MapPin, Calendar } from 'lucide-react';
-import { format, differenceInDays } from 'date-fns';
+import { FileText, Clock, Users, Mail, AlertTriangle, MapPin, Calendar, TrendingUp, CheckCircle } from 'lucide-react';
+import { format, differenceInDays, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 interface Stats {
   newRequests: number;
   inProgressRequests: number;
+  completedRequests: number;
   todayWorkers: number;
   unreadMessages: number;
+  totalWorkers: number;
 }
 
 interface UrgentRequest {
@@ -30,10 +33,13 @@ const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats>({
     newRequests: 0,
     inProgressRequests: 0,
+    completedRequests: 0,
     todayWorkers: 0,
     unreadMessages: 0,
+    totalWorkers: 0,
   });
   const [urgentRequests, setUrgentRequests] = useState<UrgentRequest[]>([]);
+  const [chartData, setChartData] = useState<{ date: string; requests: number; completed: number }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,14 +51,16 @@ const AdminDashboard: React.FC = () => {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
 
-      const [requestsRes, responsesRes, chatsRes] = await Promise.all([
-        supabase.from('requests').select('id, status, start_date, position, address, quantity'),
+      const [requestsRes, responsesRes, chatsRes, workersRes] = await Promise.all([
+        supabase.from('requests').select('id, status, start_date, position, address, quantity, created_at'),
         supabase.from('responses').select('status').eq('status', 'assigned'),
         supabase.from('support_chats').select('unread_count'),
+        supabase.from('user_roles').select('id').eq('role', 'worker'),
       ]);
 
       const requests = requestsRes.data || [];
       const chats = chatsRes.data || [];
+      const workers = workersRes.data || [];
 
       // Filter urgent requests (2 days or less until start_date, not completed/cancelled)
       const urgent = requests
@@ -69,11 +77,40 @@ const AdminDashboard: React.FC = () => {
 
       setUrgentRequests(urgent);
 
+      // Build chart data for last 7 days
+      const days = eachDayOfInterval({
+        start: subDays(today, 6),
+        end: today,
+      });
+
+      const dailyData = days.map(day => {
+        const dayStart = startOfDay(day);
+        const requestsCount = requests.filter(r => {
+          const createdDate = startOfDay(new Date(r.created_at));
+          return createdDate.getTime() === dayStart.getTime();
+        }).length;
+        
+        const completedCount = requests.filter(r => {
+          const createdDate = startOfDay(new Date(r.created_at));
+          return createdDate.getTime() === dayStart.getTime() && r.status === 'completed';
+        }).length;
+
+        return {
+          date: format(day, 'dd.MM'),
+          requests: requestsCount,
+          completed: completedCount,
+        };
+      });
+
+      setChartData(dailyData);
+
       setStats({
         newRequests: requests.filter(r => r.status === 'new').length,
         inProgressRequests: requests.filter(r => r.status === 'in_progress').length,
-        todayWorkers: requests.filter(r => r.start_date === todayStr).length * 2,
+        completedRequests: requests.filter(r => r.status === 'completed').length,
+        todayWorkers: requests.filter(r => r.start_date === todayStr).reduce((sum, r) => sum + r.quantity, 0),
         unreadMessages: chats.reduce((sum, c) => sum + (c.unread_count || 0), 0),
+        totalWorkers: workers.length,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -84,9 +121,11 @@ const AdminDashboard: React.FC = () => {
 
   const statCards = [
     { label: 'Новые заявки', value: stats.newRequests, icon: <FileText className="w-6 h-6" />, href: '/admin/requests', color: 'text-status-orange' },
-    { label: 'Заявки в работе', value: stats.inProgressRequests, icon: <Clock className="w-6 h-6" />, href: '/admin/requests', color: 'text-primary' },
-    { label: 'Сегодня на смене', value: stats.todayWorkers, icon: <Users className="w-6 h-6" />, href: '/admin/workers', color: 'text-status-success' },
-    { label: 'Непрочитанные сообщения', value: stats.unreadMessages, icon: <Mail className="w-6 h-6" />, href: '/admin/messages', color: 'text-secondary' },
+    { label: 'В работе', value: stats.inProgressRequests, icon: <Clock className="w-6 h-6" />, href: '/admin/requests', color: 'text-primary' },
+    { label: 'Выполнено', value: stats.completedRequests, icon: <CheckCircle className="w-6 h-6" />, href: '/admin/requests', color: 'text-status-success' },
+    { label: 'Исполнители', value: stats.totalWorkers, icon: <Users className="w-6 h-6" />, href: '/admin/workers', color: 'text-secondary' },
+    { label: 'На смене сегодня', value: stats.todayWorkers, icon: <TrendingUp className="w-6 h-6" />, href: '/admin/workers', color: 'text-primary' },
+    { label: 'Сообщения', value: stats.unreadMessages, icon: <Mail className="w-6 h-6" />, href: '/admin/messages', color: 'text-status-orange' },
   ];
 
   const getUrgencyBadge = (daysUntil: number) => {

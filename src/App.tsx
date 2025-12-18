@@ -25,6 +25,7 @@ import HRTemplates from "./pages/hr/HRTemplates";
 // Worker Pages
 import WorkerProfile from "./pages/worker/WorkerProfile";
 import WorkerVacancies from "./pages/worker/WorkerVacancies";
+import WorkerCalendar from "./pages/worker/WorkerCalendar";
 import WorkerResponses from "./pages/worker/WorkerResponses";
 import WorkerSupport from "./pages/worker/WorkerSupport";
 
@@ -99,6 +100,11 @@ const App = () => (
             <Route path="/worker/vacancies" element={
               <ProtectedRoute allowedRoles={['worker']}>
                 <WorkerVacancies />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/calendar" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerCalendar />
               </ProtectedRoute>
             } />
             <Route path="/worker/responses" element={

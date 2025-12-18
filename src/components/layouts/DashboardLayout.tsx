@@ -29,6 +29,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Calendar,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -56,6 +57,7 @@ const hrNavItems: NavItem[] = [
 const workerNavItems: NavItem[] = [
   { label: 'Моя анкета', href: '/worker/profile', icon: <User className="w-5 h-5" /> },
   { label: 'Доступные смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Календарь', href: '/worker/calendar', icon: <Calendar className="w-5 h-5" /> },
   { label: 'Мои отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
   { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
