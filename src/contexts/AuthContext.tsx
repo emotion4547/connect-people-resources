@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { supabaseAuth } from '@/integrations/supabase/authClient';
+import { signInWithPasswordApi, signUpWithApi } from '@/lib/authApi';
 
 type AppRole = 'hr' | 'worker' | 'admin';
 
@@ -86,21 +87,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => {
-    // Minimal signup - no options at all to isolate the issue
-    const { data, error } = await supabaseAuth.auth.signUp({
-      email: email.trim().toLowerCase(),
+    const safeEmail = email.trim().toLowerCase();
+
+    const { data, error } = await signUpWithApi({
+      email: safeEmail,
       password,
     });
 
     // If signup successful, save role and profile data manually
-    if (!error && data.user) {
-      // Insert role
+    if (!error && data?.user?.id) {
+      // Create role
       await supabase.from('user_roles').insert({
         user_id: data.user.id,
         role: metadata.role,
       });
 
-      // Update profile with user data
+      // Update profile
       await supabase
         .from('profiles')
         .update({
@@ -109,15 +111,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
         .eq('user_id', data.user.id);
     }
-    
+
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabaseAuth.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
+    const safeEmail = email.trim().toLowerCase();
+    const { data, error } = await signInWithPasswordApi({
+      email: safeEmail,
       password,
     });
+
+    if (!error && data?.access_token && data?.refresh_token) {
+      await supabaseAuth.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      });
+    }
 
     return { error };
   };
