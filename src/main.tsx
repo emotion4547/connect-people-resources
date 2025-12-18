@@ -23,26 +23,39 @@ if (import.meta.env.DEV && typeof window !== "undefined" && typeof window.fetch 
   };
 
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const headers = init?.headers;
-    if (headers) {
-      const entries: Array<[string, string]> = [];
-      if (headers instanceof Headers) {
-        headers.forEach((v, k) => entries.push([k, v]));
-      } else if (Array.isArray(headers)) {
-        entries.push(...headers);
-      } else {
-        entries.push(...Object.entries(headers as Record<string, string>));
-      }
+    try {
+      const headers = init?.headers;
+      if (headers) {
+        const entries: Array<[string, string]> = [];
+        if (headers instanceof Headers) {
+          headers.forEach((v, k) => entries.push([k, v]));
+        } else if (Array.isArray(headers)) {
+          entries.push(...headers);
+        } else {
+          entries.push(...Object.entries(headers as Record<string, string>));
+        }
 
-      for (const [k, v] of entries) {
-        if (typeof v === "string" && hasNonLatin1(v)) {
-          // eslint-disable-next-line no-console
-          console.warn("Non-Latin1 header detected:", { header: k, value: redact(k, v) });
+        for (const [k, v] of entries) {
+          if (typeof v === "string" && hasNonLatin1(v)) {
+            const detail = { header: k, value: redact(k, v) };
+            // eslint-disable-next-line no-console
+            console.warn("Non-Latin1 header detected:", detail);
+            window.dispatchEvent(new CustomEvent("lovable-non-latin1-header", { detail }));
+          }
         }
       }
-    }
 
-    return originalFetch(input, init);
+      return await originalFetch(input, init);
+    } catch (err) {
+      window.dispatchEvent(
+        new CustomEvent("lovable-fetch-error", {
+          detail: {
+            message: err instanceof Error ? err.message : String(err),
+          },
+        })
+      );
+      throw err;
+    }
   };
 }
 
