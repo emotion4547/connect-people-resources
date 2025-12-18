@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Briefcase, HardHat, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
+import PageMeta from '@/components/PageMeta';
 
 type RoleType = 'hr' | 'worker';
 
@@ -163,6 +164,10 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
+      <PageMeta 
+        title={isSignUp ? 'Регистрация' : 'Вход'} 
+        description="Войдите или зарегистрируйтесь в системе Люди и Ресурсы для подбора персонала"
+      />
       <div className="w-full max-w-md animate-scale-in">
         <Link 
           to="/" 

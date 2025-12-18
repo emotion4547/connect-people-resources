@@ -12,6 +12,7 @@ import { MapPin, Calendar, Clock, Banknote, Briefcase, Search, RotateCcw, Messag
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import PageMeta from '@/components/PageMeta';
 
 interface Vacancy {
   id: string;
@@ -152,6 +153,7 @@ const WorkerVacancies: React.FC = () => {
 
   return (
     <DashboardLayout role="worker">
+      <PageMeta title="Доступные смены" description="Найдите подходящие вакансии и смены в системе Люди и Ресурсы" />
       <div className="space-y-6 animate-slide-up">
         <div>
           <h1 className="text-3xl font-bold mb-2">Доступные смены</h1>
