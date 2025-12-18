@@ -5,7 +5,7 @@ interface PageMetaProps {
   description?: string;
 }
 
-const SITE_NAME = 'Люди и Ресурсы';
+const SITE_NAME = 'Работа для Всех';
 
 export const PageMeta = ({ title, description }: PageMetaProps) => {
   useEffect(() => {

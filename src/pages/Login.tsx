@@ -167,7 +167,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
       <PageMeta 
         title={isSignUp ? 'Регистрация' : 'Вход'} 
-        description="Войдите или зарегистрируйтесь в системе Люди и Ресурсы для подбора персонала"
+        description="Войдите или зарегистрируйтесь в системе Работа для Всех для подбора персонала"
       />
       <div className="w-full max-w-md animate-scale-in">
         <Link 
@@ -180,9 +180,9 @@ const Login: React.FC = () => {
 
         <Card className="shadow-card border-secondary/20">
           <CardHeader className="text-center pb-4">
-            <img src={logo} alt="Люди и Ресурсы" className="w-14 h-14 object-contain mx-auto mb-4" />
+            <img src={logo} alt="Работа для Всех" className="w-14 h-14 object-contain mx-auto mb-4" />
             <CardTitle className="text-2xl">
-              {isSignUp ? 'Регистрация' : 'Вход'} в "ЛЮДИ И РЕСУРСЫ"
+              {isSignUp ? 'Регистрация' : 'Вход'} в "РАБОТА ДЛЯ ВСЕХ"
             </CardTitle>
             <CardDescription>
               {isSignUp ? 'Создайте аккаунт для начала работы' : 'Войдите в свой аккаунт'}

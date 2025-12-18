@@ -70,7 +70,7 @@ const HRDashboard: React.FC = () => {
 
   return (
     <DashboardLayout role="hr">
-      <PageMeta title="HR Дашборд" description="Управление заявками на персонал в системе Люди и Ресурсы" />
+      <PageMeta title="HR Дашборд" description="Управление заявками на персонал в системе Работа для Всех" />
       <div className="space-y-6">
         {/* Welcome */}
         <div className="animate-slide-up">
