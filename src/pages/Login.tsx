@@ -111,9 +111,11 @@ const Login: React.FC = () => {
 
         toast({
           title: 'Регистрация успешна!',
-          description: 'Добро пожаловать в систему',
+          description: 'На вашу почту отправлено письмо для подтверждения. Проверьте почту и перейдите по ссылке.',
+          duration: 10000,
         });
-        // Redirect will happen via useEffect when role is loaded
+        // Don't redirect - user needs to confirm email first
+        return;
       } else {
         const { error } = await signIn(email, password);
 
