@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { Loader2, Save } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 const HRProfile: React.FC = () => {
   const { user, profile } = useAuth();
@@ -68,6 +69,7 @@ const HRProfile: React.FC = () => {
 
   return (
     <DashboardLayout role="hr">
+      <PageMeta title="HR Профиль" description="Управление профилем HR-менеджера" />
       <div className="space-y-6 max-w-2xl animate-fade-in">
         <div>
           <h1 className="text-3xl font-bold mb-2">Профиль</h1>

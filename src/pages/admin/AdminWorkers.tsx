@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, Users, UserPlus, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 interface Worker {
   id: string;
@@ -224,6 +225,7 @@ const AdminWorkers: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Исполнители" description="Управление исполнителями" />
       <div className="space-y-6 animate-slide-up">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>

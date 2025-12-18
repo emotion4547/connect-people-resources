@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 interface User {
   id: string;
@@ -228,6 +229,7 @@ const AdminUsers: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Пользователи" description="Управление пользователями системы" />
       <div className="space-y-6 animate-slide-up">
         <div>
           <h1 className="text-3xl font-bold mb-2">Пользователи</h1>

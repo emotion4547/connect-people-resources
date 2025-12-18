@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Edit, Trash2, FileText, Save } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 interface Template {
   id: string;
@@ -199,6 +200,7 @@ const HRTemplates: React.FC = () => {
 
   return (
     <DashboardLayout role="hr">
+      <PageMeta title="Шаблоны заявок" description="Управление шаблонами заявок на персонал" />
       <div className="space-y-6 animate-slide-up">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Шаблоны заявок</h1>

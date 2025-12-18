@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart3, Download, FileText, Users, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import PageMeta from '@/components/PageMeta';
 
 const AdminReports: React.FC = () => {
   const [stats, setStats] = useState({ totalRequests: 0, completedRequests: 0, totalWorkers: 0, totalResponses: 0 });
@@ -65,6 +66,7 @@ const AdminReports: React.FC = () => {
 
   return (
     <DashboardLayout role="admin">
+      <PageMeta title="Отчеты" description="Статистика и отчеты системы" />
       <div className="space-y-6 animate-slide-up">
         <h1 className="text-3xl font-bold">Отчеты</h1>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">

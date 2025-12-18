@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { Save } from 'lucide-react';
+import PageMeta from '@/components/PageMeta';
 
 const WorkerProfile: React.FC = () => {
   const { user, profile } = useAuth();
@@ -98,6 +99,7 @@ const WorkerProfile: React.FC = () => {
 
   return (
     <DashboardLayout role="worker">
+      <PageMeta title="Моя анкета" description="Управление профилем исполнителя" />
       <div className="max-w-2xl mx-auto animate-slide-up">
         <Card className="shadow-card">
           <CardHeader>
