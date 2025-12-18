@@ -2,11 +2,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// DEV-only fetch diagnostics for "String contains non ISO-8859-1 code point".
-// Logs which header contains non-Latin1 characters (without leaking secrets).
-if (import.meta.env.DEV && typeof window !== "undefined" && typeof window.fetch === "function") {
-  const originalFetch = window.fetch.bind(window);
-
+// DEV-only diagnostics for "String contains non ISO-8859-1 code point".
+// Identifies which header/value contains non-Latin1 characters (without leaking secrets).
+if (import.meta.env.DEV && typeof window !== "undefined") {
   const hasNonLatin1 = (value: string) => {
     for (let i = 0; i < value.length; i++) {
       if (value.charCodeAt(i) > 255) return true;
@@ -16,62 +14,57 @@ if (import.meta.env.DEV && typeof window !== "undefined" && typeof window.fetch 
 
   const redact = (name: string, value: string) => {
     const n = name.toLowerCase();
-    if (n.includes("authorization") || n.includes("apikey") || n.includes("api-key")) {
+    if (n.includes("authorization") || n.includes("apikey") || n.includes("api-key") || n.includes("token")) {
       return value ? `${value.slice(0, 10)}…[redacted]` : value;
     }
-    return value;
+    return value.length > 180 ? `${value.slice(0, 180)}…` : value;
   };
 
-  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const getHeaderEntries = (h: RequestInit["headers"]) => {
-      const entries: Array<[string, string]> = [];
-      if (!h) return entries;
-      if (h instanceof Headers) {
-        h.forEach((v, k) => entries.push([k, v]));
-      } else if (Array.isArray(h)) {
-        entries.push(...h);
-      } else {
-        entries.push(...Object.entries(h as Record<string, string>));
+  const emit = (header: string, value: string) => {
+    if (!hasNonLatin1(value)) return;
+    const detail = { header, value: redact(header, value) };
+    // eslint-disable-next-line no-console
+    console.warn("Non-Latin1 header detected:", detail);
+    window.dispatchEvent(new CustomEvent("lovable-non-latin1-header", { detail }));
+  };
+
+  // Catch headers even when libraries create Request/Headers internally (before our fetch wrapper sees init.headers)
+  if (typeof Headers !== "undefined") {
+    const origAppend = Headers.prototype.append;
+    const origSet = Headers.prototype.set;
+
+    Headers.prototype.append = function (name: string, value: string) {
+      try {
+        emit(String(name), String(value));
+      } catch {
+        // ignore
       }
-      return entries;
+      return origAppend.call(this, name, value);
     };
 
-    try {
-      const entries = getHeaderEntries(init?.headers);
-      for (const [k, v] of entries) {
-        if (typeof v === "string" && hasNonLatin1(v)) {
-          const detail = { header: k, value: redact(k, v) };
-          // eslint-disable-next-line no-console
-          console.warn("Non-Latin1 header detected:", detail);
-          window.dispatchEvent(new CustomEvent("lovable-non-latin1-header", { detail }));
-        }
+    Headers.prototype.set = function (name: string, value: string) {
+      try {
+        emit(String(name), String(value));
+      } catch {
+        // ignore
       }
+      return origSet.call(this, name, value);
+    };
+  }
 
-      return await originalFetch(input, init);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-
-      // If the browser rejects headers as non-Latin1, identify the culprit.
-      if (message.includes("non ISO-8859-1")) {
-        const entries = getHeaderEntries(init?.headers);
-        for (const [k, v] of entries) {
-          if (typeof v === "string" && hasNonLatin1(v)) {
-            const detail = { header: k, value: redact(k, v) };
-            window.dispatchEvent(new CustomEvent("lovable-non-latin1-header", { detail }));
-          }
-        }
+  // Also keep a fetch wrapper to surface the original error message.
+  if (typeof window.fetch === "function") {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      try {
+        return await originalFetch(input, init);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        window.dispatchEvent(new CustomEvent("lovable-fetch-error", { detail: { message } }));
+        throw err;
       }
-
-      window.dispatchEvent(
-        new CustomEvent("lovable-fetch-error", {
-          detail: {
-            message,
-          },
-        })
-      );
-      throw err;
-    }
-  };
+    };
+  }
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
