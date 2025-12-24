@@ -33,4 +33,10 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
-        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/rabota-vsem-56.ru/dist/
+        env:
+          DEPLOY_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_HOST: ${{ secrets.SERVER_HOST }}
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            dist/ ${DEPLOY_USER}@${DEPLOY_HOST}:/var/www/rabota-vsem-56.ru/dist/
