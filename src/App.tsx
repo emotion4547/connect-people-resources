@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import Install from "./pages/Install";
 
 // HR Pages
 import HRDashboard from "./pages/hr/HRDashboard";
@@ -60,8 +61,9 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/install" element={<Install />} />
 
-            {/* HR routes */}
+
             <Route path="/hr/dashboard" element={
               <ProtectedRoute allowedRoles={['hr']}>
                 <HRDashboard />
