@@ -6,6 +6,7 @@ import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import {
   Tooltip,
   TooltipContent,
@@ -25,14 +26,20 @@ import {
   Copy,
   Settings,
   LogOut,
-  Menu,
-  X,
   ChevronLeft,
   ChevronRight,
   Calendar,
+  MoreHorizontal,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface NavItem {
   label: string;
@@ -56,9 +63,9 @@ const hrNavItems: NavItem[] = [
 
 const workerNavItems: NavItem[] = [
   { label: 'Моя анкета', href: '/worker/profile', icon: <User className="w-5 h-5" /> },
-  { label: 'Доступные смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
   { label: 'Календарь', href: '/worker/calendar', icon: <Calendar className="w-5 h-5" /> },
-  { label: 'Мои отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
+  { label: 'Отклики', href: '/worker/responses', icon: <CheckCircle className="w-5 h-5" /> },
   { label: 'Поддержка', href: '/worker/support', icon: <MessageCircle className="w-5 h-5" /> },
 ];
 
@@ -77,7 +84,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, signOut, role: userRole } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(() => {
     const saved = localStorage.getItem('sidebar-collapsed');
     return saved === 'true';
@@ -96,7 +102,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
       return count || 0;
     },
     enabled: role === 'admin',
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000,
   });
 
   React.useEffect(() => {
@@ -117,6 +123,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   };
 
   const navItems = getNavItems();
+
+  // For mobile bottom nav, show first 4 items + "More" menu for the rest
+  const mobileNavItems = navItems.slice(0, 4);
+  const moreNavItems = navItems.slice(4);
 
   const handleSignOut = async () => {
     await signOut();
@@ -139,20 +149,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   return (
     <TooltipProvider delayDuration={0}>
       <div className="min-h-screen bg-background">
-        {/* Mobile menu button */}
-        <button
-          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-primary-foreground rounded-lg shadow-lg"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-
-        {/* Sidebar */}
+        {/* Desktop Sidebar - hidden on mobile */}
         <aside
           className={cn(
-            "fixed top-0 left-0 z-40 h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300",
-            collapsed ? "w-16" : "w-64",
-            mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+            "fixed top-0 left-0 z-40 h-screen bg-sidebar text-sidebar-foreground flex-col transition-all duration-300 hidden lg:flex",
+            collapsed ? "w-16" : "w-64"
           )}
         >
           {/* Logo */}
@@ -161,10 +162,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
               <img 
                 src={logo} 
                 alt="Работа для Всех" 
-                className={cn(
-                  "object-cover rounded-full flex-shrink-0",
-                  collapsed ? "w-10 h-10" : "w-10 h-10"
-                )} 
+                className="w-10 h-10 object-cover rounded-full flex-shrink-0"
               />
               {!collapsed && <span className="font-bold text-lg">РАБОТА ДЛЯ ВСЕХ</span>}
             </Link>
@@ -172,12 +170,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
 
           {/* Navigation */}
           <nav className={cn("flex-1 p-2 space-y-1 overflow-y-auto", collapsed ? "px-1" : "p-4")}>
-          {navItems.map((item) => (
+            {navItems.map((item) => (
               <Tooltip key={item.href}>
                 <TooltipTrigger asChild>
                   <Link
                     to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
                     className={cn(
                       "flex items-center gap-3 rounded-xl transition-all duration-200 relative",
                       collapsed ? "px-3 py-3 justify-center" : "px-4 py-3",
@@ -219,8 +216,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
             ))}
           </nav>
 
+          {/* PWA Install Prompt */}
+          <PWAInstallPrompt collapsed={collapsed} />
+
           {/* Collapse toggle button */}
-          <div className="hidden lg:flex justify-end p-2 border-t border-sidebar-border">
+          <div className="flex justify-end p-2 border-t border-sidebar-border">
             <Button
               variant="ghost"
               size="sm"
@@ -236,8 +236,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link 
-                  to={getProfileLink()} 
-                  onClick={() => setMobileMenuOpen(false)}
+                  to={getProfileLink()}
                   className={cn(
                     "flex items-center gap-3 mb-2 p-2 rounded-xl hover:bg-sidebar-accent/50 transition-colors cursor-pointer",
                     collapsed && "justify-center"
@@ -286,20 +285,99 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
           </div>
         </aside>
 
-        {/* Overlay for mobile */}
-        {mobileMenuOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-        )}
+        {/* Mobile Bottom Navigation */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+          <div className="flex items-center justify-around h-16 px-2">
+            {mobileNavItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-lg transition-colors relative",
+                  location.pathname === item.href
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <span className="relative">
+                  {item.icon}
+                  {item.badge && item.badge > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center"
+                    >
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </Badge>
+                  )}
+                </span>
+                <span className="text-[10px] mt-1 truncate max-w-[60px]">{item.label}</span>
+              </Link>
+            ))}
+            
+            {/* More menu for additional items */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    "flex flex-col items-center justify-center flex-1 py-2 px-1 rounded-lg transition-colors",
+                    moreNavItems.some(item => location.pathname === item.href)
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                  <span className="text-[10px] mt-1">Ещё</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 mb-2">
+                {moreNavItems.map((item) => (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link
+                      to={item.href}
+                      className={cn(
+                        "flex items-center gap-3 cursor-pointer",
+                        location.pathname === item.href && "text-primary"
+                      )}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                      {item.badge && item.badge > 0 && (
+                        <Badge variant="destructive" className="ml-auto h-5 min-w-5 px-1.5 text-xs">
+                          {item.badge > 99 ? '99+' : item.badge}
+                        </Badge>
+                      )}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to={getProfileLink()} className="flex items-center gap-3 cursor-pointer">
+                    <Avatar className="w-6 h-6 border border-secondary">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>Профиль</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleSignOut}
+                  className="flex items-center gap-3 cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Выйти</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </nav>
 
         {/* Main content */}
         <main className={cn(
-          "min-h-screen transition-all duration-300",
+          "min-h-screen transition-all duration-300 pb-20 lg:pb-0",
           collapsed ? "lg:ml-16" : "lg:ml-64"
         )}>
-          <div className="p-4 lg:p-8 pt-16 lg:pt-8 animate-fade-in">
+          <div className="p-4 lg:p-8 animate-fade-in">
             {children}
           </div>
         </main>
