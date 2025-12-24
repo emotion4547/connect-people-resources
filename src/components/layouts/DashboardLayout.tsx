@@ -6,6 +6,7 @@ import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import {
   Tooltip,
   TooltipContent,
@@ -218,6 +219,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
               </Tooltip>
             ))}
           </nav>
+
+          {/* PWA Install Prompt */}
+          <PWAInstallPrompt collapsed={collapsed} />
 
           {/* Collapse toggle button */}
           <div className="hidden lg:flex justify-end p-2 border-t border-sidebar-border">
