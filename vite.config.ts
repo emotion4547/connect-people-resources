@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.png", "favicon.ico", "og-image.png"],
+      includeAssets: ["favicon.png", "favicon.ico", "og-image.png", "pwa-icon.png"],
       manifest: {
         name: "Работа для Всех",
         short_name: "РаботаДВ",
@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => ({
         display: "standalone",
         orientation: "portrait",
         scope: "/",
-        start_url: "/",
+        start_url: "/login",
         lang: "ru",
         icons: [
           {
