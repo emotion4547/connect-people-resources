@@ -30,13 +30,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H 31.207.77.42 >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
-        env:
-          DEPLOY_USER: ${{ secrets.SERVER_USER }}
-          DEPLOY_HOST: ${{ secrets.SERVER_HOST }}
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            dist/ ${DEPLOY_USER}@${DEPLOY_HOST}:/var/www/rabota-vsem-56.ru/dist/
+        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" dist/ root@31.207.77.42:/var/www/rabota-vsem-56.ru/dist/
