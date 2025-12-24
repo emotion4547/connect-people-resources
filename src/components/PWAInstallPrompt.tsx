@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Smartphone, X } from 'lucide-react';
+import { Download, Smartphone, X, Share } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -10,9 +10,13 @@ interface BeforeInstallPromptEvent extends Event {
 
 interface PWAInstallPromptProps {
   collapsed?: boolean;
+  variant?: 'sidebar' | 'mobile-banner';
 }
 
-export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ collapsed = false }) => {
+export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ 
+  collapsed = false, 
+  variant = 'sidebar' 
+}) => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -64,7 +68,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ collapsed = 
       }
       setDeferredPrompt(null);
     } else if (isIOS) {
-      setShowIOSHint(true);
+      setShowIOSHint(!showIOSHint);
     }
   };
 
@@ -83,6 +87,65 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ collapsed = 
     return null;
   }
 
+  // Mobile banner variant
+  if (variant === 'mobile-banner') {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-card border-t border-border shadow-lg animate-slide-up">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Smartphone className="w-6 h-6 text-primary" />
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm text-foreground">Установите приложение</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {isIOS ? 'Нажмите «Поделиться» → «На экран Домой»' : 'Быстрый доступ с главного экрана'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {!isIOS && (
+              <Button
+                size="sm"
+                onClick={handleInstall}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                <Download className="w-4 h-4" />
+              </Button>
+            )}
+            {isIOS && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleInstall}
+                className="border-primary text-primary"
+              >
+                <Share className="w-4 h-4" />
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleDismiss}
+              className="text-muted-foreground hover:text-foreground px-2"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {showIOSHint && isIOS && (
+          <div className="mt-3 p-3 bg-muted rounded-lg text-xs text-muted-foreground">
+            <p className="font-medium text-foreground mb-1">Как установить на iPhone/iPad:</p>
+            <p>1. Нажмите кнопку «Поделиться» <Share className="w-3 h-3 inline" /> внизу Safari</p>
+            <p>2. Прокрутите вниз и выберите «На экран Домой»</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Sidebar variant
   if (collapsed) {
     return (
       <div className="p-2">
