@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Briefcase, HardHat, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import PageMeta from '@/components/PageMeta';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import logo from '@/assets/logo.png';
 
 type RoleType = 'hr' | 'worker';
@@ -164,7 +165,12 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4 pb-24 sm:pb-4">
+      {/* Mobile PWA Install Banner */}
+      <div className="sm:hidden">
+        <PWAInstallPrompt variant="mobile-banner" />
+      </div>
+      
       <PageMeta 
         title={isSignUp ? 'Регистрация' : 'Вход'} 
         description="Войдите или зарегистрируйтесь в системе Работа для Всех для подбора персонала"
