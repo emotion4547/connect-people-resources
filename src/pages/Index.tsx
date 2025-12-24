@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PageMeta from "@/components/PageMeta";
 import ScrollReveal from "@/components/ScrollReveal";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import logo from "@/assets/logo.png";
 import {
   Users, Rocket, HardHat, Clock, MapPin, Shield, Zap, 
@@ -50,11 +51,14 @@ const Index = () => {
             <img src={logo} alt="Работа для Всех" className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-full flex-shrink-0" />
             <span className="text-base sm:text-xl font-bold text-foreground truncate">РАБОТА ДЛЯ ВСЕХ</span>
           </div>
-          <Link to="/login">
-            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white flex-shrink-0">
-              Войти
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeSwitcher />
+            <Link to="/login">
+              <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white flex-shrink-0">
+                Войти
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
