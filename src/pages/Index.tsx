@@ -74,7 +74,7 @@ const Index = () => {
             {/* Text Block */}
             <div className="text-center lg:text-left relative z-10">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2 sm:px-0">
-                Аутстаффинг персонала{" "}
+                Аутсорсинг персонала{" "}
                 <span className="text-primary">в один клик</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 px-2 sm:px-0">
@@ -160,7 +160,7 @@ const Index = () => {
                   {[
                     { icon: ClipboardList, text: "Создаёте заявку на нужные даты и объект за пару минут." },
                     { icon: Send, text: "Сервис автоматически рассылает её исполнителям и публикует в Telegram и VK." },
-                    { icon: UserCheck, text: "Менеджер аутстаффинговой компании подбирает людей и подтверждает выход." },
+                    { icon: UserCheck, text: "Менеджер аутсорсинговой компании подбирает людей и подтверждает выход." },
                     { icon: Eye, text: "Вы в личном кабинете видите статусы и понимаете, кто и когда выйдет на смену." }
                   ].map((step, index) => (
                     <div key={index} className="flex items-start gap-4">
