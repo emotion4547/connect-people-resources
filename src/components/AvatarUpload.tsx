@@ -112,6 +112,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       setAvatarUrl(publicUrl);
       onAvatarChange?.(publicUrl);
+      await refetchProfile();
 
       toast({
         title: 'Аватар обновлён',
