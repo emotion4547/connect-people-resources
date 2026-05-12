@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import PageMeta from '@/components/PageMeta';
 
 const AdminProfile: React.FC = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, refetchProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
