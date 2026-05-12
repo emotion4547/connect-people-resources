@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Camera, Loader2, User } from 'lucide-react';
 
 interface AvatarUploadProps {
@@ -39,9 +40,14 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   size = 'md',
 }) => {
   const { toast } = useToast();
+  const { refetchProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(currentAvatarUrl);
+
+  useEffect(() => {
+    setAvatarUrl(currentAvatarUrl);
+  }, [currentAvatarUrl]);
 
   const getInitials = (name?: string | null) => {
     if (!name) return <User className={iconSizeClasses[size]} />;
@@ -106,6 +112,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       setAvatarUrl(publicUrl);
       onAvatarChange?.(publicUrl);
+      await refetchProfile();
 
       toast({
         title: 'Аватар обновлён',
