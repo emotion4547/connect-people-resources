@@ -13,7 +13,7 @@ import { Save } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
 
 const WorkerProfile: React.FC = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, refetchProfile } = useAuth();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
