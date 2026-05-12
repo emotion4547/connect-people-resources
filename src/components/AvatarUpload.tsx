@@ -40,9 +40,14 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   size = 'md',
 }) => {
   const { toast } = useToast();
+  const { refetchProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(currentAvatarUrl);
+
+  useEffect(() => {
+    setAvatarUrl(currentAvatarUrl);
+  }, [currentAvatarUrl]);
 
   const getInitials = (name?: string | null) => {
     if (!name) return <User className={iconSizeClasses[size]} />;
