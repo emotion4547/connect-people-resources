@@ -13,6 +13,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  refetchProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
