@@ -50,6 +50,8 @@ const AdminProfile: React.FC = () => {
 
       if (error) throw error;
 
+      await refetchProfile();
+
       toast({
         title: 'Профиль обновлён',
         description: 'Ваши данные успешно сохранены.',
