@@ -243,6 +243,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
                   )}
                 >
                   <Avatar className={cn("border-2 border-secondary flex-shrink-0", collapsed ? "w-8 h-8" : "w-10 h-10")}>
+                    {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Аватар'} />}
                     <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold text-sm">
                       {getInitials()}
                     </AvatarFallback>
