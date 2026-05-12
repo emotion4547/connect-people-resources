@@ -184,10 +184,28 @@ const AdminWorkers: React.FC = () => {
   };
 
   const handleAddWorker = async () => {
-    if (!newWorker.email || !newWorker.password || !newWorker.fullName) {
+    if (!newWorker.login || !newWorker.password || !newWorker.fullName) {
       toast({
         title: 'Ошибка',
-        description: 'Заполните обязательные поля',
+        description: 'Заполните обязательные поля (Логин, Пароль, ФИО)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!loginRegex.test(newWorker.login)) {
+      toast({
+        title: 'Некорректный логин',
+        description: 'Логин: 3-32 символа (буквы, цифры, . _ -)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (newWorker.password.length < 6) {
+      toast({
+        title: 'Слишком короткий пароль',
+        description: 'Минимум 6 символов',
         variant: 'destructive',
       });
       return;
@@ -195,13 +213,25 @@ const AdminWorkers: React.FC = () => {
 
     setAddLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: newWorker.email,
+      // Use an isolated client so the admin's session is not replaced by the new sign-up.
+      const { createClient } = await import('@supabase/supabase-js');
+      const isolated = createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        { auth: { persistSession: false, autoRefreshToken: false } }
+      );
+
+      const loginLower = newWorker.login.trim().toLowerCase();
+      const synthEmail = `${loginLower}@${WORKER_EMAIL_DOMAIN}`;
+
+      const { data, error } = await isolated.auth.signUp({
+        email: synthEmail,
         password: newWorker.password,
         options: {
           data: {
             role: 'worker',
             full_name: newWorker.fullName,
+            login: loginLower,
           },
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -221,12 +251,12 @@ const AdminWorkers: React.FC = () => {
 
       toast({
         title: 'Исполнитель добавлен',
-        description: 'Аккаунт успешно создан',
+        description: `Логин: ${loginLower}`,
       });
 
       setShowAddDialog(false);
-      setNewWorker({ email: '', password: '', fullName: '', phone: '', city: '' });
-      
+      setNewWorker({ login: '', password: '', fullName: '', phone: '', city: '' });
+
       setTimeout(fetchWorkers, 1000);
     } catch (error: any) {
       console.error('Error adding worker:', error);
@@ -237,6 +267,36 @@ const AdminWorkers: React.FC = () => {
       });
     } finally {
       setAddLoading(false);
+    }
+  };
+
+  const handleDeleteWorker = async () => {
+    if (!workerToDelete) return;
+    setDeleteLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { user_id: workerToDelete.user_id },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      setWorkers(prev => prev.filter(w => w.id !== workerToDelete.id));
+      toast({
+        title: 'Исполнитель удалён',
+        description: `Аккаунт ${workerToDelete.full_name || workerToDelete.login || ''} полностью удалён`,
+      });
+      setShowDeleteDialog(false);
+      setWorkerToDelete(null);
+      if (selectedWorker?.id === workerToDelete.id) setSelectedWorker(null);
+    } catch (error: any) {
+      console.error('Error deleting worker:', error);
+      toast({
+        title: 'Ошибка удаления',
+        description: error.message || 'Не удалось удалить исполнителя',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
