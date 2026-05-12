@@ -667,6 +667,28 @@ const AdminWorkers: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить исполнителя?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {workerToDelete?.full_name || workerToDelete?.login || workerToDelete?.email}
+              <br />
+              Аккаунт будет удалён без возможности восстановления вместе с откликами и чатами.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteWorker(); }}
+              disabled={deleteLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteLoading ? 'Удаление...' : 'Удалить'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
