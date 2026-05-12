@@ -2,3 +2,6 @@ project_id = "sfikomhuakhbwqwltood"
 
 [functions.send-webhook]
 verify_jwt = true
+
+[functions.delete-user]
+verify_jwt = true
