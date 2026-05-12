@@ -471,7 +471,11 @@ const AdminWorkers: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{selectedWorker.email}</p>
+                  <p className="font-medium break-all">{selectedWorker.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Логин</p>
+                  <p className="font-medium">{selectedWorker.login || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Телефон</p>
