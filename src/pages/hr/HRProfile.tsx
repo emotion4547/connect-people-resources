@@ -12,7 +12,7 @@ import { Loader2, Save } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
 
 const HRProfile: React.FC = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, refetchProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -51,6 +51,8 @@ const HRProfile: React.FC = () => {
         .eq('user_id', user.id);
 
       if (error) throw error;
+
+      await refetchProfile();
 
       toast({
         title: 'Профиль обновлён',
