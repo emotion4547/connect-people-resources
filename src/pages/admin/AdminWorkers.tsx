@@ -520,18 +520,28 @@ const AdminWorkers: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t">
                 <Badge className={selectedWorker.is_active ? 'bg-status-success/20 text-status-success' : 'bg-destructive/20 text-destructive'}>
                   {selectedWorker.is_active ? 'Активен' : 'Заблокирован'}
                 </Badge>
-                <Button 
-                  variant={selectedWorker.is_active ? "destructive" : "default"}
-                  onClick={() => handleOpenBlockDialog(selectedWorker)}
-                  className="gap-2"
-                >
-                  {selectedWorker.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
-                  {selectedWorker.is_active ? 'Заблокировать' : 'Разблокировать'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => { setWorkerToDelete(selectedWorker); setShowDeleteDialog(true); }}
+                    className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Удалить
+                  </Button>
+                  <Button
+                    variant={selectedWorker.is_active ? "destructive" : "default"}
+                    onClick={() => handleOpenBlockDialog(selectedWorker)}
+                    className="gap-2"
+                  >
+                    {selectedWorker.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                    {selectedWorker.is_active ? 'Заблокировать' : 'Разблокировать'}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
