@@ -114,7 +114,8 @@ const AdminWorkers: React.FC = () => {
         const matchName = w.full_name?.toLowerCase().includes(search);
         const matchPhone = w.phone?.includes(search);
         const matchEmail = w.email?.toLowerCase().includes(search);
-        if (!matchName && !matchPhone && !matchEmail) return false;
+        const matchLogin = w.login?.toLowerCase().includes(search);
+        if (!matchName && !matchPhone && !matchEmail && !matchLogin) return false;
       }
       if (cityFilter && w.city !== cityFilter) return false;
       if (statusFilter === 'active' && !w.is_active) return false;
