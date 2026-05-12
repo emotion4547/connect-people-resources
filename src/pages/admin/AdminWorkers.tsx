@@ -11,7 +11,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, Users, UserPlus, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
+import { Eye, Users, UserPlus, Search, RotateCcw, Ban, CheckCircle, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import PageMeta from '@/components/PageMeta';
 
 interface Worker {
@@ -19,6 +29,7 @@ interface Worker {
   user_id: string;
   full_name: string | null;
   email: string;
+  login: string | null;
   phone: string | null;
   city: string | null;
   experience: string | null;
@@ -29,6 +40,9 @@ interface Worker {
   block_reason: string | null;
 }
 
+const WORKER_EMAIL_DOMAIN = 'workers.local';
+const loginRegex = /^[a-zA-Z0-9._-]{3,32}$/;
+
 const AdminWorkers: React.FC = () => {
   const { toast } = useToast();
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -36,10 +50,13 @@ const AdminWorkers: React.FC = () => {
   const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [workerToDelete, setWorkerToDelete] = useState<Worker | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [blockReason, setBlockReason] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [newWorker, setNewWorker] = useState({
-    email: '',
+    login: '',
     password: '',
     fullName: '',
     phone: '',
@@ -97,7 +114,8 @@ const AdminWorkers: React.FC = () => {
         const matchName = w.full_name?.toLowerCase().includes(search);
         const matchPhone = w.phone?.includes(search);
         const matchEmail = w.email?.toLowerCase().includes(search);
-        if (!matchName && !matchPhone && !matchEmail) return false;
+        const matchLogin = w.login?.toLowerCase().includes(search);
+        if (!matchName && !matchPhone && !matchEmail && !matchLogin) return false;
       }
       if (cityFilter && w.city !== cityFilter) return false;
       if (statusFilter === 'active' && !w.is_active) return false;
@@ -167,10 +185,28 @@ const AdminWorkers: React.FC = () => {
   };
 
   const handleAddWorker = async () => {
-    if (!newWorker.email || !newWorker.password || !newWorker.fullName) {
+    if (!newWorker.login || !newWorker.password || !newWorker.fullName) {
       toast({
         title: 'Ошибка',
-        description: 'Заполните обязательные поля',
+        description: 'Заполните обязательные поля (Логин, Пароль, ФИО)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!loginRegex.test(newWorker.login)) {
+      toast({
+        title: 'Некорректный логин',
+        description: 'Логин: 3-32 символа (буквы, цифры, . _ -)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (newWorker.password.length < 6) {
+      toast({
+        title: 'Слишком короткий пароль',
+        description: 'Минимум 6 символов',
         variant: 'destructive',
       });
       return;
@@ -178,13 +214,25 @@ const AdminWorkers: React.FC = () => {
 
     setAddLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: newWorker.email,
+      // Use an isolated client so the admin's session is not replaced by the new sign-up.
+      const { createClient } = await import('@supabase/supabase-js');
+      const isolated = createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        { auth: { persistSession: false, autoRefreshToken: false } }
+      );
+
+      const loginLower = newWorker.login.trim().toLowerCase();
+      const synthEmail = `${loginLower}@${WORKER_EMAIL_DOMAIN}`;
+
+      const { data, error } = await isolated.auth.signUp({
+        email: synthEmail,
         password: newWorker.password,
         options: {
           data: {
             role: 'worker',
             full_name: newWorker.fullName,
+            login: loginLower,
           },
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -204,12 +252,12 @@ const AdminWorkers: React.FC = () => {
 
       toast({
         title: 'Исполнитель добавлен',
-        description: 'Аккаунт успешно создан',
+        description: `Логин: ${loginLower}`,
       });
 
       setShowAddDialog(false);
-      setNewWorker({ email: '', password: '', fullName: '', phone: '', city: '' });
-      
+      setNewWorker({ login: '', password: '', fullName: '', phone: '', city: '' });
+
       setTimeout(fetchWorkers, 1000);
     } catch (error: any) {
       console.error('Error adding worker:', error);
@@ -220,6 +268,36 @@ const AdminWorkers: React.FC = () => {
       });
     } finally {
       setAddLoading(false);
+    }
+  };
+
+  const handleDeleteWorker = async () => {
+    if (!workerToDelete) return;
+    setDeleteLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { user_id: workerToDelete.user_id },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      setWorkers(prev => prev.filter(w => w.id !== workerToDelete.id));
+      toast({
+        title: 'Исполнитель удалён',
+        description: `Аккаунт ${workerToDelete.full_name || workerToDelete.login || ''} полностью удалён`,
+      });
+      setShowDeleteDialog(false);
+      setWorkerToDelete(null);
+      if (selectedWorker?.id === workerToDelete.id) setSelectedWorker(null);
+    } catch (error: any) {
+      console.error('Error deleting worker:', error);
+      toast({
+        title: 'Ошибка удаления',
+        description: error.message || 'Не удалось удалить исполнителя',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -347,6 +425,15 @@ const AdminWorkers: React.FC = () => {
                             >
                               {worker.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                             </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => { setWorkerToDelete(worker); setShowDeleteDialog(true); }}
+                              className="text-destructive hover:text-destructive"
+                              title="Удалить аккаунт"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -385,7 +472,11 @@ const AdminWorkers: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{selectedWorker.email}</p>
+                  <p className="font-medium break-all">{selectedWorker.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Логин</p>
+                  <p className="font-medium">{selectedWorker.login || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Телефон</p>
@@ -430,18 +521,28 @@ const AdminWorkers: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t">
                 <Badge className={selectedWorker.is_active ? 'bg-status-success/20 text-status-success' : 'bg-destructive/20 text-destructive'}>
                   {selectedWorker.is_active ? 'Активен' : 'Заблокирован'}
                 </Badge>
-                <Button 
-                  variant={selectedWorker.is_active ? "destructive" : "default"}
-                  onClick={() => handleOpenBlockDialog(selectedWorker)}
-                  className="gap-2"
-                >
-                  {selectedWorker.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
-                  {selectedWorker.is_active ? 'Заблокировать' : 'Разблокировать'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => { setWorkerToDelete(selectedWorker); setShowDeleteDialog(true); }}
+                    className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Удалить
+                  </Button>
+                  <Button
+                    variant={selectedWorker.is_active ? "destructive" : "default"}
+                    onClick={() => handleOpenBlockDialog(selectedWorker)}
+                    className="gap-2"
+                  >
+                    {selectedWorker.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                    {selectedWorker.is_active ? 'Заблокировать' : 'Разблокировать'}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -507,14 +608,17 @@ const AdminWorkers: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="workerEmail">Email *</Label>
+              <Label htmlFor="workerLogin">Логин *</Label>
               <Input
-                id="workerEmail"
-                type="email"
-                placeholder="email@example.com"
-                value={newWorker.email}
-                onChange={(e) => setNewWorker({ ...newWorker, email: e.target.value })}
+                id="workerLogin"
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                placeholder="ivan_petrov"
+                value={newWorker.login}
+                onChange={(e) => setNewWorker({ ...newWorker, login: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground mt-1">3-32 символа: буквы, цифры, . _ -</p>
             </div>
             <div>
               <Label htmlFor="workerPassword">Пароль *</Label>
@@ -564,6 +668,28 @@ const AdminWorkers: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить исполнителя?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {workerToDelete?.full_name || workerToDelete?.login || workerToDelete?.email}
+              <br />
+              Аккаунт будет удалён без возможности восстановления вместе с откликами и чатами.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteWorker(); }}
+              disabled={deleteLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteLoading ? 'Удаление...' : 'Удалить'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };

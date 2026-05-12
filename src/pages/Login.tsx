@@ -15,23 +15,38 @@ import logo from '@/assets/logo.png';
 
 type RoleType = 'hr' | 'worker';
 
-const loginSchema = z.object({
+const WORKER_EMAIL_DOMAIN = 'workers.local';
+const loginRegex = /^[a-zA-Z0-9._-]{3,32}$/;
+
+const loginToEmail = (login: string) => `${login.trim().toLowerCase()}@${WORKER_EMAIL_DOMAIN}`;
+
+const hrLoginSchema = z.object({
   email: z.string().trim().email('Введите корректный email'),
   password: z.string().min(6, 'Пароль должен быть не менее 6 символов'),
 });
 
-const signupSchema = loginSchema.extend({
+const workerLoginSchema = z.object({
+  login: z.string().trim().regex(loginRegex, 'Логин: 3-32 символа (буквы, цифры, . _ -)'),
+  password: z.string().min(6, 'Пароль должен быть не менее 6 символов'),
+});
+
+const hrSignupSchema = hrLoginSchema.extend({
   fullName: z.string().trim().min(2, 'Введите ваше имя'),
   company: z.string().optional(),
+});
+
+const workerSignupSchema = workerLoginSchema.extend({
+  fullName: z.string().trim().min(2, 'Введите ваше имя'),
 });
 
 const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') as RoleType | null;
-  
+
   const [selectedRole, setSelectedRole] = useState<RoleType>(initialRole || 'hr');
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [company, setCompany] = useState('');
@@ -42,7 +57,6 @@ const Login: React.FC = () => {
   const { user, role, loading: authLoading, signIn, signUp } = useAuth();
   const { toast } = useToast();
 
-  // Redirect authenticated users based on their role
   useEffect(() => {
     if (!authLoading && user && role) {
       if (role === 'hr') navigate('/hr/dashboard', { replace: true });
@@ -51,18 +65,29 @@ const Login: React.FC = () => {
     }
   }, [user, role, authLoading, navigate]);
 
-  // Only HR and Worker can self-register, Admin is assigned by existing admin
   const roles = [
     { id: 'hr' as RoleType, label: 'HR', icon: <Briefcase className="w-5 h-5" /> },
     { id: 'worker' as RoleType, label: 'Исполнитель', icon: <HardHat className="w-5 h-5" /> },
   ];
 
+  // For sign-in we don't know the role yet — detect by whether the input looks like an email or a login.
+  const signInUsesLogin = !isSignUp && !email.includes('@') && email.length > 0;
+  const usesLogin = isSignUp ? selectedRole === 'worker' : signInUsesLogin;
+
   const validateForm = () => {
     try {
       if (isSignUp) {
-        signupSchema.parse({ email, password, fullName, company });
+        if (selectedRole === 'worker') {
+          workerSignupSchema.parse({ login, password, fullName });
+        } else {
+          hrSignupSchema.parse({ email, password, fullName, company });
+        }
       } else {
-        loginSchema.parse({ email, password });
+        if (signInUsesLogin) {
+          workerLoginSchema.parse({ login: email, password });
+        } else {
+          hrLoginSchema.parse({ email, password });
+        }
       }
       setErrors({});
       return true;
@@ -70,9 +95,7 @@ const Login: React.FC = () => {
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
-          if (err.path[0]) {
-            newErrors[err.path[0] as string] = err.message;
-          }
+          if (err.path[0]) newErrors[err.path[0] as string] = err.message;
         });
         setErrors(newErrors);
       }
@@ -82,65 +105,55 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
     setLoading(true);
 
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, {
+        const isWorker = selectedRole === 'worker';
+        const emailToUse = isWorker ? loginToEmail(login) : email;
+        const { error } = await signUp(emailToUse, password, {
           role: selectedRole,
           full_name: fullName,
-          company: selectedRole === 'hr' ? company : undefined,
-        });
+          company: !isWorker ? company : undefined,
+          ...(isWorker ? { login: login.trim().toLowerCase() } : {}),
+        } as any);
 
         if (error) {
-          if (error.message.includes('already registered')) {
+          if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
             toast({
               title: 'Ошибка регистрации',
-              description: 'Пользователь с таким email уже зарегистрирован',
+              description: isWorker
+                ? 'Пользователь с таким логином уже зарегистрирован'
+                : 'Пользователь с таким email уже зарегистрирован',
               variant: 'destructive',
             });
           } else {
-            toast({
-              title: 'Ошибка регистрации',
-              description: error.message,
-              variant: 'destructive',
-            });
+            toast({ title: 'Ошибка регистрации', description: error.message, variant: 'destructive' });
           }
           return;
         }
 
-        toast({
-          title: 'Регистрация успешна!',
-          description: 'Добро пожаловать в систему',
-        });
-        // Redirect will happen via useEffect when role is loaded
+        toast({ title: 'Регистрация успешна!', description: 'Добро пожаловать в систему' });
       } else {
-        const { error } = await signIn(email, password);
+        const emailToUse = signInUsesLogin ? loginToEmail(email) : email;
+        const { error } = await signIn(emailToUse, password);
 
         if (error) {
           toast({
             title: 'Ошибка входа',
-            description: 'Неверный email или пароль',
+            description: signInUsesLogin ? 'Неверный логин или пароль' : 'Неверный email или пароль',
             variant: 'destructive',
           });
           return;
         }
-
-        toast({
-          title: 'Добро пожаловать!',
-          description: 'Вы успешно вошли в систему',
-        });
-        // Redirect will happen via useEffect when role is loaded
+        toast({ title: 'Добро пожаловать!', description: 'Вы успешно вошли в систему' });
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Show loading if checking auth state
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -152,7 +165,6 @@ const Login: React.FC = () => {
     );
   }
 
-  // If user is already logged in but role is loading, show loading
   if (user && !role) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -166,20 +178,16 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4 pb-24 sm:pb-4">
-      {/* Mobile PWA Install Banner */}
       <div className="sm:hidden">
         <PWAInstallPrompt variant="mobile-banner" />
       </div>
-      
-      <PageMeta 
-        title={isSignUp ? 'Регистрация' : 'Вход'} 
+
+      <PageMeta
+        title={isSignUp ? 'Регистрация' : 'Вход'}
         description="Войдите или зарегистрируйтесь в системе Работа для Всех для подбора персонала"
       />
       <div className="w-full max-w-md animate-scale-in">
-        <Link 
-          to="/" 
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
-        >
+        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           На главную
         </Link>
@@ -196,30 +204,24 @@ const Login: React.FC = () => {
           </CardHeader>
 
           <CardContent>
-            {/* Role Selection - only shown for signup */}
             {isSignUp && (
               <div className="grid grid-cols-2 gap-3 mb-6">
-                {roles.map((role) => (
+                {roles.map((r) => (
                   <button
-                    key={role.id}
+                    key={r.id}
                     type="button"
-                    onClick={() => setSelectedRole(role.id)}
+                    onClick={() => setSelectedRole(r.id)}
                     className={cn(
-                      "flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all duration-200",
-                      selectedRole === role.id
-                        ? "border-secondary bg-secondary/10 text-foreground"
-                        : "border-border hover:border-secondary/50 text-muted-foreground"
+                      'flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all duration-200',
+                      selectedRole === r.id
+                        ? 'border-secondary bg-secondary/10 text-foreground'
+                        : 'border-border hover:border-secondary/50 text-muted-foreground'
                     )}
                   >
-                    <span className={cn(
-                      "flex-shrink-0",
-                      selectedRole === role.id ? "text-secondary" : "text-muted-foreground"
-                    )}>
-                      {role.icon}
+                    <span className={cn('flex-shrink-0', selectedRole === r.id ? 'text-secondary' : 'text-muted-foreground')}>
+                      {r.icon}
                     </span>
-                    <span className="font-medium whitespace-nowrap">
-                      {role.label}
-                    </span>
+                    <span className="font-medium whitespace-nowrap">{r.label}</span>
                   </button>
                 ))}
               </div>
@@ -236,11 +238,9 @@ const Login: React.FC = () => {
                       placeholder="Иванов Иван Иванович"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className={cn(errors.fullName && "border-destructive")}
+                      className={cn(errors.fullName && 'border-destructive')}
                     />
-                    {errors.fullName && (
-                      <p className="text-xs text-destructive mt-1">{errors.fullName}</p>
-                    )}
+                    {errors.fullName && <p className="text-xs text-destructive mt-1">{errors.fullName}</p>}
                   </div>
 
                   {selectedRole === 'hr' && (
@@ -258,20 +258,39 @@ const Login: React.FC = () => {
                 </>
               )}
 
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@mail.ru"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={cn(errors.email && "border-destructive")}
-                />
-                {errors.email && (
-                  <p className="text-xs text-destructive mt-1">{errors.email}</p>
-                )}
-              </div>
+              {isSignUp && selectedRole === 'worker' ? (
+                <div>
+                  <Label htmlFor="login">Логин</Label>
+                  <Input
+                    id="login"
+                    type="text"
+                    placeholder="ivan_petrov"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    value={login}
+                    onChange={(e) => setLogin(e.target.value)}
+                    className={cn(errors.login && 'border-destructive')}
+                  />
+                  {errors.login && <p className="text-xs text-destructive mt-1">{errors.login}</p>}
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="email">{!isSignUp ? 'Email или логин' : 'Email'}</Label>
+                  <Input
+                    id="email"
+                    type="text"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    placeholder={!isSignUp ? 'example@mail.ru или логин' : 'example@mail.ru'}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={cn((errors.email || errors.login) && 'border-destructive')}
+                  />
+                  {(errors.email || errors.login) && (
+                    <p className="text-xs text-destructive mt-1">{errors.email || errors.login}</p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="password">Пароль</Label>
@@ -281,11 +300,9 @@ const Login: React.FC = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={cn(errors.password && "border-destructive")}
+                  className={cn(errors.password && 'border-destructive')}
                 />
-                {errors.password && (
-                  <p className="text-xs text-destructive mt-1">{errors.password}</p>
-                )}
+                {errors.password && <p className="text-xs text-destructive mt-1">{errors.password}</p>}
               </div>
 
               <Button type="submit" className="w-full btn-hover" disabled={loading}>

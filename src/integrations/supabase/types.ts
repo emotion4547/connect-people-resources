@@ -98,6 +98,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_active: boolean | null
+          login: string | null
           phone: string | null
           preferred_positions: string[] | null
           preferred_schedule: string | null
@@ -117,6 +118,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_active?: boolean | null
+          login?: string | null
           phone?: string | null
           preferred_positions?: string[] | null
           preferred_schedule?: string | null
@@ -136,6 +138,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_active?: boolean | null
+          login?: string | null
           phone?: string | null
           preferred_positions?: string[] | null
           preferred_schedule?: string | null
