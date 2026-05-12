@@ -29,6 +29,7 @@ interface Worker {
   user_id: string;
   full_name: string | null;
   email: string;
+  login: string | null;
   phone: string | null;
   city: string | null;
   experience: string | null;
@@ -39,6 +40,9 @@ interface Worker {
   block_reason: string | null;
 }
 
+const WORKER_EMAIL_DOMAIN = 'workers.local';
+const loginRegex = /^[a-zA-Z0-9._-]{3,32}$/;
+
 const AdminWorkers: React.FC = () => {
   const { toast } = useToast();
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -46,10 +50,13 @@ const AdminWorkers: React.FC = () => {
   const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [workerToDelete, setWorkerToDelete] = useState<Worker | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [blockReason, setBlockReason] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [newWorker, setNewWorker] = useState({
-    email: '',
+    login: '',
     password: '',
     fullName: '',
     phone: '',
