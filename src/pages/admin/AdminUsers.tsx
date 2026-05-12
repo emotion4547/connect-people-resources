@@ -372,6 +372,17 @@ const AdminUsers: React.FC = () => {
                             >
                               {user.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                             </Button>
+                            {user.role !== 'admin' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { setUserToDelete(user); setShowDeleteDialog(true); }}
+                                className="text-destructive hover:text-destructive"
+                                title="Удалить аккаунт"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
