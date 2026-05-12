@@ -81,6 +81,8 @@ const WorkerProfile: React.FC = () => {
 
       if (error) throw error;
 
+      await refetchProfile();
+
       toast({
         title: 'Профиль сохранен!',
         description: 'Ваши данные успешно обновлены',
