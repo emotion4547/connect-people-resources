@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
+import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle, Trash2 } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
 
 interface User {
@@ -33,6 +33,9 @@ const AdminUsers: React.FC = () => {
   const [newRole, setNewRole] = useState<string>('');
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [blockReason, setBlockReason] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Filters
   const [searchFilter, setSearchFilter] = useState('');
@@ -202,6 +205,35 @@ const AdminUsers: React.FC = () => {
         description: 'Не удалось изменить статус',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setDeleteLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { user_id: userToDelete.user_id },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      setUsers(prev => prev.filter(u => u.user_id !== userToDelete.user_id));
+      toast({
+        title: 'Пользователь удалён',
+        description: `Аккаунт ${userToDelete.full_name || userToDelete.email} полностью удалён`,
+      });
+      setShowDeleteDialog(false);
+      setUserToDelete(null);
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Ошибка удаления',
+        description: error.message || 'Не удалось удалить пользователя',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
