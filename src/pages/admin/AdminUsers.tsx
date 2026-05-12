@@ -10,7 +10,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle } from 'lucide-react';
+import { Users, UserCog, Shield, Briefcase, HardHat, Search, RotateCcw, Ban, CheckCircle, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import PageMeta from '@/components/PageMeta';
 
 interface User {
@@ -33,6 +43,9 @@ const AdminUsers: React.FC = () => {
   const [newRole, setNewRole] = useState<string>('');
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [blockReason, setBlockReason] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Filters
   const [searchFilter, setSearchFilter] = useState('');
@@ -205,6 +218,35 @@ const AdminUsers: React.FC = () => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setDeleteLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { user_id: userToDelete.user_id },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      setUsers(prev => prev.filter(u => u.user_id !== userToDelete.user_id));
+      toast({
+        title: 'Пользователь удалён',
+        description: `Аккаунт ${userToDelete.full_name || userToDelete.email} полностью удалён`,
+      });
+      setShowDeleteDialog(false);
+      setUserToDelete(null);
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Ошибка удаления',
+        description: error.message || 'Не удалось удалить пользователя',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const getRoleLabel = (role: string) => {
     switch (role) {
       case 'admin': return 'Администратор';
@@ -330,6 +372,17 @@ const AdminUsers: React.FC = () => {
                             >
                               {user.is_active ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                             </Button>
+                            {user.role !== 'admin' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { setUserToDelete(user); setShowDeleteDialog(true); }}
+                                className="text-destructive hover:text-destructive"
+                                title="Удалить аккаунт"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -429,6 +482,28 @@ const AdminUsers: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete User Alert Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Аккаунт {userToDelete?.full_name || userToDelete?.email} и все связанные данные будут безвозвратно удалены.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setUserToDelete(null)}>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleteLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteLoading ? 'Удаление...' : 'Удалить'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
