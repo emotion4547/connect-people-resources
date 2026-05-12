@@ -584,14 +584,17 @@ const AdminWorkers: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="workerEmail">Email *</Label>
+              <Label htmlFor="workerLogin">Логин *</Label>
               <Input
-                id="workerEmail"
-                type="email"
-                placeholder="email@example.com"
-                value={newWorker.email}
-                onChange={(e) => setNewWorker({ ...newWorker, email: e.target.value })}
+                id="workerLogin"
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                placeholder="ivan_petrov"
+                value={newWorker.login}
+                onChange={(e) => setNewWorker({ ...newWorker, login: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground mt-1">3-32 символа: буквы, цифры, . _ -</p>
             </div>
             <div>
               <Label htmlFor="workerPassword">Пароль *</Label>
