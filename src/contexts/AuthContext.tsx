@@ -10,7 +10,7 @@ interface AuthContextType {
   role: AppRole | null;
   profile: any | null;
   loading: boolean;
-  signUp: (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string }) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string; login?: string }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refetchProfile: () => Promise<void>;
