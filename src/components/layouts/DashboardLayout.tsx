@@ -354,6 +354,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
                 <DropdownMenuItem asChild>
                   <Link to={getProfileLink()} className="flex items-center gap-3 cursor-pointer">
                     <Avatar className="w-6 h-6 border border-secondary">
+                      {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Аватар'} />}
                       <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
                         {getInitials()}
                       </AvatarFallback>
