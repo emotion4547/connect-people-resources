@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import {
@@ -243,6 +243,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
                   )}
                 >
                   <Avatar className={cn("border-2 border-secondary flex-shrink-0", collapsed ? "w-8 h-8" : "w-10 h-10")}>
+                    {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Аватар'} />}
                     <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold text-sm">
                       {getInitials()}
                     </AvatarFallback>
@@ -353,6 +354,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
                 <DropdownMenuItem asChild>
                   <Link to={getProfileLink()} className="flex items-center gap-3 cursor-pointer">
                     <Avatar className="w-6 h-6 border border-secondary">
+                      {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Аватар'} />}
                       <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
                         {getInitials()}
                       </AvatarFallback>
