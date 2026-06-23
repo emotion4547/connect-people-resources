@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Send, X, Info, FileText, PenLine, MessageCircle } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
+import { TimeInput } from '@/components/TimeInput';
 import { POSITIONS as positions, CUSTOM_POSITION } from '@/lib/constants';
 
 interface Template {
