@@ -315,17 +315,19 @@ const HRRequests: React.FC = () => {
     }
   };
 
-  const hasFilters = activeFilter !== 'all' || dateFrom || dateTo || payFilter;
+  const hasFilters = activeFilter !== 'all' || dateFrom || dateTo || payFilter || siteFilter !== 'all';
 
   const clearFilters = () => {
     setActiveFilter('all');
     setDateFrom('');
     setDateTo('');
     setPayFilter('');
+    setSiteFilter('all');
   };
 
   const filteredRequests = requests.filter(r => {
     if (activeFilter !== 'all' && r.status !== activeFilter) return false;
+    if (siteFilter !== 'all' && r.site_id !== siteFilter) return false;
     if (dateFrom && r.start_date < dateFrom) return false;
     if (dateTo && r.start_date > dateTo) return false;
     if (payFilter && r.pay && !r.pay.toLowerCase().includes(payFilter.toLowerCase())) return false;
@@ -379,8 +381,22 @@ const HRRequests: React.FC = () => {
               </div>
             </div>
             
-            {/* Date filters - stack on mobile */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-end">
+            {/* Site + Date filters */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-end">
+              {sites.length > 1 && (
+                <div>
+                  <Label className="text-xs">Объект</Label>
+                  <Select value={siteFilter} onValueChange={setSiteFilter}>
+                    <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Все объекты</SelectItem>
+                      {sites.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
                 <Label className="text-xs">Дата от</Label>
                 <Input
