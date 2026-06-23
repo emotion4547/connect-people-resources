@@ -35,6 +35,11 @@ interface User {
   block_reason: string | null;
 }
 
+interface AdminBlockRow {
+  user_id: string;
+  block_reason: string | null;
+}
+
 const AdminUsers: React.FC = () => {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
@@ -72,11 +77,19 @@ const AdminUsers: React.FC = () => {
 
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('user_id, email, full_name, company, id, is_active, block_reason');
+        .select('user_id, email, full_name, company, id, is_active');
 
       if (profilesError) throw profilesError;
 
+      const { data: adminRows } = await supabase
+        .from('profile_admin_data')
+        .select('user_id, block_reason')
+        .in('user_id', userIds);
+
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+      const blockMap = new Map<string, string | null>(
+        (adminRows as AdminBlockRow[] | null)?.map(r => [r.user_id, r.block_reason]) || []
+      );
 
       const usersData: User[] = roles.map(r => {
         const profile = profileMap.get(r.user_id);
@@ -89,7 +102,7 @@ const AdminUsers: React.FC = () => {
           role: r.role,
           created_at: r.created_at,
           is_active: profile?.is_active ?? true,
-          block_reason: profile?.block_reason || null,
+          block_reason: blockMap.get(r.user_id) ?? null,
         };
       });
 
@@ -185,15 +198,19 @@ const AdminUsers: React.FC = () => {
     }
 
     try {
+      const newReason = selectedUser.is_active ? blockReason.trim() : null;
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          is_active: !selectedUser.is_active,
-          block_reason: selectedUser.is_active ? blockReason.trim() : null,
-        })
+        .update({ is_active: !selectedUser.is_active })
         .eq('user_id', selectedUser.user_id);
 
       if (error) throw error;
+
+      const { error: adminError } = await supabase
+        .from('profile_admin_data')
+        .upsert({ user_id: selectedUser.user_id, block_reason: newReason }, { onConflict: 'user_id' });
+
+      if (adminError) throw adminError;
 
       setUsers(users.map(u =>
         u.user_id === selectedUser.user_id 
