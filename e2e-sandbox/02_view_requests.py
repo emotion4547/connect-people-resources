@@ -14,7 +14,7 @@ async def main():
         await login(page, HR, "/hr/")
         await page.goto(f"{BASE_URL}/hr/requests", wait_until="domcontentloaded")
         # Wait for either a row or the empty state to appear.
-        await page.wait_for_selector("table, text=Заявок пока нет", timeout=10000)
+        await page.wait_for_selector("table, [class*='text-muted-foreground']", timeout=10000)
         await page.wait_for_load_state("networkidle")
         await page.screenshot(path=str(SH / "requests_list.png"))
 
