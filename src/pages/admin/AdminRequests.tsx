@@ -26,7 +26,13 @@ interface Request {
   requirements: string | null;
   webhook_sent: boolean;
   hr_id: string;
+  site_id: string | null;
   company?: string;
+}
+
+interface Site {
+  id: string;
+  name: string;
 }
 
 interface Response {
@@ -62,11 +68,19 @@ const AdminRequests: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [companyFilter, setCompanyFilter] = useState<string>('');
   const [dateFilter, setDateFilter] = useState<string>('');
+  const [siteFilter, setSiteFilter] = useState<string>('all');
+  const [sites, setSites] = useState<Site[]>([]);
 
   useEffect(() => {
     fetchRequests();
     fetchAllWorkers();
+    void fetchSites();
   }, []);
+
+  const fetchSites = async () => {
+    const { data } = await supabase.from('sites').select('id, name').order('name');
+    setSites(data || []);
+  };
 
   const fetchRequests = async () => {
     try {
@@ -151,19 +165,21 @@ const AdminRequests: React.FC = () => {
   const filteredRequests = useMemo(() => {
     return requests.filter(r => {
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+      if (siteFilter !== 'all' && r.site_id !== siteFilter) return false;
       if (companyFilter && !r.company?.toLowerCase().includes(companyFilter.toLowerCase())) return false;
       if (dateFilter && r.start_date !== dateFilter) return false;
       return true;
     });
-  }, [requests, statusFilter, companyFilter, dateFilter]);
+  }, [requests, statusFilter, siteFilter, companyFilter, dateFilter]);
 
   const resetFilters = () => {
     setStatusFilter('all');
     setCompanyFilter('');
     setDateFilter('');
+    setSiteFilter('all');
   };
 
-  const hasActiveFilters = statusFilter !== 'all' || companyFilter || dateFilter;
+  const hasActiveFilters = statusFilter !== 'all' || companyFilter || dateFilter || siteFilter !== 'all';
 
   const handleViewDetails = async (request: Request) => {
     setSelectedRequest(request);
@@ -445,6 +461,18 @@ const AdminRequests: React.FC = () => {
                     <SelectItem value="pending_confirmation">Ожидает подтверждения</SelectItem>
                     <SelectItem value="completed">Выполнено</SelectItem>
                     <SelectItem value="cancelled">Отменена</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Объект</label>
+                <Select value={siteFilter} onValueChange={setSiteFilter}>
+                  <SelectTrigger><SelectValue placeholder="Все объекты" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все объекты</SelectItem>
+                    {sites.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

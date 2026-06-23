@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -33,6 +34,12 @@ interface Request {
   status: string;
   webhook_sent: boolean;
   created_at: string;
+  site_id: string | null;
+}
+
+interface Site {
+  id: string;
+  name: string;
 }
 
 interface Response {
@@ -76,10 +83,13 @@ const HRRequests: React.FC = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [payFilter, setPayFilter] = useState('');
+  const [siteFilter, setSiteFilter] = useState<string>('all');
+  const [sites, setSites] = useState<Site[]>([]);
 
   useEffect(() => {
     fetchRequests();
-  }, []);
+    void fetchMySites();
+  }, [user]);
 
   const fetchRequests = async () => {
     try {
@@ -95,6 +105,25 @@ const HRRequests: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchMySites = async () => {
+    if (!user) return;
+    const { data: assignments } = await supabase
+      .from('site_managers')
+      .select('site_id')
+      .eq('hr_user_id', user.id);
+    const ids = (assignments || []).map((a) => a.site_id);
+    if (ids.length === 0) {
+      setSites([]);
+      return;
+    }
+    const { data } = await supabase
+      .from('sites')
+      .select('id, name')
+      .in('id', ids)
+      .order('name');
+    setSites(data || []);
   };
 
   const fetchAssignedWorkers = async (requestId: string) => {
@@ -130,51 +159,50 @@ const HRRequests: React.FC = () => {
   const handleConfirmCompletion = async (requestId: string) => {
     setConfirmingId(requestId);
     try {
-      // First, update the request status
-      const { error } = await supabase
+      // 1. Update request status -> completed, verify the row actually changed
+      const { data: updated, error: updateErr } = await supabase
         .from('requests')
         .update({ status: 'completed' as any })
-        .eq('id', requestId);
+        .eq('id', requestId)
+        .select('id, status');
 
-      if (error) throw error;
+      if (updateErr) throw new Error(`Не удалось обновить заявку: ${updateErr.message}`);
+      if (!updated || updated.length === 0) {
+        throw new Error('Заявка не обновлена — недостаточно прав или заявка не найдена.');
+      }
 
-      // Update responses status to completed
-      await supabase
+      // 2. Mark assigned responses as completed (non-blocking; rating still works without it)
+      const { error: respErr } = await supabase
         .from('responses')
         .update({ status: 'completed' as any })
         .eq('request_id', requestId)
         .eq('status', 'assigned');
+      if (respErr) console.warn('responses update warning:', respErr.message);
 
-      setRequests(requests.map(r =>
-        r.id === requestId ? { ...r, status: 'completed' } : r
-      ));
-
+      setRequests((prev) => prev.map((r) => (r.id === requestId ? { ...r, status: 'completed' } : r)));
       if (selectedRequest?.id === requestId) {
         setSelectedRequest({ ...selectedRequest, status: 'completed' });
       }
 
-      toast({
-        title: 'Заявка подтверждена',
-        description: 'Заявка отмечена как выполненная',
-      });
+      toast({ title: 'Заявка подтверждена', description: 'Заявка отмечена как выполненная' });
 
-      // Get assigned workers for rating
+      // 3. Fetch workers to rate (include both completed and assigned in case the responses update was blocked)
       const { data: assignedForRating } = await supabase
         .from('responses')
         .select('id, worker_id, status')
         .eq('request_id', requestId)
-        .eq('status', 'completed');
+        .in('status', ['completed', 'assigned']);
 
       if (assignedForRating && assignedForRating.length > 0) {
-        const workerIds = assignedForRating.map(r => r.worker_id);
+        const workerIds = assignedForRating.map((r) => r.worker_id);
         const { data: profiles } = await supabase
           .from('profiles')
           .select('user_id, full_name, phone, city, experience, rating')
           .in('user_id', workerIds);
 
-        const workersWithProfiles = assignedForRating.map(resp => ({
+        const workersWithProfiles = assignedForRating.map((resp) => ({
           ...resp,
-          worker_profile: profiles?.find(p => p.user_id === resp.worker_id)
+          worker_profile: profiles?.find((p) => p.user_id === resp.worker_id),
         }));
 
         setWorkersToRate(workersWithProfiles);
@@ -286,17 +314,19 @@ const HRRequests: React.FC = () => {
     }
   };
 
-  const hasFilters = activeFilter !== 'all' || dateFrom || dateTo || payFilter;
+  const hasFilters = activeFilter !== 'all' || dateFrom || dateTo || payFilter || siteFilter !== 'all';
 
   const clearFilters = () => {
     setActiveFilter('all');
     setDateFrom('');
     setDateTo('');
     setPayFilter('');
+    setSiteFilter('all');
   };
 
   const filteredRequests = requests.filter(r => {
     if (activeFilter !== 'all' && r.status !== activeFilter) return false;
+    if (siteFilter !== 'all' && r.site_id !== siteFilter) return false;
     if (dateFrom && r.start_date < dateFrom) return false;
     if (dateTo && r.start_date > dateTo) return false;
     if (payFilter && r.pay && !r.pay.toLowerCase().includes(payFilter.toLowerCase())) return false;
@@ -350,8 +380,22 @@ const HRRequests: React.FC = () => {
               </div>
             </div>
             
-            {/* Date filters - stack on mobile */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-end">
+            {/* Site + Date filters */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-end">
+              {sites.length > 1 && (
+                <div>
+                  <Label className="text-xs">Объект</Label>
+                  <Select value={siteFilter} onValueChange={setSiteFilter}>
+                    <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Все объекты</SelectItem>
+                      {sites.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
                 <Label className="text-xs">Дата от</Label>
                 <Input
