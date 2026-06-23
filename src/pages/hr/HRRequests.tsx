@@ -297,6 +297,54 @@ const HRRequests: React.FC = () => {
     }
   };
 
+  const [cancelTarget, setCancelTarget] = useState<Request | null>(null);
+
+  const handleCancelRequest = async (request: Request) => {
+    setCancellingId(request.id);
+    try {
+      const { data, error } = await supabase
+        .from('requests')
+        .update({ status: 'cancelled' as any })
+        .eq('id', request.id)
+        .select('id, status');
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('Не удалось отменить заявку');
+
+      // Reject any pending responses to free workers
+      await supabase
+        .from('responses')
+        .update({ status: 'rejected' as any })
+        .eq('request_id', request.id)
+        .in('status', ['pending', 'assigned']);
+
+      setRequests((prev) => prev.map((r) => (r.id === request.id ? { ...r, status: 'cancelled' } : r)));
+      toast({ title: 'Заявка отменена' });
+    } catch (e: any) {
+      toast({ title: 'Ошибка', description: e?.message || 'Не удалось отменить заявку', variant: 'destructive' });
+    } finally {
+      setCancellingId(null);
+      setCancelTarget(null);
+    }
+  };
+
+  const handleDuplicateRequest = (request: Request) => {
+    navigate('/hr/create-request', {
+      state: {
+        duplicate: {
+          position: request.position,
+          start_time: request.start_time,
+          end_time: request.end_time,
+          address: request.address,
+          quantity: request.quantity,
+          requirements: request.requirements,
+          comments: request.comments,
+          pay: request.pay,
+          site_id: request.site_id,
+        },
+      },
+    });
+  };
+
   const handleContactSupport = async (request: Request) => {
     if (!user) return;
     
