@@ -9,8 +9,10 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { AvatarUpload } from '@/components/AvatarUpload';
-import { Save } from 'lucide-react';
+import { Save, Check } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
+import { POSITIONS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 const WorkerProfile: React.FC = () => {
   const { user, profile, refetchProfile } = useAuth();
@@ -24,8 +26,8 @@ const WorkerProfile: React.FC = () => {
     city: '',
     experience: '',
     preferredSchedule: '',
-    preferredPositions: '',
   });
+  const [preferredPositions, setPreferredPositions] = useState<string[]>([]);
 
   useEffect(() => {
     if (profile) {
@@ -35,11 +37,17 @@ const WorkerProfile: React.FC = () => {
         city: profile.city || '',
         experience: profile.experience || '',
         preferredSchedule: profile.preferred_schedule || '',
-        preferredPositions: profile.preferred_positions?.join(', ') || '',
       });
+      setPreferredPositions(profile.preferred_positions || []);
       setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile]);
+
+  const togglePosition = (pos: string) => {
+    setPreferredPositions((prev) =>
+      prev.includes(pos) ? prev.filter((p) => p !== pos) : [...prev, pos],
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
