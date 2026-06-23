@@ -21,7 +21,6 @@ interface WebhookPayload {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -29,14 +28,50 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+
+    // ---- AuthZ: require an authenticated admin caller ----
+    const authHeader = req.headers.get('Authorization') || ''
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+    if (!token) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    })
+    const { data: userData, error: userErr } = await userClient.auth.getUser()
+    if (userErr || !userData?.user) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    const { data: roleRow } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userData.user.id)
+      .eq('role', 'admin')
+      .maybeSingle()
+
+    if (!roleRow) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    // ---- end AuthZ ----
 
     const { request_id, test_mode } = await req.json()
 
     console.log(`Processing webhook for request_id: ${request_id}, test_mode: ${test_mode}`)
 
-    // Get webhook settings
     const { data: settings, error: settingsError } = await supabase
       .from('webhook_settings')
       .select('*')
@@ -59,7 +94,6 @@ Deno.serve(async (req) => {
     let payload: WebhookPayload
 
     if (test_mode) {
-      // Send test payload
       payload = {
         id: 'test-' + Date.now(),
         company: 'Тестовая компания',
@@ -75,7 +109,6 @@ Deno.serve(async (req) => {
         comments: 'Тестовая заявка'
       }
     } else {
-      // Get request data
       const { data: request, error: requestError } = await supabase
         .from('requests')
         .select('*')
@@ -87,7 +120,6 @@ Deno.serve(async (req) => {
         throw new Error('Request not found')
       }
 
-      // Get HR profile for company name
       const { data: profile } = await supabase
         .from('profiles')
         .select('company')
@@ -112,7 +144,6 @@ Deno.serve(async (req) => {
 
     console.log('Sending webhook payload:', JSON.stringify(payload))
 
-    // Send webhook with retry logic
     let success = false
     let responseText = ''
     let attempts = 0
@@ -121,13 +152,11 @@ Deno.serve(async (req) => {
     while (!success && attempts < maxAttempts) {
       attempts++
       console.log(`Webhook attempt ${attempts}/${maxAttempts}`)
-      
+
       try {
         const response = await fetch(settings.webhook_url, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
 
@@ -137,20 +166,17 @@ Deno.serve(async (req) => {
         console.log(`Webhook response (attempt ${attempts}): status=${response.status}, body=${responseText}`)
 
         if (!success && attempts < maxAttempts) {
-          // Wait before retry (exponential backoff)
           await new Promise(resolve => setTimeout(resolve, 1000 * attempts))
         }
       } catch (fetchError) {
         console.error(`Webhook fetch error (attempt ${attempts}):`, fetchError)
         responseText = fetchError instanceof Error ? fetchError.message : 'Unknown error'
-        
         if (attempts < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, 1000 * attempts))
         }
       }
     }
 
-    // Log webhook attempt
     if (!test_mode && request_id) {
       const { error: logError } = await supabase
         .from('webhook_logs')
@@ -158,14 +184,11 @@ Deno.serve(async (req) => {
           request_id,
           url: settings.webhook_url,
           success,
-          response: responseText.substring(0, 1000) // Limit response size
+          response: responseText.substring(0, 1000)
         })
 
-      if (logError) {
-        console.error('Error logging webhook:', logError)
-      }
+      if (logError) console.error('Error logging webhook:', logError)
 
-      // Update request webhook_sent status
       if (success) {
         await supabase
           .from('requests')
@@ -175,8 +198,8 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ 
-        success, 
+      JSON.stringify({
+        success,
         message: success ? 'Webhook отправлен успешно' : 'Ошибка отправки webhook',
         attempts,
         response: responseText.substring(0, 200)
@@ -187,14 +210,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Webhook function error:', error)
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
