@@ -26,7 +26,13 @@ interface Request {
   requirements: string | null;
   webhook_sent: boolean;
   hr_id: string;
+  site_id: string | null;
   company?: string;
+}
+
+interface Site {
+  id: string;
+  name: string;
 }
 
 interface Response {
@@ -62,11 +68,19 @@ const AdminRequests: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [companyFilter, setCompanyFilter] = useState<string>('');
   const [dateFilter, setDateFilter] = useState<string>('');
+  const [siteFilter, setSiteFilter] = useState<string>('all');
+  const [sites, setSites] = useState<Site[]>([]);
 
   useEffect(() => {
     fetchRequests();
     fetchAllWorkers();
+    void fetchSites();
   }, []);
+
+  const fetchSites = async () => {
+    const { data } = await supabase.from('sites').select('id, name').order('name');
+    setSites(data || []);
+  };
 
   const fetchRequests = async () => {
     try {
