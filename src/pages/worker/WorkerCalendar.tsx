@@ -41,12 +41,12 @@ const WorkerCalendar: React.FC = () => {
     if (!user) return;
 
     try {
-      // Get assigned responses
+      // Get pending, assigned and completed responses
       const { data: responsesData, error: responsesError } = await supabase
         .from('responses')
         .select('id, status, request_id')
         .eq('worker_id', user.id)
-        .in('status', ['assigned', 'completed']);
+        .in('status', ['pending', 'assigned', 'completed']);
 
       if (responsesError) throw responsesError;
 
@@ -118,6 +118,9 @@ const WorkerCalendar: React.FC = () => {
     if (status === 'completed') {
       return <Badge className="bg-status-gold/20 text-secondary">Выполнено</Badge>;
     }
+    if (status === 'pending') {
+      return <Badge className="bg-primary/20 text-primary">На рассмотрении</Badge>;
+    }
     return <Badge className="bg-status-success/20 text-status-success">Назначен</Badge>;
   };
 
@@ -188,6 +191,7 @@ const WorkerCalendar: React.FC = () => {
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
                       const hasCompleted = dayShifts.some(s => s.status === 'completed');
                       const hasAssigned = dayShifts.some(s => s.status === 'assigned');
+                      const hasPending = dayShifts.some(s => s.status === 'pending');
 
                       return (
                         <button
@@ -204,6 +208,9 @@ const WorkerCalendar: React.FC = () => {
                           <span className="text-sm font-medium">{format(day, 'd')}</span>
                           {hasShifts && (
                             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                              {hasPending && (
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                              )}
                               {hasAssigned && (
                                 <div className="w-1.5 h-1.5 rounded-full bg-status-success" />
                               )}
@@ -218,7 +225,11 @@ const WorkerCalendar: React.FC = () => {
                   </div>
 
                   {/* Legend */}
-                  <div className="flex items-center gap-4 mt-4 pt-4 border-t text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 pt-4 border-t text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <span>На рассмотрении</span>
+                    </div>
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full bg-status-success" />
                       <span>Назначено</span>
