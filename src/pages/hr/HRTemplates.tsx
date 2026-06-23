@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Edit, Trash2, FileText, Save } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
 import { TimeInput } from '@/components/TimeInput';
+import { POSITIONS as positions, CUSTOM_POSITION } from '@/lib/constants';
 
 interface Template {
   id: string;
@@ -26,17 +27,6 @@ interface Template {
   start_time: string | null;
   end_time: string | null;
 }
-
-const positions = [
-  'Сортировщик',
-  'Упаковщик',
-  'Грузчик',
-  'Комплектовщик',
-  'Кладовщик',
-  'Разнорабочий',
-];
-
-const CUSTOM_POSITION = '__custom__';
 
 const HRTemplates: React.FC = () => {
   const { user } = useAuth();
