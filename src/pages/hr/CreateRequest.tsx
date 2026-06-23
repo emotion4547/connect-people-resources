@@ -256,9 +256,17 @@ const CreateRequest: React.FC = () => {
                 <div className="space-y-3">
                   <Label htmlFor="site">Объект *</Label>
                   {sites.length === 0 ? (
-                    <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-md">
-                      Вы не закреплены ни за одним объектом. Обратитесь к администратору.
-                    </p>
+                    <div className="p-3 bg-muted/50 rounded-md space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        Вы не закреплены ни за одним объектом. Обратитесь к администратору, чтобы получить доступ.
+                      </p>
+                      <Button asChild type="button" variant="outline" size="sm" className="gap-2">
+                        <Link to="/hr/support">
+                          <MessageCircle className="w-4 h-4" />
+                          Написать в поддержку
+                        </Link>
+                      </Button>
+                    </div>
                   ) : (
                     <Select value={siteId} onValueChange={setSiteId}>
                       <SelectTrigger><SelectValue placeholder="Выберите объект" /></SelectTrigger>
@@ -303,12 +311,12 @@ const CreateRequest: React.FC = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="startDate">Дата начала *</Label>
-                    <Input id="startDate" type="date" value={formData.startDate}
+                    <Input id="startDate" type="date" min={todayStr} value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
                   </div>
                   <div>
                     <Label htmlFor="endDate">Дата окончания *</Label>
-                    <Input id="endDate" type="date" value={formData.endDate}
+                    <Input id="endDate" type="date" min={formData.startDate || todayStr} value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
                   </div>
                 </div>
@@ -330,10 +338,17 @@ const CreateRequest: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
                 </div>
 
-                <div>
-                  <Label htmlFor="quantity">Количество сотрудников</Label>
-                  <Input id="quantity" type="number" min={1} value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })} />
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="quantity">Количество сотрудников</Label>
+                    <Input id="quantity" type="number" min={1} value={formData.quantity}
+                      onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })} />
+                  </div>
+                  <div>
+                    <Label htmlFor="pay">Оплата</Label>
+                    <Input id="pay" placeholder="3500 ₽ / смена" value={formData.pay}
+                      onChange={(e) => setFormData({ ...formData, pay: e.target.value })} />
+                  </div>
                 </div>
 
                 <div>
