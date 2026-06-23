@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, X, Info, FileText, PenLine } from 'lucide-react';
+import { Send, X, Info, FileText, PenLine, MessageCircle } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
-import { TimeInput } from '@/components/TimeInput';
+import { POSITIONS as positions, CUSTOM_POSITION } from '@/lib/constants';
 
 interface Template {
   id: string;
@@ -23,6 +23,7 @@ interface Template {
   quantity: number;
   requirements: string | null;
   comments: string | null;
+  pay: string | null;
   start_time: string | null;
   end_time: string | null;
 }
@@ -33,17 +34,6 @@ interface Site {
   city: string | null;
   address: string | null;
 }
-
-const positions = [
-  'Сортировщик',
-  'Упаковщик',
-  'Грузчик',
-  'Комплектовщик',
-  'Кладовщик',
-  'Разнорабочий',
-];
-
-const CUSTOM_POSITION = '__custom__';
 
 const CreateRequest: React.FC = () => {
   const navigate = useNavigate();
