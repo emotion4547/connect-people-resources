@@ -159,51 +159,50 @@ const HRRequests: React.FC = () => {
   const handleConfirmCompletion = async (requestId: string) => {
     setConfirmingId(requestId);
     try {
-      // First, update the request status
-      const { error } = await supabase
+      // 1. Update request status -> completed, verify the row actually changed
+      const { data: updated, error: updateErr } = await supabase
         .from('requests')
         .update({ status: 'completed' as any })
-        .eq('id', requestId);
+        .eq('id', requestId)
+        .select('id, status');
 
-      if (error) throw error;
+      if (updateErr) throw new Error(`Не удалось обновить заявку: ${updateErr.message}`);
+      if (!updated || updated.length === 0) {
+        throw new Error('Заявка не обновлена — недостаточно прав или заявка не найдена.');
+      }
 
-      // Update responses status to completed
-      await supabase
+      // 2. Mark assigned responses as completed (non-blocking; rating still works without it)
+      const { error: respErr } = await supabase
         .from('responses')
         .update({ status: 'completed' as any })
         .eq('request_id', requestId)
         .eq('status', 'assigned');
+      if (respErr) console.warn('responses update warning:', respErr.message);
 
-      setRequests(requests.map(r =>
-        r.id === requestId ? { ...r, status: 'completed' } : r
-      ));
-
+      setRequests((prev) => prev.map((r) => (r.id === requestId ? { ...r, status: 'completed' } : r)));
       if (selectedRequest?.id === requestId) {
         setSelectedRequest({ ...selectedRequest, status: 'completed' });
       }
 
-      toast({
-        title: 'Заявка подтверждена',
-        description: 'Заявка отмечена как выполненная',
-      });
+      toast({ title: 'Заявка подтверждена', description: 'Заявка отмечена как выполненная' });
 
-      // Get assigned workers for rating
+      // 3. Fetch workers to rate (include both completed and assigned in case the responses update was blocked)
       const { data: assignedForRating } = await supabase
         .from('responses')
         .select('id, worker_id, status')
         .eq('request_id', requestId)
-        .eq('status', 'completed');
+        .in('status', ['completed', 'assigned']);
 
       if (assignedForRating && assignedForRating.length > 0) {
-        const workerIds = assignedForRating.map(r => r.worker_id);
+        const workerIds = assignedForRating.map((r) => r.worker_id);
         const { data: profiles } = await supabase
           .from('profiles')
           .select('user_id, full_name, phone, city, experience, rating')
           .in('user_id', workerIds);
 
-        const workersWithProfiles = assignedForRating.map(resp => ({
+        const workersWithProfiles = assignedForRating.map((resp) => ({
           ...resp,
-          worker_profile: profiles?.find(p => p.user_id === resp.worker_id)
+          worker_profile: profiles?.find((p) => p.user_id === resp.worker_id),
         }));
 
         setWorkersToRate(workersWithProfiles);
