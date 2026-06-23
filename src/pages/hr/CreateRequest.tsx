@@ -103,6 +103,7 @@ const CreateRequest: React.FC = () => {
       ...formData,
       address: template.address || '',
       quantity: template.quantity,
+      pay: template.pay || '',
       requirements: template.requirements || '',
       comments: template.comments || '',
       startTime: template.start_time?.slice(0, 5) || '09:00',
