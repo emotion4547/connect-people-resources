@@ -181,11 +181,11 @@ const HRRequests: React.FC = () => {
         setCurrentRatingIndex(0);
         setShowRatingDialog(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error confirming request:', error);
       toast({
         title: 'Ошибка',
-        description: 'Не удалось подтвердить выполнение',
+        description: error?.message || 'Не удалось подтвердить выполнение',
         variant: 'destructive',
       });
     } finally {
@@ -406,7 +406,6 @@ const HRRequests: React.FC = () => {
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">ID</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Должность</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Дата</th>
-                      <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Оплата</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Кол-во</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Статус</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Действия</th>
