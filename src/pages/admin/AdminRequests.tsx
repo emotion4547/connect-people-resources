@@ -75,6 +75,16 @@ const AdminRequests: React.FC = () => {
     fetchRequests();
     fetchAllWorkers();
     void fetchSites();
+
+    const channel = supabase
+      .channel('admin-requests-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => {
+        fetchRequests();
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchSites = async () => {
@@ -87,7 +97,9 @@ const AdminRequests: React.FC = () => {
       const { data, error } = await supabase
         .from('requests')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(500);
+
 
       if (error) throw error;
       
