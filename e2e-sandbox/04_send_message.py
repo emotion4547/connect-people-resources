@@ -18,22 +18,25 @@ async def main():
         await page.screenshot(path=str(SH / "support_open.png"))
 
         msg = f"[e2e ping {int(time.time())}]"
-        # Support pages use a textarea or input plus a send button. Try both.
-        textarea = page.locator('textarea, input[type="text"]').filter(
-            has_text=""
-        )
-        # Prefer the placeholder hint typical for chat
-        chat_input = page.get_by_placeholder("Введите сообщение")
+
+        # If no chat exists yet, the page may show a "create chat" prompt.
+        # The form input has placeholder "Написать сообщение..." once chat is open.
+        chat_input = page.get_by_placeholder("Написать сообщение...")
         if await chat_input.count() == 0:
-            chat_input = page.locator("textarea").last
-        await chat_input.fill(msg)
+            # Try creating a new chat
+            start_btn = page.get_by_role("button", name="Начать чат")
+            if await start_btn.count() == 0:
+                start_btn = page.get_by_role("button", name="Новый чат")
+            if await start_btn.count() > 0:
+                await start_btn.first.click()
+                await page.wait_for_selector('[placeholder="Написать сообщение..."]', timeout=10000)
+                chat_input = page.get_by_placeholder("Написать сообщение...")
+
+        await chat_input.first.fill(msg)
         await page.screenshot(path=str(SH / "support_typed.png"))
 
-        # Send: button with Send icon or text "Отправить"
-        send_btn = page.get_by_role("button", name="Отправить")
-        if await send_btn.count() == 0:
-            send_btn = page.locator('button:has(svg)').last
-        await send_btn.click()
+        # Submit via Enter on the form (input is inside <form onSubmit>)
+        await chat_input.first.press("Enter")
 
         await page.wait_for_selector(f'text="{msg}"', timeout=10000)
         await page.screenshot(path=str(SH / "support_after_send.png"))
