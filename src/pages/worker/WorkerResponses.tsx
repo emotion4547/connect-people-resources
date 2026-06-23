@@ -130,6 +130,32 @@ const WorkerResponses: React.FC = () => {
     navigate(`/worker/support?request_id=${requestId}`);
   };
 
+  const confirmCancel = async () => {
+    if (!cancelTarget || !user) return;
+    setCancelling(true);
+    try {
+      const { error } = await supabase
+        .from('responses')
+        .delete()
+        .eq('id', cancelTarget.id)
+        .eq('worker_id', user.id)
+        .eq('status', 'pending');
+      if (error) throw error;
+      setResponses((prev) => prev.filter((r) => r.id !== cancelTarget.id));
+      toast({ title: 'Отклик отменён' });
+    } catch (e: any) {
+      console.error('Error cancelling response:', e);
+      toast({
+        title: 'Не удалось отменить',
+        description: e?.message || 'Попробуйте позже',
+        variant: 'destructive',
+      });
+    } finally {
+      setCancelling(false);
+      setCancelTarget(null);
+    }
+  };
+
   return (
     <DashboardLayout role="worker">
       <PageMeta title="Мои отклики" description="История откликов на вакансии" />
