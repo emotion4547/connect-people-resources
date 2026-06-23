@@ -71,18 +71,23 @@ const statusFilters = [
 const HRRequests: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [assignedWorkers, setAssignedWorkers] = useState<Response[]>([]);
-  
+  const highlightId = searchParams.get('highlight');
+  const highlightRef = useRef<HTMLTableRowElement | null>(null);
+
   // Rating state
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [workersToRate, setWorkersToRate] = useState<Response[]>([]);
   const [currentRatingIndex, setCurrentRatingIndex] = useState(0);
-  
+
   // Additional filters
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -94,6 +99,19 @@ const HRRequests: React.FC = () => {
     fetchRequests();
     void fetchMySites();
   }, [user]);
+
+  useEffect(() => {
+    if (highlightId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const t = setTimeout(() => {
+        const next = new URLSearchParams(searchParams);
+        next.delete('highlight');
+        setSearchParams(next, { replace: true });
+      }, 4000);
+      return () => clearTimeout(t);
+    }
+  }, [highlightId, requests]);
+
 
   const fetchRequests = async () => {
     try {
