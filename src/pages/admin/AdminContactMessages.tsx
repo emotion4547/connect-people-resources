@@ -152,7 +152,7 @@ const AdminContactMessages: React.FC = () => {
           <InboxTabs />
         </div>
 
-        </div>
+
 
         <Card>
           <CardHeader>
