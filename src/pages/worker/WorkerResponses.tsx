@@ -277,6 +277,32 @@ const WorkerResponses: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={!!cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Отменить отклик?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {cancelTarget
+                ? `Отклик на «${cancelTarget.requests.position}» будет удалён. Вы сможете откликнуться снова позже, если вакансия ещё открыта.`
+                : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelling}>Не отменять</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void confirmCancel();
+              }}
+              disabled={cancelling}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelling ? 'Отмена…' : 'Отменить отклик'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
