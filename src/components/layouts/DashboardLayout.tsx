@@ -30,6 +30,7 @@ import {
   ChevronRight,
   Calendar,
   MoreHorizontal,
+  Building2,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -72,6 +73,7 @@ const workerNavItems: NavItem[] = [
 const adminNavItems: NavItem[] = [
   { label: 'Дашборд', href: '/admin/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Заявки', href: '/admin/requests', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Объекты', href: '/admin/sites', icon: <Building2 className="w-5 h-5" /> },
   { label: 'Исполнители', href: '/admin/workers', icon: <Users className="w-5 h-5" /> },
   { label: 'Пользователи', href: '/admin/users', icon: <User className="w-5 h-5" /> },
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
