@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,27 +38,47 @@ interface Site {
 
 const CreateRequest: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const duplicateData = (location.state as any)?.duplicate as
+    | {
+        position?: string;
+        start_time?: string | null;
+        end_time?: string | null;
+        address?: string;
+        quantity?: number;
+        requirements?: string | null;
+        comments?: string | null;
+        pay?: string | null;
+        site_id?: string | null;
+      }
+    | undefined;
   const { user } = useAuth();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
-  const [showModeDialog, setShowModeDialog] = useState(true);
+  const [showModeDialog, setShowModeDialog] = useState(!duplicateData);
   const [showTemplateSelect, setShowTemplateSelect] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
-  const [siteId, setSiteId] = useState<string>('');
-  const [selectedPosition, setSelectedPosition] = useState('');
-  const [customPosition, setCustomPosition] = useState('');
+  const [siteId, setSiteId] = useState<string>(duplicateData?.site_id || '');
+  const [selectedPosition, setSelectedPosition] = useState(() => {
+    if (!duplicateData?.position) return '';
+    return positions.includes(duplicateData.position) ? duplicateData.position : CUSTOM_POSITION;
+  });
+  const [customPosition, setCustomPosition] = useState(() => {
+    if (!duplicateData?.position) return '';
+    return positions.includes(duplicateData.position) ? '' : duplicateData.position;
+  });
   const [formData, setFormData] = useState({
     startDate: '',
     endDate: '',
-    startTime: '09:00',
-    endTime: '18:00',
-    address: '',
-    quantity: 1,
-    pay: '',
-    requirements: '',
-    comments: '',
+    startTime: duplicateData?.start_time?.slice(0, 5) || '09:00',
+    endTime: duplicateData?.end_time?.slice(0, 5) || '18:00',
+    address: duplicateData?.address || '',
+    quantity: duplicateData?.quantity || 1,
+    pay: duplicateData?.pay || '',
+    requirements: duplicateData?.requirements || '',
+    comments: duplicateData?.comments || '',
   });
 
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -67,6 +87,7 @@ const CreateRequest: React.FC = () => {
     void fetchTemplates();
     void fetchSites();
   }, [user]);
+
 
   const fetchTemplates = async () => {
     const { data } = await supabase.from('request_templates').select('*').order('name');
@@ -92,7 +113,7 @@ const CreateRequest: React.FC = () => {
       .eq('is_active', true)
       .order('name');
     setSites(data || []);
-    if (data && data.length === 1) setSiteId(data[0].id);
+    if (data && data.length === 1 && !siteId) setSiteId(data[0].id);
   };
 
   const handleSelectTemplate = (template: Template) => {
@@ -179,7 +200,7 @@ const CreateRequest: React.FC = () => {
         description: webhookSuccess ? 'Опубликовано в Telegram и VK!' : 'Заявка создана. Публикация в соцсетях недоступна.',
       });
 
-      navigate('/hr/requests');
+      navigate(`/hr/requests?highlight=${data.id}`);
     } catch (error: any) {
       console.error('Error creating request:', error);
       toast({ title: 'Ошибка', description: error?.message || 'Не удалось создать заявку', variant: 'destructive' });

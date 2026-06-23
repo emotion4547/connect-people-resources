@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User, Star } from 'lucide-react';
+import { PlusCircle, Eye, CheckCircle, FileText, ThumbsUp, Filter, X, MessageCircle, User, Star, Copy, Ban } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
@@ -67,18 +71,23 @@ const statusFilters = [
 const HRRequests: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [assignedWorkers, setAssignedWorkers] = useState<Response[]>([]);
-  
+  const highlightId = searchParams.get('highlight');
+  const highlightRef = useRef<HTMLTableRowElement | null>(null);
+
   // Rating state
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [workersToRate, setWorkersToRate] = useState<Response[]>([]);
   const [currentRatingIndex, setCurrentRatingIndex] = useState(0);
-  
+
   // Additional filters
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -90,6 +99,19 @@ const HRRequests: React.FC = () => {
     fetchRequests();
     void fetchMySites();
   }, [user]);
+
+  useEffect(() => {
+    if (highlightId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const t = setTimeout(() => {
+        const next = new URLSearchParams(searchParams);
+        next.delete('highlight');
+        setSearchParams(next, { replace: true });
+      }, 4000);
+      return () => clearTimeout(t);
+    }
+  }, [highlightId, requests]);
+
 
   const fetchRequests = async () => {
     try {
@@ -275,6 +297,54 @@ const HRRequests: React.FC = () => {
     }
   };
 
+  const [cancelTarget, setCancelTarget] = useState<Request | null>(null);
+
+  const handleCancelRequest = async (request: Request) => {
+    setCancellingId(request.id);
+    try {
+      const { data, error } = await supabase
+        .from('requests')
+        .update({ status: 'cancelled' as any })
+        .eq('id', request.id)
+        .select('id, status');
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('Не удалось отменить заявку');
+
+      // Reject any pending responses to free workers
+      await supabase
+        .from('responses')
+        .update({ status: 'rejected' as any })
+        .eq('request_id', request.id)
+        .in('status', ['pending', 'assigned']);
+
+      setRequests((prev) => prev.map((r) => (r.id === request.id ? { ...r, status: 'cancelled' } : r)));
+      toast({ title: 'Заявка отменена' });
+    } catch (e: any) {
+      toast({ title: 'Ошибка', description: e?.message || 'Не удалось отменить заявку', variant: 'destructive' });
+    } finally {
+      setCancellingId(null);
+      setCancelTarget(null);
+    }
+  };
+
+  const handleDuplicateRequest = (request: Request) => {
+    navigate('/hr/create-request', {
+      state: {
+        duplicate: {
+          position: request.position,
+          start_time: request.start_time,
+          end_time: request.end_time,
+          address: request.address,
+          quantity: request.quantity,
+          requirements: request.requirements,
+          comments: request.comments,
+          pay: request.pay,
+          site_id: request.site_id,
+        },
+      },
+    });
+  };
+
   const handleContactSupport = async (request: Request) => {
     if (!user) return;
     
@@ -447,8 +517,17 @@ const HRRequests: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredRequests.map((request) => (
-                      <tr key={request.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                    {filteredRequests.map((request) => {
+                      const isHighlighted = request.id === highlightId;
+                      const canCancel = ['new', 'in_progress'].includes(request.status);
+                      return (
+                      <tr
+                        key={request.id}
+                        ref={isHighlighted ? highlightRef : undefined}
+                        className={`border-b last:border-0 hover:bg-muted/30 transition-colors ${
+                          isHighlighted ? 'bg-primary/10 animate-pulse' : ''
+                        }`}
+                      >
                         <td className="py-4 px-4 text-sm font-mono">{request.id.slice(0, 8)}</td>
                         <td className="py-4 px-4 font-medium">{request.position}</td>
                         <td className="py-4 px-4 text-sm text-muted-foreground">
@@ -457,29 +536,34 @@ const HRRequests: React.FC = () => {
                             <> - {format(new Date(request.end_date), 'd MMM', { locale: ru })}</>
                           )}
                         </td>
-                        
+
                         <td className="py-4 px-4">{request.quantity}</td>
                         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
                         <td className="py-4 px-4">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleViewDetails(request)}
-                              className="gap-1"
-                            >
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Button variant="ghost" size="sm" onClick={() => handleViewDetails(request)} className="gap-1">
                               <Eye className="w-4 h-4" />
                               Детали
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleContactSupport(request)}
-                              className="gap-1"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => handleDuplicateRequest(request)} className="gap-1" title="Дублировать">
+                              <Copy className="w-4 h-4" />
+                              Дублировать
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleContactSupport(request)} className="gap-1">
                               <MessageCircle className="w-4 h-4" />
                               Поддержка
                             </Button>
+                            {canCancel && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCancelTarget(request)}
+                                className="gap-1 text-destructive hover:text-destructive"
+                              >
+                                <Ban className="w-4 h-4" />
+                                Отменить
+                              </Button>
+                            )}
                             {request.status === 'pending_confirmation' && (
                               <Button
                                 size="sm"
@@ -493,8 +577,10 @@ const HRRequests: React.FC = () => {
                             )}
                           </div>
                         </td>
+
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -664,6 +750,27 @@ const HRRequests: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Отменить заявку?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Заявка «{cancelTarget?.position}» будет отменена. Откликнувшимся исполнителям отклики автоматически отклонятся.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Назад</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => cancelTarget && handleCancelRequest(cancelTarget)}
+              disabled={!!cancellingId}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Отменить заявку
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
