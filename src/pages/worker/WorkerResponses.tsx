@@ -4,9 +4,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { FileText, RotateCcw, MessageCircle } from 'lucide-react';
+import { FileText, RotateCcw, MessageCircle, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -27,9 +38,12 @@ interface Response {
 
 const WorkerResponses: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [responses, setResponses] = useState<Response[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelTarget, setCancelTarget] = useState<Response | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
