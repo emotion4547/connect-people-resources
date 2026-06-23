@@ -475,6 +475,7 @@ const AdminRequests: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
               <div className="flex-1 min-w-[200px]">
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Компания</label>
                 <div className="relative">
