@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -33,6 +34,12 @@ interface Request {
   status: string;
   webhook_sent: boolean;
   created_at: string;
+  site_id: string | null;
+}
+
+interface Site {
+  id: string;
+  name: string;
 }
 
 interface Response {
@@ -76,10 +83,13 @@ const HRRequests: React.FC = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [payFilter, setPayFilter] = useState('');
+  const [siteFilter, setSiteFilter] = useState<string>('all');
+  const [sites, setSites] = useState<Site[]>([]);
 
   useEffect(() => {
     fetchRequests();
-  }, []);
+    void fetchMySites();
+  }, [user]);
 
   const fetchRequests = async () => {
     try {
@@ -95,6 +105,25 @@ const HRRequests: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchMySites = async () => {
+    if (!user) return;
+    const { data: assignments } = await supabase
+      .from('site_managers')
+      .select('site_id')
+      .eq('hr_user_id', user.id);
+    const ids = (assignments || []).map((a) => a.site_id);
+    if (ids.length === 0) {
+      setSites([]);
+      return;
+    }
+    const { data } = await supabase
+      .from('sites')
+      .select('id, name')
+      .in('id', ids)
+      .order('name');
+    setSites(data || []);
   };
 
   const fetchAssignedWorkers = async (requestId: string) => {
