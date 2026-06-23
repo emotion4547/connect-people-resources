@@ -579,7 +579,8 @@ const HRRequests: React.FC = () => {
                         </td>
 
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
