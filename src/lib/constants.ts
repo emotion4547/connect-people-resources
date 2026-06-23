@@ -1,6 +1,6 @@
 // Shared constants used across HR/Worker/Admin screens.
 
-export const POSITIONS = [
+export const POSITIONS: string[] = [
   'Сортировщик',
   'Упаковщик',
   'Грузчик',
@@ -8,8 +8,6 @@ export const POSITIONS = [
   'Кладовщик',
   'Водитель погрузчика',
   'Разнорабочий',
-] as const;
-
-export type Position = (typeof POSITIONS)[number];
+];
 
 export const CUSTOM_POSITION = '__custom__';
