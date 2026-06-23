@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
+import { InboxTabs } from '@/components/admin/InboxTabs';
 
 interface Chat {
   id: string;
@@ -136,9 +137,11 @@ const AdminMessages: React.FC = () => {
     <DashboardLayout role="admin">
       <PageMeta title="Сообщения" description="Управление чатами поддержки" />
       <div className="h-[calc(100vh-8rem)] flex flex-col animate-slide-up">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">Сообщения поддержки</h1>
+        <div className="flex flex-col gap-3 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">Входящие</h1>
+          <InboxTabs />
         </div>
+
 
         <div className="flex-1 flex gap-4 min-h-0">
           {/* Chat List */}

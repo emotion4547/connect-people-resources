@@ -24,6 +24,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import PageMeta from '@/components/PageMeta';
+import { InboxTabs } from '@/components/admin/InboxTabs';
 
 interface ContactMessage {
   id: string;
@@ -136,17 +137,22 @@ const AdminContactMessages: React.FC = () => {
       <PageMeta title="Обращения" description="Просмотр обращений с формы обратной связи" />
       
       <div className="space-y-6 animate-slide-up">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Обращения</h1>
-            <p className="text-muted-foreground">Сообщения с формы обратной связи</p>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold">Входящие</h1>
+              <p className="text-muted-foreground">Сообщения с формы обратной связи</p>
+            </div>
+            {unreadCount > 0 && (
+              <Badge className="bg-destructive text-destructive-foreground">
+                {unreadCount} непрочитанных
+              </Badge>
+            )}
           </div>
-          {unreadCount > 0 && (
-            <Badge className="bg-destructive text-destructive-foreground">
-              {unreadCount} непрочитанных
-            </Badge>
-          )}
+          <InboxTabs />
         </div>
+
+
 
         <Card>
           <CardHeader>

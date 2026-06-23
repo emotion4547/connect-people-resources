@@ -44,6 +44,7 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import AdminContactMessages from "./pages/admin/AdminContactMessages";
 
 import CookieConsent from "./components/CookieConsent";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
         <BrowserRouter>
+          <ErrorBoundary>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -182,6 +184,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
             <CookieConsent />
+          </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
