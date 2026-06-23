@@ -185,9 +185,9 @@ const HRSupport: React.FC = () => {
           <CardHeader className="border-b">
             <div className="flex items-center justify-between">
               <CardTitle>Связь с поддержкой</CardTitle>
-              <div className="flex items-center gap-2 text-sm text-status-success">
-                <CheckCircle className="w-4 h-4" />
-                Менеджер онлайн
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle className="w-4 h-4 text-status-success" />
+                Обычно отвечаем в течение часа
               </div>
             </div>
             

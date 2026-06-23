@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import PageMeta from '@/components/PageMeta';
+import { POSITIONS } from '@/lib/constants';
 
 interface Vacancy {
   id: string;
@@ -27,16 +28,6 @@ interface Vacancy {
   pay: string | null;
   status: string;
 }
-
-const POSITIONS = [
-  'Сортировщик',
-  'Упаковщик',
-  'Грузчик',
-  'Комплектовщик',
-  'Кладовщик',
-  'Водитель погрузчика',
-  'Разнорабочий',
-];
 
 const WorkerVacancies: React.FC = () => {
   const { user } = useAuth();

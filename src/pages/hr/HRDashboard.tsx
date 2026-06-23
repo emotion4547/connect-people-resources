@@ -40,10 +40,18 @@ const HRDashboard: React.FC = () => {
         const { data: requests } = await supabase
           .from('requests')
           .select('id, position, start_date, status, created_at')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(500);
+
+        const { data: upcoming } = await supabase
+          .from('requests')
+          .select('id, position, start_date, status, created_at')
+          .gte('start_date', new Date().toISOString().slice(0, 10))
+          .order('start_date', { ascending: true })
+          .limit(5);
 
         if (requests) {
-          setRecentRequests(requests.slice(0, 5));
+          setRecentRequests(upcoming || []);
           setStats({
             total: requests.length,
             new: requests.filter(r => r.status === 'new').length,

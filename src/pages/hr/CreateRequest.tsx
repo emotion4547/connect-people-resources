@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, X, Info, FileText, PenLine } from 'lucide-react';
+import { Send, X, Info, FileText, PenLine, MessageCircle } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
 import { TimeInput } from '@/components/TimeInput';
+import { POSITIONS as positions, CUSTOM_POSITION } from '@/lib/constants';
 
 interface Template {
   id: string;
@@ -23,6 +24,7 @@ interface Template {
   quantity: number;
   requirements: string | null;
   comments: string | null;
+  pay: string | null;
   start_time: string | null;
   end_time: string | null;
 }
@@ -33,17 +35,6 @@ interface Site {
   city: string | null;
   address: string | null;
 }
-
-const positions = [
-  'Сортировщик',
-  'Упаковщик',
-  'Грузчик',
-  'Комплектовщик',
-  'Кладовщик',
-  'Разнорабочий',
-];
-
-const CUSTOM_POSITION = '__custom__';
 
 const CreateRequest: React.FC = () => {
   const navigate = useNavigate();
@@ -65,9 +56,12 @@ const CreateRequest: React.FC = () => {
     endTime: '18:00',
     address: '',
     quantity: 1,
+    pay: '',
     requirements: '',
     comments: '',
   });
+
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
     void fetchTemplates();
@@ -109,6 +103,7 @@ const CreateRequest: React.FC = () => {
       ...formData,
       address: template.address || '',
       quantity: template.quantity,
+      pay: template.pay || '',
       requirements: template.requirements || '',
       comments: template.comments || '',
       startTime: template.start_time?.slice(0, 5) || '09:00',
@@ -159,6 +154,7 @@ const CreateRequest: React.FC = () => {
           end_time: formData.endTime,
           address: formData.address,
           quantity: formData.quantity,
+          pay: formData.pay || null,
           requirements: formData.requirements || null,
           comments: formData.comments || null,
           status: 'new',
@@ -260,9 +256,17 @@ const CreateRequest: React.FC = () => {
                 <div className="space-y-3">
                   <Label htmlFor="site">Объект *</Label>
                   {sites.length === 0 ? (
-                    <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-md">
-                      Вы не закреплены ни за одним объектом. Обратитесь к администратору.
-                    </p>
+                    <div className="p-3 bg-muted/50 rounded-md space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        Вы не закреплены ни за одним объектом. Обратитесь к администратору, чтобы получить доступ.
+                      </p>
+                      <Button asChild type="button" variant="outline" size="sm" className="gap-2">
+                        <Link to="/hr/support">
+                          <MessageCircle className="w-4 h-4" />
+                          Написать в поддержку
+                        </Link>
+                      </Button>
+                    </div>
                   ) : (
                     <Select value={siteId} onValueChange={setSiteId}>
                       <SelectTrigger><SelectValue placeholder="Выберите объект" /></SelectTrigger>
@@ -307,12 +311,12 @@ const CreateRequest: React.FC = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="startDate">Дата начала *</Label>
-                    <Input id="startDate" type="date" value={formData.startDate}
+                    <Input id="startDate" type="date" min={todayStr} value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
                   </div>
                   <div>
                     <Label htmlFor="endDate">Дата окончания *</Label>
-                    <Input id="endDate" type="date" value={formData.endDate}
+                    <Input id="endDate" type="date" min={formData.startDate || todayStr} value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
                   </div>
                 </div>
@@ -334,10 +338,17 @@ const CreateRequest: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
                 </div>
 
-                <div>
-                  <Label htmlFor="quantity">Количество сотрудников</Label>
-                  <Input id="quantity" type="number" min={1} value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })} />
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="quantity">Количество сотрудников</Label>
+                    <Input id="quantity" type="number" min={1} value={formData.quantity}
+                      onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })} />
+                  </div>
+                  <div>
+                    <Label htmlFor="pay">Оплата</Label>
+                    <Input id="pay" placeholder="3500 ₽ / смена" value={formData.pay}
+                      onChange={(e) => setFormData({ ...formData, pay: e.target.value })} />
+                  </div>
                 </div>
 
                 <div>
