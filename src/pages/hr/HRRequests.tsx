@@ -750,6 +750,27 @@ const HRRequests: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Отменить заявку?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Заявка «{cancelTarget?.position}» будет отменена. Откликнувшимся исполнителям отклики автоматически отклонятся.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Назад</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => cancelTarget && handleCancelRequest(cancelTarget)}
+              disabled={!!cancellingId}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Отменить заявку
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };
