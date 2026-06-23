@@ -422,7 +422,7 @@ const HRRequests: React.FC = () => {
                             <> - {format(new Date(request.end_date), 'd MMM', { locale: ru })}</>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-sm">{request.pay || '—'}</td>
+                        
                         <td className="py-4 px-4">{request.quantity}</td>
                         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
                         <td className="py-4 px-4">
@@ -522,12 +522,6 @@ const HRRequests: React.FC = () => {
                   <p className="text-sm text-muted-foreground">Количество</p>
                   <p className="font-medium">{selectedRequest.quantity} чел.</p>
                 </div>
-                {selectedRequest.pay && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Оплата</p>
-                    <p className="font-medium">{selectedRequest.pay}</p>
-                  </div>
-                )}
               </div>
               
               {selectedRequest.requirements && (
