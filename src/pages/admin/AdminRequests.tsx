@@ -465,6 +465,17 @@ const AdminRequests: React.FC = () => {
                 </Select>
               </div>
               <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Объект</label>
+                <Select value={siteFilter} onValueChange={setSiteFilter}>
+                  <SelectTrigger><SelectValue placeholder="Все объекты" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все объекты</SelectItem>
+                    {sites.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              <div className="flex-1 min-w-[200px]">
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Компания</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
