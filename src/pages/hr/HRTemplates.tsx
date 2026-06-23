@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Edit, Trash2, FileText, Save } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
+import { TimeInput } from '@/components/TimeInput';
 
 interface Template {
   id: string;
@@ -336,19 +337,11 @@ const HRTemplates: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Время начала</Label>
-                <Input
-                  type="time"
-                  value={formData.startTime}
-                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                />
+                <TimeInput value={formData.startTime} onChange={(v) => setFormData({ ...formData, startTime: v })} />
               </div>
               <div>
                 <Label>Время окончания</Label>
-                <Input
-                  type="time"
-                  value={formData.endTime}
-                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                />
+                <TimeInput value={formData.endTime} onChange={(v) => setFormData({ ...formData, endTime: v })} />
               </div>
             </div>
 
