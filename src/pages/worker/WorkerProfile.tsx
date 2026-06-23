@@ -189,15 +189,30 @@ const WorkerProfile: React.FC = () => {
 
               {/* Preferred Positions */}
               <div>
-                <Label htmlFor="preferredPositions">Предпочитаемые должности</Label>
-                <Input
-                  id="preferredPositions"
-                  placeholder="Грузчик, Сортировщик, Упаковщик"
-                  value={formData.preferredPositions}
-                  onChange={(e) => setFormData({ ...formData, preferredPositions: e.target.value })}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Укажите через запятую
+                <Label>Предпочитаемые должности</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {POSITIONS.map((pos) => {
+                    const active = preferredPositions.includes(pos);
+                    return (
+                      <button
+                        type="button"
+                        key={pos}
+                        onClick={() => togglePosition(pos)}
+                        className={cn(
+                          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors',
+                          active
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-border hover:border-primary/60 text-foreground',
+                        )}
+                      >
+                        {active && <Check className="w-3.5 h-3.5" />}
+                        {pos}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Выберите одну или несколько — вакансии с этими должностями будут показываться в первую очередь
                 </p>
               </div>
 
