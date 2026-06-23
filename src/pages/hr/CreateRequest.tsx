@@ -113,7 +113,7 @@ const CreateRequest: React.FC = () => {
       .eq('is_active', true)
       .order('name');
     setSites(data || []);
-    if (data && data.length === 1) setSiteId(data[0].id);
+    if (data && data.length === 1 && !siteId) setSiteId(data[0].id);
   };
 
   const handleSelectTemplate = (template: Template) => {
