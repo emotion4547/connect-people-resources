@@ -4,9 +4,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { FileText, RotateCcw, MessageCircle } from 'lucide-react';
+import { FileText, RotateCcw, MessageCircle, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -27,9 +38,12 @@ interface Response {
 
 const WorkerResponses: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [responses, setResponses] = useState<Response[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelTarget, setCancelTarget] = useState<Response | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -116,6 +130,32 @@ const WorkerResponses: React.FC = () => {
     navigate(`/worker/support?request_id=${requestId}`);
   };
 
+  const confirmCancel = async () => {
+    if (!cancelTarget || !user) return;
+    setCancelling(true);
+    try {
+      const { error } = await supabase
+        .from('responses')
+        .delete()
+        .eq('id', cancelTarget.id)
+        .eq('worker_id', user.id)
+        .eq('status', 'pending');
+      if (error) throw error;
+      setResponses((prev) => prev.filter((r) => r.id !== cancelTarget.id));
+      toast({ title: 'Отклик отменён' });
+    } catch (e: any) {
+      console.error('Error cancelling response:', e);
+      toast({
+        title: 'Не удалось отменить',
+        description: e?.message || 'Попробуйте позже',
+        variant: 'destructive',
+      });
+    } finally {
+      setCancelling(false);
+      setCancelTarget(null);
+    }
+  };
+
   return (
     <DashboardLayout role="worker">
       <PageMeta title="Мои отклики" description="История откликов на вакансии" />
@@ -193,15 +233,28 @@ const WorkerResponses: React.FC = () => {
                         </td>
                         <td className="py-4 px-4">{getStatusBadge(response.status)}</td>
                         <td className="py-4 px-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleContactSupport(response.request_id)}
-                            className="gap-1"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            Поддержка
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleContactSupport(response.request_id)}
+                              className="gap-1"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              <span className="hidden sm:inline">Поддержка</span>
+                            </Button>
+                            {response.status === 'pending' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCancelTarget(response)}
+                                className="gap-1 text-destructive hover:text-destructive"
+                              >
+                                <X className="w-4 h-4" />
+                                <span className="hidden sm:inline">Отменить</span>
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -224,6 +277,32 @@ const WorkerResponses: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={!!cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Отменить отклик?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {cancelTarget
+                ? `Отклик на «${cancelTarget.requests.position}» будет удалён. Вы сможете откликнуться снова позже, если вакансия ещё открыта.`
+                : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelling}>Не отменять</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void confirmCancel();
+              }}
+              disabled={cancelling}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelling ? 'Отмена…' : 'Отменить отклик'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 };

@@ -9,8 +9,10 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { AvatarUpload } from '@/components/AvatarUpload';
-import { Save } from 'lucide-react';
+import { Save, Check } from 'lucide-react';
 import PageMeta from '@/components/PageMeta';
+import { POSITIONS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 const WorkerProfile: React.FC = () => {
   const { user, profile, refetchProfile } = useAuth();
@@ -24,8 +26,8 @@ const WorkerProfile: React.FC = () => {
     city: '',
     experience: '',
     preferredSchedule: '',
-    preferredPositions: '',
   });
+  const [preferredPositions, setPreferredPositions] = useState<string[]>([]);
 
   useEffect(() => {
     if (profile) {
@@ -35,11 +37,17 @@ const WorkerProfile: React.FC = () => {
         city: profile.city || '',
         experience: profile.experience || '',
         preferredSchedule: profile.preferred_schedule || '',
-        preferredPositions: profile.preferred_positions?.join(', ') || '',
       });
+      setPreferredPositions(profile.preferred_positions || []);
       setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile]);
+
+  const togglePosition = (pos: string) => {
+    setPreferredPositions((prev) =>
+      prev.includes(pos) ? prev.filter((p) => p !== pos) : [...prev, pos],
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,9 +81,7 @@ const WorkerProfile: React.FC = () => {
           city: formData.city,
           experience: formData.experience || null,
           preferred_schedule: formData.preferredSchedule || null,
-          preferred_positions: formData.preferredPositions
-            ? formData.preferredPositions.split(',').map(s => s.trim())
-            : null,
+          preferred_positions: preferredPositions.length > 0 ? preferredPositions : null,
         })
         .eq('user_id', user.id);
 
@@ -183,15 +189,30 @@ const WorkerProfile: React.FC = () => {
 
               {/* Preferred Positions */}
               <div>
-                <Label htmlFor="preferredPositions">Предпочитаемые должности</Label>
-                <Input
-                  id="preferredPositions"
-                  placeholder="Грузчик, Сортировщик, Упаковщик"
-                  value={formData.preferredPositions}
-                  onChange={(e) => setFormData({ ...formData, preferredPositions: e.target.value })}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Укажите через запятую
+                <Label>Предпочитаемые должности</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {POSITIONS.map((pos) => {
+                    const active = preferredPositions.includes(pos);
+                    return (
+                      <button
+                        type="button"
+                        key={pos}
+                        onClick={() => togglePosition(pos)}
+                        className={cn(
+                          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors',
+                          active
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-border hover:border-primary/60 text-foreground',
+                        )}
+                      >
+                        {active && <Check className="w-3.5 h-3.5" />}
+                        {pos}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Выберите одну или несколько — вакансии с этими должностями будут показываться в первую очередь
                 </p>
               </div>
 
