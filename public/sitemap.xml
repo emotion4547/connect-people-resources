@@ -1,42 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Главная страница -->
   <url>
-    <loc>https://rabotadlyavsekh.ru/</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://connect-people-resources.lovable.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  
-  <!-- Страница входа -->
   <url>
-    <loc>https://rabotadlyavsekh.ru/login</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://connect-people-resources.lovable.app/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Политика конфиденциальности -->
   <url>
-    <loc>https://rabotadlyavsekh.ru/privacy</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://connect-people-resources.lovable.app/install</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
-  
-  <!-- Условия использования -->
   <url>
-    <loc>https://rabotadlyavsekh.ru/terms</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  
-  <!-- Контакты -->
-  <url>
-    <loc>https://rabotadlyavsekh.ru/contact</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://connect-people-resources.lovable.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://connect-people-resources.lovable.app/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://connect-people-resources.lovable.app/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

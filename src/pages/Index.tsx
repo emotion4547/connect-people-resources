@@ -65,7 +65,7 @@ const Index = () => {
           </div>
         </div>
       </header>
-
+      <main>
       {/* Hero Section */}
       <section className="pt-24 sm:pt-28 pb-12 sm:pb-20 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 animate-fade-in overflow-hidden">
         <div className="container mx-auto max-w-6xl">
@@ -459,6 +459,7 @@ const Index = () => {
           </p>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="py-8 sm:py-12 px-4 bg-foreground">

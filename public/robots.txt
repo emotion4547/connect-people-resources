@@ -1,5 +1,4 @@
 # Работа для Всех - robots.txt
-# https://rabotadlyavsekh.ru
 
 User-agent: Googlebot
 Allow: /
@@ -27,4 +26,4 @@ Disallow: /hr/
 Disallow: /worker/
 
 # Sitemap location
-Sitemap: https://rabotadlyavsekh.ru/sitemap.xml
+Sitemap: https://connect-people-resources.lovable.app/sitemap.xml
