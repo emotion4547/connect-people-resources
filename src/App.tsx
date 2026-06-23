@@ -24,6 +24,7 @@ import HRSupport from "./pages/hr/HRSupport";
 import HRTemplates from "./pages/hr/HRTemplates";
 
 // Worker Pages
+import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import WorkerProfile from "./pages/worker/WorkerProfile";
 import WorkerVacancies from "./pages/worker/WorkerVacancies";
 import WorkerCalendar from "./pages/worker/WorkerCalendar";
@@ -94,6 +95,11 @@ const App = () => (
             } />
 
             {/* Worker routes */}
+            <Route path="/worker/dashboard" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/worker/profile" element={
               <ProtectedRoute allowedRoles={['worker']}>
                 <WorkerProfile />
