@@ -56,9 +56,12 @@ const CreateRequest: React.FC = () => {
     endTime: '18:00',
     address: '',
     quantity: 1,
+    pay: '',
     requirements: '',
     comments: '',
   });
+
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
     void fetchTemplates();
