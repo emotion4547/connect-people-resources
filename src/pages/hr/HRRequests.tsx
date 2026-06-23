@@ -350,8 +350,8 @@ const HRRequests: React.FC = () => {
               </div>
             </div>
             
-            {/* Date and pay filters - stack on mobile */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-end">
+            {/* Date filters - stack on mobile */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-end">
               <div>
                 <Label className="text-xs">Дата от</Label>
                 <Input
@@ -367,15 +367,6 @@ const HRRequests: React.FC = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="h-9 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Оплата</Label>
-                <Input
-                  placeholder="Поиск..."
-                  value={payFilter}
-                  onChange={(e) => setPayFilter(e.target.value)}
                   className="h-9 text-sm"
                 />
               </div>
