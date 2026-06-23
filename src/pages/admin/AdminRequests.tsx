@@ -200,9 +200,9 @@ const AdminRequests: React.FC = () => {
       }
 
       toast({ title: 'Статус обновлен' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating status:', error);
-      toast({ title: 'Ошибка', variant: 'destructive' });
+      toast({ title: 'Ошибка', description: error?.message || 'Не удалось обновить статус', variant: 'destructive' });
     }
   };
 

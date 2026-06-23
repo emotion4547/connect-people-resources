@@ -36,6 +36,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProfile from "./pages/admin/AdminProfile";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminWorkers from "./pages/admin/AdminWorkers";
+import AdminSites from "./pages/admin/AdminSites";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminMessages from "./pages/admin/AdminMessages";
@@ -140,6 +141,11 @@ const App = () => (
             <Route path="/admin/workers" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminWorkers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/sites" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminSites />
               </ProtectedRoute>
             } />
             <Route path="/admin/users" element={

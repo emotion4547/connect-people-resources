@@ -181,11 +181,11 @@ const HRRequests: React.FC = () => {
         setCurrentRatingIndex(0);
         setShowRatingDialog(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error confirming request:', error);
       toast({
         title: 'Ошибка',
-        description: 'Не удалось подтвердить выполнение',
+        description: error?.message || 'Не удалось подтвердить выполнение',
         variant: 'destructive',
       });
     } finally {
@@ -350,8 +350,8 @@ const HRRequests: React.FC = () => {
               </div>
             </div>
             
-            {/* Date and pay filters - stack on mobile */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-end">
+            {/* Date filters - stack on mobile */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-end">
               <div>
                 <Label className="text-xs">Дата от</Label>
                 <Input
@@ -367,15 +367,6 @@ const HRRequests: React.FC = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="h-9 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Оплата</Label>
-                <Input
-                  placeholder="Поиск..."
-                  value={payFilter}
-                  onChange={(e) => setPayFilter(e.target.value)}
                   className="h-9 text-sm"
                 />
               </div>
@@ -406,7 +397,6 @@ const HRRequests: React.FC = () => {
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">ID</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Должность</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Дата</th>
-                      <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Оплата</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Кол-во</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Статус</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">Действия</th>
@@ -423,7 +413,7 @@ const HRRequests: React.FC = () => {
                             <> - {format(new Date(request.end_date), 'd MMM', { locale: ru })}</>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-sm">{request.pay || '—'}</td>
+                        
                         <td className="py-4 px-4">{request.quantity}</td>
                         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
                         <td className="py-4 px-4">
@@ -523,12 +513,6 @@ const HRRequests: React.FC = () => {
                   <p className="text-sm text-muted-foreground">Количество</p>
                   <p className="font-medium">{selectedRequest.quantity} чел.</p>
                 </div>
-                {selectedRequest.pay && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Оплата</p>
-                    <p className="font-medium">{selectedRequest.pay}</p>
-                  </div>
-                )}
               </div>
               
               {selectedRequest.requirements && (

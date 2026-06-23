@@ -209,6 +209,7 @@ export type Database = {
           position: string
           quantity: number
           requirements: string | null
+          site_id: string | null
           start_date: string
           start_time: string | null
           status: Database["public"]["Enums"]["request_status"]
@@ -227,6 +228,7 @@ export type Database = {
           position: string
           quantity?: number
           requirements?: string | null
+          site_id?: string | null
           start_date: string
           start_time?: string | null
           status?: Database["public"]["Enums"]["request_status"]
@@ -245,13 +247,22 @@ export type Database = {
           position?: string
           quantity?: number
           requirements?: string | null
+          site_id?: string | null
           start_date?: string
           start_time?: string | null
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
           webhook_sent?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "requests_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       responses: {
         Row: {
@@ -287,6 +298,97 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_managers: {
+        Row: {
+          created_at: string
+          hr_user_id: string
+          id: string
+          site_id: string
+        }
+        Insert: {
+          created_at?: string
+          hr_user_id: string
+          id?: string
+          site_id: string
+        }
+        Update: {
+          created_at?: string
+          hr_user_id?: string
+          id?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_managers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_workers: {
+        Row: {
+          created_at: string
+          id: string
+          site_id: string
+          worker_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          site_id: string
+          worker_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          site_id?: string
+          worker_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_workers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sites: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       support_chats: {
         Row: {
@@ -425,12 +527,28 @@ export type Database = {
         }
         Returns: boolean
       }
+      hr_assigned_to_site: {
+        Args: { _hr: string; _site: string }
+        Returns: boolean
+      }
+      hr_can_rate_worker: {
+        Args: { _hr: string; _worker: string }
+        Returns: boolean
+      }
       hr_has_worker: {
         Args: { _hr_id: string; _worker_user_id: string }
         Returns: boolean
       }
       hr_owns_request: {
         Args: { _hr_id: string; _request_id: string }
+        Returns: boolean
+      }
+      hr_shares_site_with_worker: {
+        Args: { _hr: string; _worker: string }
+        Returns: boolean
+      }
+      worker_assigned_to_site: {
+        Args: { _site: string; _worker: string }
         Returns: boolean
       }
       worker_responded_to_request: {
