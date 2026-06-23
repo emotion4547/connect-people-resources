@@ -92,7 +92,22 @@ const AdminWorkers: React.FC = () => {
         .in('user_id', workerIds);
 
       if (error) throw error;
-      setWorkers(data || []);
+
+      const { data: adminRows } = await supabase
+        .from('profile_admin_data')
+        .select('user_id, block_reason')
+        .in('user_id', workerIds);
+
+      const blockMap = new Map<string, string | null>(
+        (adminRows || []).map((r: { user_id: string; block_reason: string | null }) => [r.user_id, r.block_reason])
+      );
+
+      setWorkers(
+        (data || []).map((w) => ({
+          ...w,
+          block_reason: blockMap.get(w.user_id) ?? null,
+        })) as Worker[]
+      );
     } catch (error) {
       console.error('Error fetching workers:', error);
     } finally {
@@ -151,19 +166,23 @@ const AdminWorkers: React.FC = () => {
     }
 
     try {
+      const newReason = selectedWorker.is_active ? blockReason.trim() : null;
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          is_active: !selectedWorker.is_active,
-          block_reason: selectedWorker.is_active ? blockReason.trim() : null,
-        })
+        .update({ is_active: !selectedWorker.is_active })
         .eq('id', selectedWorker.id);
 
       if (error) throw error;
 
+      const { error: adminError } = await supabase
+        .from('profile_admin_data')
+        .upsert({ user_id: selectedWorker.user_id, block_reason: newReason }, { onConflict: 'user_id' });
+
+      if (adminError) throw adminError;
+
       setWorkers(workers.map(w =>
         w.id === selectedWorker.id 
-          ? { ...w, is_active: !selectedWorker.is_active, block_reason: selectedWorker.is_active ? blockReason.trim() : null } 
+          ? { ...w, is_active: !selectedWorker.is_active, block_reason: newReason } 
           : w
       ));
 

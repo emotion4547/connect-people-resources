@@ -85,7 +85,23 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
+      const mimeToExt: Record<string, string> = {
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif',
+      };
+      const fileExt = mimeToExt[file.type];
+      if (!fileExt) {
+        toast({
+          title: 'Неподдерживаемый формат',
+          description: 'Разрешены JPG, PNG, WebP, GIF',
+          variant: 'destructive',
+        });
+        setUploading(false);
+        return;
+      }
       const fileName = `${userId}/avatar.${fileExt}`;
 
       // Delete old avatar if exists
