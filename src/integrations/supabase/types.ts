@@ -85,11 +85,33 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      profile_admin_data: {
         Row: {
           admin_notes: string | null
-          avatar_url: string | null
           block_reason: string | null
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          block_reason?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          block_reason?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
           city: string | null
           company: string | null
           created_at: string
@@ -107,9 +129,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          admin_notes?: string | null
           avatar_url?: string | null
-          block_reason?: string | null
           city?: string | null
           company?: string | null
           created_at?: string
@@ -127,9 +147,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          admin_notes?: string | null
           avatar_url?: string | null
-          block_reason?: string | null
           city?: string | null
           company?: string | null
           created_at?: string
@@ -516,45 +534,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["app_role"]
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      hr_assigned_to_site: {
-        Args: { _hr: string; _site: string }
-        Returns: boolean
-      }
-      hr_can_rate_worker: {
-        Args: { _hr: string; _worker: string }
-        Returns: boolean
-      }
-      hr_has_worker: {
-        Args: { _hr_id: string; _worker_user_id: string }
-        Returns: boolean
-      }
-      hr_owns_request: {
-        Args: { _hr_id: string; _request_id: string }
-        Returns: boolean
-      }
-      hr_shares_site_with_worker: {
-        Args: { _hr: string; _worker: string }
-        Returns: boolean
-      }
-      worker_assigned_to_site: {
-        Args: { _site: string; _worker: string }
-        Returns: boolean
-      }
-      worker_responded_to_request: {
-        Args: { _request_id: string; _worker_id: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       app_role: "hr" | "worker" | "admin"
