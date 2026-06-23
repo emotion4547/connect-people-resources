@@ -233,15 +233,28 @@ const WorkerResponses: React.FC = () => {
                         </td>
                         <td className="py-4 px-4">{getStatusBadge(response.status)}</td>
                         <td className="py-4 px-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleContactSupport(response.request_id)}
-                            className="gap-1"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            Поддержка
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleContactSupport(response.request_id)}
+                              className="gap-1"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              <span className="hidden sm:inline">Поддержка</span>
+                            </Button>
+                            {response.status === 'pending' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCancelTarget(response)}
+                                className="gap-1 text-destructive hover:text-destructive"
+                              >
+                                <X className="w-4 h-4" />
+                                <span className="hidden sm:inline">Отменить</span>
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
