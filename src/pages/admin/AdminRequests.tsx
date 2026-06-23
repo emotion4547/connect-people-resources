@@ -165,19 +165,21 @@ const AdminRequests: React.FC = () => {
   const filteredRequests = useMemo(() => {
     return requests.filter(r => {
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+      if (siteFilter !== 'all' && r.site_id !== siteFilter) return false;
       if (companyFilter && !r.company?.toLowerCase().includes(companyFilter.toLowerCase())) return false;
       if (dateFilter && r.start_date !== dateFilter) return false;
       return true;
     });
-  }, [requests, statusFilter, companyFilter, dateFilter]);
+  }, [requests, statusFilter, siteFilter, companyFilter, dateFilter]);
 
   const resetFilters = () => {
     setStatusFilter('all');
     setCompanyFilter('');
     setDateFilter('');
+    setSiteFilter('all');
   };
 
-  const hasActiveFilters = statusFilter !== 'all' || companyFilter || dateFilter;
+  const hasActiveFilters = statusFilter !== 'all' || companyFilter || dateFilter || siteFilter !== 'all';
 
   const handleViewDetails = async (request: Request) => {
     setSelectedRequest(request);
