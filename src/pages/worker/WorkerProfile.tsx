@@ -81,9 +81,7 @@ const WorkerProfile: React.FC = () => {
           city: formData.city,
           experience: formData.experience || null,
           preferred_schedule: formData.preferredSchedule || null,
-          preferred_positions: formData.preferredPositions
-            ? formData.preferredPositions.split(',').map(s => s.trim())
-            : null,
+          preferred_positions: preferredPositions.length > 0 ? preferredPositions : null,
         })
         .eq('user_id', user.id);
 
