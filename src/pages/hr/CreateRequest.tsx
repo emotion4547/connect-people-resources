@@ -154,6 +154,7 @@ const CreateRequest: React.FC = () => {
           end_time: formData.endTime,
           address: formData.address,
           quantity: formData.quantity,
+          pay: formData.pay || null,
           requirements: formData.requirements || null,
           comments: formData.comments || null,
           status: 'new',
