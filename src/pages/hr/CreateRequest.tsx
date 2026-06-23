@@ -200,7 +200,7 @@ const CreateRequest: React.FC = () => {
         description: webhookSuccess ? 'Опубликовано в Telegram и VK!' : 'Заявка создана. Публикация в соцсетях недоступна.',
       });
 
-      navigate('/hr/requests');
+      navigate(`/hr/requests?highlight=${data.id}`);
     } catch (error: any) {
       console.error('Error creating request:', error);
       toast({ title: 'Ошибка', description: error?.message || 'Не удалось создать заявку', variant: 'destructive' });
