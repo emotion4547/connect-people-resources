@@ -53,22 +53,47 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    const { data: roleRow } = await supabase
+    const { request_id, test_mode } = await req.json()
+
+    const { data: roles } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userData.user.id)
-      .eq('role', 'admin')
-      .maybeSingle()
 
-    if (!roleRow) {
+    const roleSet = new Set((roles ?? []).map((r: any) => r.role))
+    const isAdmin = roleSet.has('admin')
+    const isHr = roleSet.has('hr')
+
+    // test_mode доступен только админу
+    if (test_mode && !isAdmin) {
       return new Response(
         JSON.stringify({ success: false, error: 'Forbidden' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
-    // ---- end AuthZ ----
 
-    const { request_id, test_mode } = await req.json()
+    // HR может дёргать вебхук только по СВОЕЙ заявке
+    if (!test_mode && !isAdmin) {
+      if (!isHr || !request_id) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Forbidden' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      const { data: reqRow } = await supabase
+        .from('requests')
+        .select('hr_id')
+        .eq('id', request_id)
+        .maybeSingle()
+
+      if (!reqRow || reqRow.hr_id !== userData.user.id) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Forbidden' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+    // ---- end AuthZ ----
 
     console.log(`Processing webhook for request_id: ${request_id}, test_mode: ${test_mode}`)
 
