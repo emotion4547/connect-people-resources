@@ -51,18 +51,23 @@ const WorkerVacancies: React.FC = () => {
     if (!user) return;
 
     try {
-      const { data: requests } = await supabase
-        .from('requests')
-        .select('*')
-        .in('status', ['new', 'in_progress'])
-        .order('start_date', { ascending: true });
+      // Shifts that have already ended stay "new" in the database, but applying to them is pointless.
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const [{ data: requests }, { data: responses }] = await Promise.all([
+        supabase
+          .from('requests')
+          .select('*')
+          .in('status', ['new', 'in_progress'])
+          .gte('end_date', today)
+          .order('start_date', { ascending: true })
+          .limit(500),
+        supabase
+          .from('responses')
+          .select('request_id')
+          .eq('worker_id', user.id),
+      ]);
 
       setVacancies(requests || []);
-
-      const { data: responses } = await supabase
-        .from('responses')
-        .select('request_id')
-        .eq('worker_id', user.id);
 
       if (responses) {
         setAppliedIds(new Set(responses.map(r => r.request_id)));
@@ -121,7 +126,7 @@ const WorkerVacancies: React.FC = () => {
         return;
       }
 
-      setAppliedIds(new Set([...appliedIds, vacancyId]));
+      setAppliedIds((prev) => new Set(prev).add(vacancyId));
       toast({
         title: 'Отклик отправлен!',
         description: 'Ожидайте ответа от менеджера',

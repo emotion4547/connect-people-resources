@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,43 +11,49 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Terms from "./pages/Terms";
-import Contact from "./pages/Contact";
-import Install from "./pages/Install";
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Install = lazy(() => import("./pages/Install"));
 
 // HR Pages
-import HRDashboard from "./pages/hr/HRDashboard";
-import HRProfile from "./pages/hr/HRProfile";
-import CreateRequest from "./pages/hr/CreateRequest";
-import HRRequests from "./pages/hr/HRRequests";
-import HRSupport from "./pages/hr/HRSupport";
-import HRTemplates from "./pages/hr/HRTemplates";
+const HRDashboard = lazy(() => import("./pages/hr/HRDashboard"));
+const HRProfile = lazy(() => import("./pages/hr/HRProfile"));
+const CreateRequest = lazy(() => import("./pages/hr/CreateRequest"));
+const HRRequests = lazy(() => import("./pages/hr/HRRequests"));
+const HRSupport = lazy(() => import("./pages/hr/HRSupport"));
+const HRTemplates = lazy(() => import("./pages/hr/HRTemplates"));
 
 // Worker Pages
-import WorkerDashboard from "./pages/worker/WorkerDashboard";
-import WorkerProfile from "./pages/worker/WorkerProfile";
-import WorkerVacancies from "./pages/worker/WorkerVacancies";
-import WorkerCalendar from "./pages/worker/WorkerCalendar";
-import WorkerResponses from "./pages/worker/WorkerResponses";
-import WorkerSupport from "./pages/worker/WorkerSupport";
+const WorkerDashboard = lazy(() => import("./pages/worker/WorkerDashboard"));
+const WorkerProfile = lazy(() => import("./pages/worker/WorkerProfile"));
+const WorkerVacancies = lazy(() => import("./pages/worker/WorkerVacancies"));
+const WorkerCalendar = lazy(() => import("./pages/worker/WorkerCalendar"));
+const WorkerResponses = lazy(() => import("./pages/worker/WorkerResponses"));
+const WorkerSupport = lazy(() => import("./pages/worker/WorkerSupport"));
 
 // Admin Pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminProfile from "./pages/admin/AdminProfile";
-import AdminRequests from "./pages/admin/AdminRequests";
-import AdminWorkers from "./pages/admin/AdminWorkers";
-import AdminSites from "./pages/admin/AdminSites";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminReports from "./pages/admin/AdminReports";
-import AdminMessages from "./pages/admin/AdminMessages";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminContactMessages from "./pages/admin/AdminContactMessages";
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
+const AdminRequests = lazy(() => import("./pages/admin/AdminRequests"));
+const AdminWorkers = lazy(() => import("./pages/admin/AdminWorkers"));
+const AdminSites = lazy(() => import("./pages/admin/AdminSites"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
+const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminContactMessages = lazy(() => import("./pages/admin/AdminContactMessages"));
 
 import CookieConsent from "./components/CookieConsent";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -55,6 +62,7 @@ const App = () => (
           <Toaster />
         <BrowserRouter>
           <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -183,6 +191,7 @@ const App = () => (
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
             <CookieConsent />
           </ErrorBoundary>
           </BrowserRouter>

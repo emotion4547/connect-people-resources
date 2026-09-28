@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { toLocalDateString } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { FileText, Clock, Users, Mail, AlertTriangle, MapPin, Calendar, TrendingUp, CheckCircle } from 'lucide-react';
 import { format, differenceInDays, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
@@ -49,7 +50,7 @@ const AdminDashboard: React.FC = () => {
   const fetchStats = async () => {
     try {
       const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
+      const todayStr = toLocalDateString(today);
 
       const [requestsRes, responsesRes, chatsRes, workersRes] = await Promise.all([
         supabase.from('requests').select('id, status, start_date, position, address, quantity, created_at'),

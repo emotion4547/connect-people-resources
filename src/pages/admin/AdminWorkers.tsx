@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, Users, UserPlus, Search, RotateCcw, Ban, CheckCircle, Trash2 } from 'lucide-react';
 import {
@@ -234,7 +235,6 @@ const AdminWorkers: React.FC = () => {
     setAddLoading(true);
     try {
       // Use an isolated client so the admin's session is not replaced by the new sign-up.
-      const { createClient } = await import('@supabase/supabase-js');
       const isolated = createClient(
         import.meta.env.VITE_SUPABASE_URL,
         import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,

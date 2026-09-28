@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { toLocalDateString } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { PlusCircle, FileText, Clock, CheckCircle, TrendingUp } from 'lucide-react';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
@@ -46,7 +47,7 @@ const HRDashboard: React.FC = () => {
         const { data: upcoming } = await supabase
           .from('requests')
           .select('id, position, start_date, status, created_at')
-          .gte('start_date', new Date().toISOString().slice(0, 10))
+          .gte('start_date', toLocalDateString())
           .order('start_date', { ascending: true })
           .limit(5);
 

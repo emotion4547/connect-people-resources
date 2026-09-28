@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { toLocalDateString } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Send, X, Info, FileText, PenLine, MessageCircle } from 'lucide-react';
@@ -81,7 +82,7 @@ const CreateRequest: React.FC = () => {
     comments: duplicateData?.comments || '',
   });
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = toLocalDateString();
 
   useEffect(() => {
     void fetchTemplates();

@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { toLocalDateString } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart3, Download, FileText, Users, CheckCircle, Activity } from 'lucide-react';
-import { format, subDays, startOfDay } from 'date-fns';
+import { format, subDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
 import {
@@ -53,8 +54,8 @@ const AdminReports: React.FC = () => {
   const [workersCount, setWorkersCount] = useState(0);
   const [responsesCount, setResponsesCount] = useState(0);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const monthAgo = subDays(new Date(), 30).toISOString().slice(0, 10);
+  const today = toLocalDateString();
+  const monthAgo = toLocalDateString(subDays(new Date(), 30));
   const [dateFrom, setDateFrom] = useState(monthAgo);
   const [dateTo, setDateTo] = useState(today);
 
@@ -75,7 +76,7 @@ const AdminReports: React.FC = () => {
 
   const filtered = useMemo(() => {
     return requests.filter((r) => {
-      const day = r.created_at.slice(0, 10);
+      const day = toLocalDateString(r.created_at);
       if (dateFrom && day < dateFrom) return false;
       if (dateTo && day > dateTo) return false;
       return true;
@@ -104,17 +105,17 @@ const AdminReports: React.FC = () => {
 
   const dailyData = useMemo(() => {
     const map = new Map<string, number>();
-    const from = new Date(dateFrom);
-    const to = new Date(dateTo);
-    for (let d = startOfDay(from); d <= to; d = new Date(d.getTime() + 86400000)) {
-      map.set(d.toISOString().slice(0, 10), 0);
-    }
+    // parseISO reads "yyyy-MM-dd" as local midnight; new Date() would read it as UTC.
+    const from = parseISO(dateFrom);
+    const to = parseISO(dateTo);
+    const days = from <= to ? eachDayOfInterval({ start: from, end: to }) : [];
+    days.forEach((d) => map.set(toLocalDateString(d), 0));
     filtered.forEach((r) => {
-      const day = r.created_at.slice(0, 10);
+      const day = toLocalDateString(r.created_at);
       if (map.has(day)) map.set(day, (map.get(day) || 0) + 1);
     });
     return Array.from(map.entries()).map(([date, count]) => ({
-      date: format(new Date(date), 'd MMM', { locale: ru }),
+      date: format(parseISO(date), 'd MMM', { locale: ru }),
       count,
     }));
   }, [filtered, dateFrom, dateTo]);

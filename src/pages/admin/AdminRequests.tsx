@@ -76,13 +76,17 @@ const AdminRequests: React.FC = () => {
     fetchAllWorkers();
     void fetchSites();
 
+    // A burst of changes (e.g. cancelling a request) triggers one reload, not one per row.
+    let reloadTimer: ReturnType<typeof setTimeout> | undefined;
     const channel = supabase
       .channel('admin-requests-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => {
-        fetchRequests();
+        clearTimeout(reloadTimer);
+        reloadTimer = setTimeout(fetchRequests, 300);
       })
       .subscribe();
     return () => {
+      clearTimeout(reloadTimer);
       supabase.removeChannel(channel);
     };
   }, []);

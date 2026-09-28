@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toLocalDateString } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -57,7 +58,7 @@ const WorkerDashboard: React.FC = () => {
         responses?.filter((r) => r.status === 'assigned').map((r) => r.request_id) || [];
 
       if (assignedIds.length > 0) {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = toLocalDateString();
         const { data: req } = await supabase
           .from('requests')
           .select('position, start_date, start_time, end_time, address, pay')

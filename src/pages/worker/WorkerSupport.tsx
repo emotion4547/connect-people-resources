@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Send, CheckCircle, FileText, MapPin, Calendar, Briefcase } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, appendMessage } from '@/lib/utils';
+import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
@@ -70,7 +71,7 @@ const WorkerSupport: React.FC = () => {
         },
         (payload) => {
           const newMsg = payload.new as Message;
-          setMessages((prev) => [...prev, newMsg]);
+          setMessages((prev) => appendMessage(prev, newMsg));
         }
       )
       .subscribe();
@@ -172,16 +173,22 @@ const WorkerSupport: React.FC = () => {
 
     setSending(true);
     try {
-      const { error } = await supabase.from('chat_messages').insert({
-        chat_id: chatId,
-        message: newMessage.trim(),
-        sender_type: 'user',
-      });
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .insert({
+          chat_id: chatId,
+          message: newMessage.trim(),
+          sender_type: 'user',
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+      setMessages((prev) => appendMessage(prev, data as Message));
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
+      toast({ title: 'Сообщение не отправлено', description: 'Проверьте подключение и попробуйте ещё раз', variant: 'destructive' });
     } finally {
       setSending(false);
     }

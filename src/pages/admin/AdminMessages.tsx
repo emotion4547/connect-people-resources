@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { Send, Mail, User, FileText, MapPin, Calendar, RotateCcw } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, appendMessage } from '@/lib/utils';
+import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import PageMeta from '@/components/PageMeta';
@@ -59,7 +60,7 @@ const AdminMessages: React.FC = () => {
     if (!selectedChat) return;
     const channel = supabase.channel(`admin-chat-${selectedChat.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${selectedChat.id}` },
-        (payload) => setMessages((prev) => [...prev, payload.new as Message]))
+        (payload) => setMessages((prev) => appendMessage(prev, payload.new as Message)))
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [selectedChat]);
@@ -86,30 +87,37 @@ const AdminMessages: React.FC = () => {
 
   const hasActiveFilters = userTypeFilter !== 'all';
 
+  // The chat the admin opened last. Responses for a chat that is no longer
+  // selected are dropped, otherwise fast switching shows another chat's history.
+  const selectedChatIdRef = useRef<string | null>(null);
+
   const selectChat = async (chat: Chat) => {
+    selectedChatIdRef.current = chat.id;
     setSelectedChat(chat);
     setLinkedRequest(null);
-    
-    const { data } = await supabase.from('chat_messages').select('*').eq('chat_id', chat.id).order('created_at', { ascending: true });
-    setMessages(data || []);
+    setMessages([]);
 
-    // Fetch linked request if exists
-    if (chat.request_id) {
-      const { data: requestData } = await supabase
-        .from('requests')
-        .select('id, position, address, start_date, status')
-        .eq('id', chat.request_id)
-        .maybeSingle();
-      
-      if (requestData) {
-        setLinkedRequest(requestData);
-      }
-    }
+    const [{ data }, requestRes] = await Promise.all([
+      supabase.from('chat_messages').select('*').eq('chat_id', chat.id).order('created_at', { ascending: true }),
+      chat.request_id
+        ? supabase
+            .from('requests')
+            .select('id, position, address, start_date, status')
+            .eq('id', chat.request_id)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+    ]);
+    if (selectedChatIdRef.current !== chat.id) return;
+
+    // Keep messages that arrived over realtime while the history was loading.
+    const history: Message[] = data || [];
+    setMessages((prev) => history.concat(prev.filter((m) => !history.some((h) => h.id === m.id))));
+    if (requestRes.data) setLinkedRequest(requestRes.data);
 
     // Mark as read
     if (chat.unread_count > 0) {
       await supabase.from('support_chats').update({ unread_count: 0 }).eq('id', chat.id);
-      setChats(chats.map(c => c.id === chat.id ? { ...c, unread_count: 0 } : c));
+      setChats((prev) => prev.map(c => c.id === chat.id ? { ...c, unread_count: 0 } : c));
     }
   };
 
@@ -117,9 +125,19 @@ const AdminMessages: React.FC = () => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedChat) return;
     setSending(true);
-    await supabase.from('chat_messages').insert({ chat_id: selectedChat.id, message: newMessage.trim(), sender_type: 'admin' });
-    setNewMessage('');
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .insert({ chat_id: selectedChat.id, message: newMessage.trim(), sender_type: 'admin' })
+      .select()
+      .single();
     setSending(false);
+    if (error) {
+      console.error('Error sending message:', error);
+      toast({ title: 'Сообщение не отправлено', description: 'Проверьте подключение и попробуйте ещё раз', variant: 'destructive' });
+      return;
+    }
+    setMessages((prev) => appendMessage(prev, data as Message));
+    setNewMessage('');
   };
 
   const getStatusBadge = (status: string) => {
