@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# self-hosted Supabase: секреты и данные не коммитим
+deploy/supabase/.env
+deploy/supabase/volumes/db/data
+deploy/supabase/volumes/storage

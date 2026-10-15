@@ -1,0 +1,30 @@
+# Внутренний шлюз: замена Kong/Envoy из официального стека Supabase.
+# Снаружи его вызывает основной Caddy на хосте (reverse_proxy 127.0.0.1:8000).
+{
+	auto_https off
+	admin off
+}
+
+:8000 {
+	handle_path /auth/v1/* {
+		reverse_proxy auth:9999
+	}
+	handle_path /rest/v1/* {
+		reverse_proxy rest:3000
+	}
+	handle_path /storage/v1/* {
+		reverse_proxy storage:5000
+	}
+	handle_path /functions/v1/* {
+		reverse_proxy functions:9000
+	}
+	# supabase-js ходит на /realtime/v1/websocket, а сервер ждёт /socket/websocket
+	# и определяет «тенанта» по имени хоста.
+	handle_path /realtime/v1/* {
+		rewrite * /socket{uri}
+		reverse_proxy realtime:4000 {
+			header_up Host realtime-dev.supabase-realtime
+		}
+	}
+	respond 404
+}

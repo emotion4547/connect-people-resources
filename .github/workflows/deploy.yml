@@ -16,11 +16,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build project
         run: npm run build
@@ -30,7 +30,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H 31.207.77.42 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 89.125.121.144 >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
-        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" dist/ root@31.207.77.42:/var/www/rabota-vsem-56.ru/dist/
+        run: rsync -avz --delete --chown=caddy:caddy -e "ssh -i ~/.ssh/deploy_key" dist/ root@89.125.121.144:/var/www/rabota-vsem-56.ru/
