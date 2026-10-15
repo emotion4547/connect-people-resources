@@ -13,7 +13,7 @@ interface PageMetaProps {
 }
 
 const SITE_NAME = 'Работа для Всех';
-const SITE_ORIGIN = 'https://connect-people-resources.lovable.app';
+const SITE_ORIGIN = 'https://rabota-vsem-56.ru';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-image.png`;
 
 function upsertMeta(selector: string, attr: 'name' | 'property', key: string, content: string) {

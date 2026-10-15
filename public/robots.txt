@@ -26,4 +26,4 @@ Disallow: /hr/
 Disallow: /worker/
 
 # Sitemap location
-Sitemap: https://connect-people-resources.lovable.app/sitemap.xml
+Sitemap: https://rabota-vsem-56.ru/sitemap.xml
