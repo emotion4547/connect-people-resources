@@ -14,7 +14,7 @@ import { buildPaymentOrders, encodeCp1251, type PayLine } from '@/lib/bankFiles'
 import { fmtDate, fmtMoney } from '@/lib/format';
 import { LINE_STATUSES, REGISTRY_CHANNELS, REGISTRY_KINDS, REGISTRY_STATUSES, type Registry, type RegistryLine } from '@/lib/payoutMeta';
 import PageMeta from '@/components/PageMeta';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
 
 const PayoutRegistryDetail: React.FC = () => {
   const { id } = useParams();
@@ -116,6 +116,7 @@ const PayoutRegistryDetail: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               {reg.channel === 'bank' && <Button variant="outline" onClick={downloadBankFile}>Файл для банка (1С)</Button>}
               <Button variant="outline" onClick={downloadTable}>Таблица (Excel)</Button>
+              <Button variant="outline" className="gap-2" onClick={() => window.print()}><Printer className="w-4 h-4" /> Печать реестра</Button>
               {reg.status === 'confirmed' && <Button variant="outline" disabled={busy} onClick={() => run('mark_registry_sent', { _registry_id: reg.id }, 'Отмечен отправленным')}>Отметить отправленным</Button>}
               {reg.channel === 'platform' && <Button disabled={busy} onClick={sendPlatform}>Отправить на платформу</Button>}
             </div>

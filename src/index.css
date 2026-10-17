@@ -269,3 +269,23 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-muted-foreground/50;
 }
+
+/* Печатные формы: боковая панель и кнопки в печать не идут, выпадающие списки остаются (в них выбранные значения). */
+@media print {
+  aside,
+  nav {
+    display: none !important;
+  }
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  main button:not([role='combobox']),
+  [data-slot='toast'],
+  [data-radix-toast-viewport] {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+}

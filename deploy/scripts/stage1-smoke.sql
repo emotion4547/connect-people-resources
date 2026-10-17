@@ -112,6 +112,7 @@ select pg_temp.check('аноним не видит счётчики дашбор
 select pg_temp.check('аноним не видит реестр документов', pg_temp.denied($$select * from public.document_registry(private.default_org_id())$$));
 select pg_temp.check('аноним не видит календарь вахт', pg_temp.denied($$select * from public.rotation_calendar(private.default_org_id(), current_date, 7)$$));
 select pg_temp.check('аноним не читает условия вахт', pg_temp.denied($$select count(*) from public.order_rotations$$));
+select pg_temp.check('аноним не импортирует', pg_temp.denied($$select * from public.import_rows(private.default_org_id(), 'clients', '[]'::jsonb)$$));
 select pg_temp.check('аноним не читает сделки', pg_temp.denied($$select count(*) from public.deals$$));
 select pg_temp.check('аноним не читает КП', pg_temp.denied($$select count(*) from public.deal_quotes$$));
 select pg_temp.check('аноним не читает агрегаты аналитики', pg_temp.denied($$select count(*) from public.analytics_daily$$));

@@ -16,7 +16,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { db } from '@/lib/db';
 import { CLIENT_STATUSES, type StaffOption } from '@/lib/clientsMeta';
 import PageMeta from '@/components/PageMeta';
-import { Plus, Search } from 'lucide-react';
+import { downloadCsv } from '@/lib/csv';
+import { Download, Plus, Search } from 'lucide-react';
 
 interface ClientRow {
   id: string; name: string; inn: string | null; city: string | null; status: string;
@@ -67,6 +68,20 @@ const ClientsList: React.FC = () => {
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => { setPage(0); }, [search, status, orgId]);
+
+  // Выгрузка в Excel: все заказчики по текущим фильтрам, а не только страница.
+  const exportCsv = async () => {
+    if (!orgId) return;
+    let q = db('clients').select('name,inn,city,status,sales_manager_id,sites_manager_id').eq('org_id', orgId).order('name').limit(10000);
+    if (status !== ALL) q = q.eq('status', status);
+    const term = search.trim().replace(/[%,()]/g, ' ');
+    if (term) q = q.or(`name.ilike.%${term}%,inn.ilike.%${term}%`);
+    const { data, error } = await q;
+    if (error) { toast({ title: 'Не удалось выгрузить', description: error.message, variant: 'destructive' }); return; }
+    const who = (id: string | null) => staff.find((x) => x.user_id === id)?.full_name ?? '';
+    downloadCsv('zakazchiki.csv', ['Название', 'ИНН', 'Город', 'Статус', 'Менеджер продаж', 'Менеджер объектов'],
+      (data ?? []).map((c: ClientRow) => [c.name, c.inn, c.city, CLIENT_STATUSES[c.status], who(c.sales_manager_id), who(c.sites_manager_id)]));
+  };
 
   useEffect(() => {
     if (!orgId) return;
@@ -124,6 +139,7 @@ const ClientsList: React.FC = () => {
                   {Object.entries(CLIENT_STATUSES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                 </SelectContent>
               </Select>
+              <Button variant="outline" className="gap-2" onClick={exportCsv}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
             </div>
 
             {permsLoading || loading ? <p className="text-muted-foreground">Загрузка…</p> : !can('clients', 'view') ? (

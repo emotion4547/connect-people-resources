@@ -48,6 +48,7 @@ MIGRATIONS=(
   20261019160000_sales_funnel.sql
   20261019170000_document_control.sql
   20261019180000_rotations.sql
+  20261019190000_excel_import.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -112,6 +113,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261019190000*) q="select to_regprocedure('public.import_rows(uuid,text,jsonb,boolean,text)') is not null" ;;
     20261019180000*) q="select to_regclass('public.order_rotations') is not null" ;;
     20261019170000*) q="select to_regprocedure('public.document_registry(uuid,uuid,text,uuid,text,integer,integer)') is not null" ;;
     20261019160000*) q="select to_regclass('public.deals') is not null" ;;

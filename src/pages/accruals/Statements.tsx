@@ -15,7 +15,7 @@ import { db, rpc } from '@/lib/db';
 import { downloadCsv } from '@/lib/csv';
 import { fmtDate, fmtMoney, monthEnd, monthStart } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
-import { Download } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
 
 interface WorkerRow {
   worker_id: string; worker_name: string; tax_status: string | null; shifts: number; hours: number; accrued: number;
@@ -130,7 +130,8 @@ const Statements: React.FC = () => {
                   <TabsTrigger value="clients">Заказчики и объекты</TabsTrigger>
                 </TabsList>
               </Tabs>
-              <Button variant="outline" className="gap-2 ml-auto" onClick={tab === 'workers' ? exportWorkers : exportClients} disabled={loading}>
+              <Button variant="outline" className="gap-2 ml-auto" onClick={() => window.print()} disabled={loading}><Printer className="w-4 h-4" /> Печать</Button>
+              <Button variant="outline" className="gap-2" onClick={tab === 'workers' ? exportWorkers : exportClients} disabled={loading}>
                 <Download className="w-4 h-4" /> В Excel (CSV)
               </Button>
             </div>

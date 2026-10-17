@@ -15,7 +15,8 @@ import { fmtDate } from '@/lib/format';
 import { ORDER_STATUSES, isUrgent, hhmm, type Order } from '@/lib/ordersMeta';
 import { OrderForm, emptyOrderForm, orderPayload, type OrderFormValue } from '@/components/orders/OrderForm';
 import PageMeta from '@/components/PageMeta';
-import { Plus } from 'lucide-react';
+import { downloadCsv } from '@/lib/csv';
+import { Download, Plus } from 'lucide-react';
 
 interface Option { id: string; name: string }
 const ALL = 'all';
@@ -56,6 +57,9 @@ const OrdersList: React.FC = () => {
   useEffect(() => { load(); }, [load]);
 
   const name = (list: Option[], id: string) => list.find((x) => x.id === id)?.name ?? '—';
+
+  const exportCsv = () => downloadCsv('zakazy.csv', ['Заказчик', 'Объект', 'Позиция', 'С', 'По', 'Начало', 'Конец', 'Людей', 'Резерв', 'Статус'],
+    rows.map((o) => [name(clients, o.client_id), name(sites, o.site_id), name(positions, o.position_id), fmtDate(o.date_from), fmtDate(o.date_to), hhmm(o.start_time), hhmm(o.end_time), o.headcount, o.reserve_count, ORDER_STATUSES[o.status]]));
 
   const create = async () => {
     if (!orgId) return;
@@ -106,6 +110,7 @@ const OrdersList: React.FC = () => {
                 {Object.entries(ORDER_STATUSES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
               </SelectContent>
             </Select>
+            <Button variant="outline" className="gap-2 ml-3" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
             {permsLoading || loading ? <p className="text-muted-foreground">Загрузка…</p> : (
               <Table>
                 <TableHeader>

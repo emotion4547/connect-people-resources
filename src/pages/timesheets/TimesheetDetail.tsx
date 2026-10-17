@@ -17,7 +17,7 @@ import { fmtDate } from '@/lib/format';
 import { LINE_STATUSES, TIMESHEET_STATUSES, fmtDateTime, hm, type Timesheet, type TimesheetLine } from '@/lib/timesheetsMeta';
 import { AdjustmentDialog } from '@/components/timesheets/AdjustmentDialog';
 import PageMeta from '@/components/PageMeta';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Printer, Send } from 'lucide-react';
 
 interface Dispute {
   id: string; assignment_id: string; proposed_hours: number; original_hours: number | null; reason: string; status: string;
@@ -92,6 +92,7 @@ const TimesheetDetail: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2" onClick={() => window.print()}><Printer className="w-4 h-4" /> Печать</Button>
             <Badge variant={ts.status === 'disputed' ? 'destructive' : 'secondary'}>{TIMESHEET_STATUSES[ts.status]}</Badge>
             {ts.confirmed_auto && <Badge variant="outline">подтверждён автоматически</Badge>}
             {ts.status === 'draft' && canUpdate && (

@@ -26,6 +26,7 @@ import {
   BarChart3,
   Handshake,
   BedDouble,
+  Upload,
   Mail,
   Copy,
   Settings,
@@ -151,6 +152,7 @@ const adminNavItems: NavItem[] = [
 // Разделы рабочего места сотрудника: показываются, если у роли есть право «смотреть» в этом модуле.
 // Список растёт вместе с шагами этапа 1 (заказы, табель, найм и т. д.).
 const staffNavItems: (NavItem & { module: string })[] = [
+  { label: 'Импорт из Excel', href: '/import', icon: <Upload className="w-5 h-5" />, module: 'clients' },
   { label: 'Дашборды', href: '/dashboards', icon: <Home className="w-5 h-5" />, module: 'analytics' },
   { label: 'Аналитика', href: '/analytics', icon: <BarChart3 className="w-5 h-5" />, module: 'analytics' },
   { label: 'Сделки', href: '/deals', icon: <Handshake className="w-5 h-5" />, module: 'deals' },
