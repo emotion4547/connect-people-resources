@@ -28,3 +28,5 @@ deploy/supabase/.env
 deploy/supabase/volumes/db/data
 deploy/supabase/volumes/storage
 .agents/
+supabase/.temp/
+supabase/.branches/

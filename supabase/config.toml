@@ -1,5 +1,11 @@
 project_id = "sfikomhuakhbwqwltood"
 
+[db]
+major_version = 17
+
+[db.seed]
+enabled = false
+
 [functions.send-webhook]
 verify_jwt = true
 
