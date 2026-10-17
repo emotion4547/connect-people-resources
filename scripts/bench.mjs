@@ -68,6 +68,10 @@ results.clients = await t("заказчики: выручка и маржа за
 results.sites = await t("объекты: укомплектованность за год", () => db.query(`select * from public.analytics_by_site(${org}, ${from}, ${to})`));
 results.bdr = await t("БДР за год", () => db.query(`select * from public.bdr_report(${org}, ${from}, ${to})`));
 results.rec = await t("записи метрики «маржа» (до 500)", () => db.query(`select * from public.analytics_records(${org}, 'margin_amount', ${from}, ${to})`));
+results.grid = await t("сетка планирования: месяц (≈2000 смен)", () => db.query("select * from public.shift_staffing where shift_date between current_date - 60 and current_date - 30"));
+results.cal = await t("платёжный календарь на 4 недели", () => db.query(`select * from public.payment_calendar(private.default_org_id(), current_date, 28)`));
+results.recv = await t("дебиторка по заказчикам", () => db.query("select * from public.client_receivables()"));
+results.workers = await t("список исполнителей: страница из 400 с поиском", () => db.query("select user_id, full_name, phone from public.workers where org_id = private.default_org_id() and full_name ilike '%b%' order by full_name limit 50"));
 await db.exec("insert into public.analytics_dirty (org_id, day) values (private.default_org_id(), current_date - 3) on conflict do nothing");
 results.inc = await t("пересчёт одного изменённого дня", () => db.query(`select * from public.analytics_metrics(${org}, current_date - 30, current_date)`));
 
