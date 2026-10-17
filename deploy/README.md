@@ -42,6 +42,8 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
 со служебным ключом и затем `update public.user_roles set role='admin'`.
 
 ## Применение изменений этапа 1 (шаги 1–3)
+Коротко: `bash deploy/scripts/apply-stage1.sh --yes` с вашего компьютера (без `--yes` покажет план). Скрипт делает всё ниже, кроме фронтенда. Подробности по шагам:
+
 Порядок важен. Перед началом — свежий бэкап (`/opt/supabase/backup.sh`).
 1. Миграции по одной, как в разделе «Новая миграция БД», строго в этом порядке:
    `20261017100000_organizations_and_audit_log.sql`, `20261017110000_settings_and_tax_rates.sql`,
