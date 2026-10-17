@@ -15,6 +15,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { db, rpc } from '@/lib/db';
 import { fmtDate } from '@/lib/format';
 import { LINE_STATUSES, TIMESHEET_STATUSES, fmtDateTime, hm, type Timesheet, type TimesheetLine } from '@/lib/timesheetsMeta';
+import { AdjustmentDialog } from '@/components/timesheets/AdjustmentDialog';
 import PageMeta from '@/components/PageMeta';
 import { ArrowLeft, Send } from 'lucide-react';
 
@@ -39,6 +40,7 @@ const TimesheetDetail: React.FC = () => {
   const [overtimeFor, setOvertimeFor] = useState<TimesheetLine | null>(null);
   const [overtime, setOvertime] = useState('0');
 
+  const [adjustFor, setAdjustFor] = useState<TimesheetLine | null>(null);
   const [ratingFor, setRatingFor] = useState<TimesheetLine | null>(null);
   const [rating, setRating] = useState('5');
   const [ratingComment, setRatingComment] = useState('');
@@ -151,6 +153,9 @@ const TimesheetDetail: React.FC = () => {
                         {canUpdate && l.overtime_hours > 0 && l.line_status !== 'confirmed' && (
                           <Button size="sm" variant="outline" onClick={() => { setOvertimeFor(l); setOvertime(String(l.overtime_approved_hours)); }}>Переработка</Button>
                         )}
+                        {l.line_status === 'confirmed' && (can('accruals', 'create') || canUpdate) && (
+                          <Button size="sm" variant="outline" onClick={() => setAdjustFor(l)}>Бонус / удержание</Button>
+                        )}
                         {canUpdate && <Button size="sm" variant="ghost" onClick={() => { setRatingFor(l); setRating('5'); setRatingComment(''); }}>Оценить</Button>}
                       </TableCell>
                     </TableRow>
@@ -162,6 +167,8 @@ const TimesheetDetail: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AdjustmentDialog assignmentId={adjustFor?.assignment_id ?? null} workerName={adjustFor?.worker_name} onClose={() => setAdjustFor(null)} onDone={load} />
 
       <Dialog open={!!resolving} onOpenChange={(o) => !o && setResolving(null)}>
         <DialogContent>

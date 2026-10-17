@@ -57,6 +57,7 @@ const WorkerDetail = lazy(() => import("./pages/workers/WorkerDetail"));
 const PlanningGrid = lazy(() => import("./pages/planning/PlanningGrid"));
 const OrdersList = lazy(() => import("./pages/orders/OrdersList"));
 const OrderDetail = lazy(() => import("./pages/orders/OrderDetail"));
+const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
 const TimesheetDetail = lazy(() => import("./pages/timesheets/TimesheetDetail"));
 const SitesList = lazy(() => import("./pages/sites/SitesList"));
@@ -264,6 +265,11 @@ const App = () => (
             <Route path="/timesheets/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <TimesheetDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/accruals" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'accountant']}>
+                <Statements />
               </ProtectedRoute>
             } />
             <Route path="/sites" element={

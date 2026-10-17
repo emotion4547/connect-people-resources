@@ -48,7 +48,7 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
 1. Миграции по одной, как в разделе «Новая миграция БД», строго в этом порядке:
    `20261017100000_organizations_and_audit_log.sql`, `20261017110000_settings_and_tax_rates.sql`,
    `20261017120000_new_roles.sql`, `20261017120100_staff_permissions_directories.sql`,
-   `20261017120200_mfa_setting.sql`, `20261017130000_clients_contracts_tariffs.sql`, `20261017140000_sites_launch.sql`, `20261017150000_orders_shifts.sql`, `20261017160000_workers_assignments.sql`, `20261017170000_hiring.sql`, `20261017180000_timesheets.sql`. Миграция `…120000_new_roles.sql` обязательно отдельным
+   `20261017120200_mfa_setting.sql`, `20261017130000_clients_contracts_tariffs.sql`, `20261017140000_sites_launch.sql`, `20261017150000_orders_shifts.sql`, `20261017160000_workers_assignments.sql`, `20261017170000_hiring.sql`, `20261017180000_timesheets.sql`, `20261017190000_accruals.sql`. Миграция `…120000_new_roles.sql` обязательно отдельным
    запуском: новые значения enum нельзя использовать в той же транзакции.
 2. Edge-функция `invite-staff`: скопировать `deploy/supabase/volumes/functions/invite-staff/` на сервер
    в `/opt/supabase/volumes/functions/` и `docker restart supabase-edge-functions`.
@@ -90,3 +90,9 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
 `process_attendance` ставит «не вышел» через 2 часа после начала смены без отметки и закрывает забытый уход по графику (пометка «авто»).
 `autoconfirm_timesheets` подтверждает табели, на которые заказчик не ответил в срок (48 часов по умолчанию, настройка `timesheet.autoconfirm_hours`).
 `recompute_all_ratings` пересчитывает рейтинг: окно 90 дней скользит со временем.
+
+### Налоговые ставки перед первыми начислениями
+Начисления считают налоги, взносы и комиссию выплаты по таблице «Налоговые статусы» (`/admin/rules`). Стартовые ставки
+из ТЗ помечены «не подтверждено»: до первого табеля бухгалтерия должна проверить ИП 0%, самозанятый — комиссия 2%,
+ГПХ — НДФЛ 13% и взносы 30%, а также ставки для трудового договора (в ТЗ не заданы, взяты как у ГПХ).
+Ставка действует с даты вступления, созданные начисления не пересчитываются.

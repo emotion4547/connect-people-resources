@@ -12,3 +12,12 @@ export const addDays = (iso: string, days: number) => {
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 };
+
+export const monthStart = (iso: string = today()) => `${iso.slice(0, 7)}-01`;
+
+export const monthEnd = (iso: string = today()) => {
+  const d = new Date(`${iso.slice(0, 7)}-01T00:00:00Z`);
+  d.setUTCMonth(d.getUTCMonth() + 1);
+  d.setUTCDate(0);
+  return d.toISOString().slice(0, 10);
+};

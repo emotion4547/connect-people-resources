@@ -102,6 +102,8 @@ reset role;
 set local role anon;
 select pg_temp.check('аноним не читает организации', pg_temp.denied($$select count(*) from public.organizations$$));
 select pg_temp.check('аноним не читает табели', pg_temp.denied($$select count(*) from public.timesheets$$));
+select pg_temp.check('аноним не читает начисления', pg_temp.denied($select count(*) from public.accruals$));
+select pg_temp.check('аноним не видит ведомость', pg_temp.denied($select * from public.worker_statement(current_date, current_date)$));
 select pg_temp.check('аноним не отмечает приход', pg_temp.denied($$select public.check_in(gen_random_uuid())$$));
 
 rollback;

@@ -15,6 +15,7 @@ import { fmtDate } from '@/lib/format';
 import { UNITS } from '@/lib/clientsMeta';
 import { ORDER_STATUSES, SHIFT_STATUSES, WEEKDAYS, fmtDateTime, fmtTime, hhmm, isUrgent, type Order, type Shift } from '@/lib/ordersMeta';
 import { OrderForm, formFromOrder, orderPayload, type OrderFormValue } from '@/components/orders/OrderForm';
+import { OrderMargin } from '@/components/orders/OrderMargin';
 import PageMeta from '@/components/PageMeta';
 import { ArrowLeft } from 'lucide-react';
 
@@ -156,6 +157,10 @@ const OrderDetail: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {can('accruals', 'view') && order.status !== 'new' && (
+              <OrderMargin orderId={order.id} siteId={order.site_id} dateFrom={order.date_from} dateTo={order.date_to} />
+            )}
 
             <Card>
               <CardHeader>
