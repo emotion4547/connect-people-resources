@@ -103,6 +103,7 @@ set local role anon;
 select pg_temp.check('аноним не читает организации', pg_temp.denied($$select count(*) from public.organizations$$));
 select pg_temp.check('аноним не читает табели', pg_temp.denied($$select count(*) from public.timesheets$$));
 select pg_temp.check('аноним не читает начисления', pg_temp.denied($select count(*) from public.accruals$));
+select pg_temp.check('аноним не читает журнал переноса', pg_temp.denied($select count(*) from public.legacy_migration_log$));
 select pg_temp.check('аноним не читает ленту уведомлений', pg_temp.denied($select count(*) from public.notifications$));
 select pg_temp.check('аноним не берёт очередь доставки', pg_temp.denied($select * from public.claim_outbox(1)$));
 select pg_temp.check('аноним не видит смены заказчика', pg_temp.denied($select * from public.client_shifts(current_date, current_date)$));
