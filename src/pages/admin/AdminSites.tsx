@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -149,8 +150,8 @@ const AdminSites: React.FC = () => {
       toast({ title: editing ? 'Объект обновлён' : 'Объект создан' });
       setDialogOpen(false);
       await loadAll();
-    } catch (e: any) {
-      toast({ title: 'Ошибка', description: e.message, variant: 'destructive' });
+    } catch (e: unknown) {
+      toast({ title: 'Ошибка', description: errorMessage(e), variant: 'destructive' });
     }
   };
 

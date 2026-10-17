@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -143,11 +144,11 @@ const WorkerResponses: React.FC = () => {
       if (error) throw error;
       setResponses((prev) => prev.filter((r) => r.id !== cancelTarget.id));
       toast({ title: 'Отклик отменён' });
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Error cancelling response:', e);
       toast({
         title: 'Не удалось отменить',
-        description: e?.message || 'Попробуйте позже',
+        description: errorMessage(e) || 'Попробуйте позже',
         variant: 'destructive',
       });
     } finally {

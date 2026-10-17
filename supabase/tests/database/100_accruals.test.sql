@@ -6,7 +6,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(56);
+select plan(61);
 
 create function pg_temp.w(i int) returns uuid language sql immutable as $$
   select (('770000' || lpad(i::text, 2, '0')) || '-0000-0000-0000-000000000000')::uuid
@@ -245,6 +245,24 @@ reset role;
 select is((select o_taxes from private.calc_amounts(private.default_org_id(), 'gph', 3000, current_date)), 1482.76, 'Налоги ГПХ с 3000: 1482,76');
 select is((select o_fee from private.calc_amounts(private.default_org_id(), 'self_employed', 3000, current_date)), 60.00, 'Комиссия самозанятого с 3000: 60');
 select throws_ok($$select * from private.calc_amounts(private.default_org_id(), 'unknown', 3000, current_date)$$, '22023', null, 'Неизвестный статус не считается');
+
+-- Настройка меняется после создания смены: пересчёт и корректировки сохраняют старые проценты.
+insert into public.tax_status_rates (org_id, status, ndfl_pct, contributions_pct, effective_from)
+values (private.default_org_id(), 'gph', 20, 30, current_date + 1);
+select is((select o_taxes from private.calc_amounts(private.default_org_id(), 'gph', 3000, current_date + 2)),
+  1875.00, 'Новая настройка действительно отличается от старой');
+select is((select o_taxes from private.calc_amounts(private.default_org_id(), 'gph', 3000, current_date + 2,
+  (select shift_id from public.accruals where worker_id = pg_temp.w(3) and kind = 'main'))),
+  1482.76, 'Смена использует снимок налогов, а не новую настройку');
+update public.workers set tax_status = 'ip' where user_id = pg_temp.w(3);
+set local role authenticated;
+set local request.jwt.claim.sub = 'd1000000-0000-0000-0000-00000000000d';
+select lives_ok($$select public.recalculate_accrual((select id from public.accruals where worker_id = pg_temp.w(3) and kind = 'main'))$$,
+  'Пересчёт после изменения справочников доступен');
+select is((select taxes from public.accruals where worker_id = pg_temp.w(3) and kind = 'main'), 1482.76,
+  'Пересчёт сохраняет налоги и налоговый статус принятого начисления');
+reset role;
+select throws_ok($$update public.shift_rates set tax_snapshot = '{}'::jsonb$$, '22023', null, 'Снимок налогов нельзя переписать');
 
 select * from finish();
 rollback;

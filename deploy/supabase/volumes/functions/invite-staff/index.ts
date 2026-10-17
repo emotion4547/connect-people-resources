@@ -48,6 +48,9 @@ Deno.serve(async (req) => {
     }
     if (!org_id) return json({ error: "Не указана организация" }, 400);
 
+    const { data: mfaOk, error: mfaErr } = await userClient.rpc('session_mfa_ok', { _org_id: org_id });
+    if (mfaErr || mfaOk !== true) return json({ error: 'Подтвердите двухфакторный вход' }, 403);
+
     const admin = createClient(supabaseUrl, serviceKey);
 
     // Вызывающий должен быть действующим администратором именно этой организации.

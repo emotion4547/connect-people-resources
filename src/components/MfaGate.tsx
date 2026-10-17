@@ -13,24 +13,24 @@ export const MFA_ROLES = ['director', 'accountant', 'recruiter', 'admin'];
 // на шагах 8–10.
 export const MfaGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { orgId, loading: orgLoading } = useOrg();
-  const [state, setState] = useState<'checking' | 'ok' | 'needs-mfa'>('checking');
+  const [state, setState] = useState<'checking' | 'ok' | 'needs-mfa' | 'error'>('checking');
 
   useEffect(() => {
     if (orgLoading) return;
     if (!orgId) { setState('ok'); return; }
+    setState('checking');
     let cancelled = false;
     (async () => {
       const { data: enforced, error } = await rpc('get_setting', { _org_id: orgId, _key: 'auth.mfa_enforced' });
       if (error) {
-        // Не удалось узнать правило: не запираем людей из-за сетевой ошибки.
         console.error('Error reading MFA setting:', error);
-        if (!cancelled) setState('ok');
+        if (!cancelled) setState('error');
         return;
       }
       if (enforced !== true) { if (!cancelled) setState('ok'); return; }
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (!cancelled) setState(aal?.currentLevel === 'aal2' ? 'ok' : 'needs-mfa');
-    })();
+    })().catch(() => { if (!cancelled) setState('error'); });
     return () => { cancelled = true; };
   }, [orgId, orgLoading]);
 
@@ -42,5 +42,9 @@ export const MfaGate: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
   if (state === 'needs-mfa') return <Navigate to="/security" replace />;
+  if (state === 'error') return <div role="alert" className="p-6 text-center">
+    <p>Не удалось проверить безопасность входа. Проверьте соединение и обновите страницу.</p>
+    <button className="mt-4 underline" onClick={() => window.location.reload()}>Повторить</button>
+  </div>;
   return <>{children}</>;
 };

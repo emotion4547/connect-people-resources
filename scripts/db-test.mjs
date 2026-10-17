@@ -57,7 +57,8 @@ const SUPABASE_STUBS = `
     select coalesce(nullif(current_setting('request.jwt.claim.role', true), ''), 'anon')
   $$;
   create function auth.jwt() returns jsonb language sql stable as $$
-    select jsonb_build_object('sub', auth.uid(), 'role', auth.role())
+    select coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb,
+      jsonb_build_object('sub', auth.uid(), 'role', auth.role()))
   $$;
 
   create table storage.buckets (
@@ -123,7 +124,7 @@ if (!failed) {
   const tests = (await readdir(TESTS).catch(() => []))
     .filter((f) => f.endsWith(".test.sql") && (!only || f.includes(only)))
     .sort();
-  if (!tests.length) console.log("  (нет файлов *.test.sql)");
+  if (!tests.length) fail("  ✗ Не найдено ни одного SQL-теста" );
   for (const f of tests) {
     console.log(`  ${f}`);
     let results;

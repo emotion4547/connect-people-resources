@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -218,7 +219,7 @@ const AdminRequests: React.FC = () => {
     try {
       const { error } = await supabase
         .from('requests')
-        .update({ status: newStatus as any })
+        .update({ status: newStatus as import('@/integrations/supabase/types').Database['public']['Enums']['request_status'] })
         .eq('id', requestId);
 
       if (error) throw error;
@@ -232,9 +233,9 @@ const AdminRequests: React.FC = () => {
       }
 
       toast({ title: 'Статус обновлен' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating status:', error);
-      toast({ title: 'Ошибка', description: error?.message || 'Не удалось обновить статус', variant: 'destructive' });
+      toast({ title: 'Ошибка', description: errorMessage(error) || 'Не удалось обновить статус', variant: 'destructive' });
     }
   };
 
@@ -242,7 +243,7 @@ const AdminRequests: React.FC = () => {
     try {
       const { error } = await supabase
         .from('responses')
-        .update({ status: 'assigned' as any })
+        .update({ status: 'assigned' })
         .eq('id', responseId);
 
       if (error) throw error;
@@ -268,7 +269,7 @@ const AdminRequests: React.FC = () => {
         if (existingResponse) {
           await supabase
             .from('responses')
-            .update({ status: 'assigned' as any })
+            .update({ status: 'assigned' })
             .eq('id', existingResponse.id);
         } else {
           await supabase
@@ -389,7 +390,7 @@ const AdminRequests: React.FC = () => {
     ]);
 
     // Create Excel XML format
-    let excelContent = `<?xml version="1.0" encoding="UTF-8"?>
+    const excelContent = `<?xml version="1.0" encoding="UTF-8"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
   xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">

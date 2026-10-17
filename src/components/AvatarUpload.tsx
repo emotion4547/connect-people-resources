@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -134,11 +135,11 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         title: 'Аватар обновлён',
         description: 'Фото профиля успешно загружено',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading avatar:', error);
       toast({
         title: 'Ошибка загрузки',
-        description: error.message || 'Не удалось загрузить аватар',
+        description: errorMessage(error) || 'Не удалось загрузить аватар',
         variant: 'destructive',
       });
     } finally {

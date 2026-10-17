@@ -93,7 +93,7 @@ const WorkerProfile: React.FC = () => {
         title: 'Профиль сохранен!',
         description: 'Ваши данные успешно обновлены',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating profile:', error);
       toast({
         title: 'Ошибка',

@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
@@ -40,7 +41,7 @@ interface Site {
 const CreateRequest: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const duplicateData = (location.state as any)?.duplicate as
+  const duplicateData = location.state?.duplicate as
     | {
         position?: string;
         start_time?: string | null;
@@ -202,9 +203,9 @@ const CreateRequest: React.FC = () => {
       });
 
       navigate(`/hr/requests?highlight=${data.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating request:', error);
-      toast({ title: 'Ошибка', description: error?.message || 'Не удалось создать заявку', variant: 'destructive' });
+      toast({ title: 'Ошибка', description: errorMessage(error) || 'Не удалось создать заявку', variant: 'destructive' });
     } finally {
       setLoading(false);
     }

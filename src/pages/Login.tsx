@@ -119,7 +119,7 @@ const Login: React.FC = () => {
           full_name: fullName,
           company: !isWorker ? company : undefined,
           ...(isWorker ? { login: login.trim().toLowerCase() } : {}),
-        } as any);
+        });
 
         if (error) {
           if (error.message?.includes('already registered') || error.message?.includes('already exists')) {

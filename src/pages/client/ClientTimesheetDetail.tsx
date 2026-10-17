@@ -19,7 +19,6 @@ import { LINE_STATUSES, TIMESHEET_STATUSES, fmtDateTime, hm, type Timesheet, typ
 import PageMeta from '@/components/PageMeta';
 import { ArrowLeft, Download } from 'lucide-react';
 
-interface ClientAccrual { accrual_id: string; kind: string; amount_client: number; worker_name: string; shift_date: string }
 
 // К-4: табель глазами заказчика — подтвердить, оспорить строку, поставить оценку, выгрузить. Ставок и сумм исполнителя здесь нет.
 const ClientTimesheetDetail: React.FC = () => {
@@ -28,7 +27,7 @@ const ClientTimesheetDetail: React.FC = () => {
   const [ts, setTs] = useState<Timesheet | null>(null);
   const [siteName, setSiteName] = useState('');
   const [lines, setLines] = useState<TimesheetLine[]>([]);
-  const [money, setMoney] = useState<ClientAccrual[]>([]);
+  const [summary, setSummary] = useState<{ hours: number; amount: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [disputeFor, setDisputeFor] = useState<TimesheetLine | null>(null);
   const [hours, setHours] = useState('');
@@ -46,11 +45,12 @@ const ClientTimesheetDetail: React.FC = () => {
     const [s, l, m] = await Promise.all([
       db('sites').select('name').eq('id', t.data.site_id).maybeSingle(),
       rpc('timesheet_lines', { _timesheet_id: id }),
-      rpc('client_accruals', { _from: t.data.period_from, _to: t.data.period_to }),
+      rpc('client_timesheet_summary', { _timesheet_id: id }),
     ]);
     setSiteName(s.data?.name ?? '');
     setLines(l.data ?? []);
-    setMoney(m.data ?? []);
+    setSummary(m.error ? null : m.data?.[0] ?? null);
+    if (m.error) toast({ title: 'Не удалось загрузить итог табеля', description: m.error.message, variant: 'destructive' });
   }, [id, toast]);
 
   useEffect(() => { load(); }, [load]);
@@ -66,8 +66,7 @@ const ClientTimesheetDetail: React.FC = () => {
   };
 
   if (!ts) return <DashboardLayout role="hr"><p className="text-muted-foreground">Загрузка…</p></DashboardLayout>;
-  const total = lines.reduce((s, l) => s + Number(l.approved_hours ?? 0), 0);
-  const sum = money.reduce((s, x) => s + Number(x.amount_client), 0);
+
   const open = ts.status === 'pending' || ts.status === 'disputed';
   const hasPending = lines.some((l) => l.line_status === 'pending');
 
@@ -83,7 +82,7 @@ const ClientTimesheetDetail: React.FC = () => {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">{siteName}</h1>
-            <p className="text-muted-foreground">{fmtDate(ts.period_from)} — {fmtDate(ts.period_to)} · часов {total.toFixed(2)} · к оплате {fmtMoney(sum)}</p>
+            <p className="text-muted-foreground">{fmtDate(ts.period_from)} — {fmtDate(ts.period_to)} · часов {summary ? Number(summary.hours).toFixed(2) : '—'} · к оплате {summary ? fmtMoney(summary.amount) : '—'}</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant={ts.status === 'disputed' ? 'destructive' : 'secondary'}>{TIMESHEET_STATUSES[ts.status]}</Badge>

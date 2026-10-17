@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useState, useMemo } from 'react';
 import type { AppRole } from '@/contexts/AuthContext';
 import { ROLE_LABELS } from '@/lib/roles';
@@ -154,7 +155,7 @@ const AdminUsers: React.FC = () => {
     try {
       const { error } = await supabase
         .from('user_roles')
-        .update({ role: newRole as any })
+        .update({ role: newRole as AppRole })
         .eq('user_id', selectedUser.user_id);
 
       if (error) throw error;
@@ -245,7 +246,7 @@ const AdminUsers: React.FC = () => {
         body: { user_id: userToDelete.user_id },
       });
       if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      if (data?.error) throw new Error(data.error);
 
       setUsers(prev => prev.filter(u => u.user_id !== userToDelete.user_id));
       toast({
@@ -254,11 +255,11 @@ const AdminUsers: React.FC = () => {
       });
       setShowDeleteDialog(false);
       setUserToDelete(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting user:', error);
       toast({
         title: 'Ошибка удаления',
-        description: error.message || 'Не удалось удалить пользователя',
+        description: errorMessage(error) || 'Не удалось удалить пользователя',
         variant: 'destructive',
       });
     } finally {

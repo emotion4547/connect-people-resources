@@ -1,0 +1,39 @@
+name: Проверка этапа 1
+
+on:
+  push:
+    branches: [stage1]
+  pull_request:
+    branches: [main, stage1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+
+  supabase:
+    # Настоящий Supabase дополняет PGlite: здесь схемы Auth/Storage создаёт сам стек.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run db:start
+      - run: npm run db:check
+      - if: always()
+        run: npm run db:stop

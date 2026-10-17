@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -126,11 +127,11 @@ const AdminSettings: React.FC = () => {
       } else {
         throw new Error(result?.message || 'Request failed');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setTestResult('error');
       toast({
         title: 'Тест не пройден',
-        description: error.message || 'Не удалось отправить данные на webhook',
+        description: errorMessage(error) || 'Не удалось отправить данные на webhook',
         variant: 'destructive',
       });
     } finally {

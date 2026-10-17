@@ -24,7 +24,7 @@ export const InboxTabs: React.FC = () => {
         supabase.from('support_chats').select('unread_count'),
       ]);
       setUnreadContact(c1 || 0);
-      setUnreadChats((chats || []).reduce((sum, c: any) => sum + (c.unread_count || 0), 0));
+      setUnreadChats((chats || []).reduce((sum, c) => sum + (c.unread_count || 0), 0));
     };
     load();
     const channel = supabase

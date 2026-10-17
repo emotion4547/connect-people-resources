@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
@@ -199,7 +200,7 @@ const HRRequests: React.FC = () => {
       // 1. Update request status -> completed, verify the row actually changed
       const { data: updated, error: updateErr } = await supabase
         .from('requests')
-        .update({ status: 'completed' as any })
+        .update({ status: 'completed' })
         .eq('id', requestId)
         .select('id, status');
 
@@ -211,7 +212,7 @@ const HRRequests: React.FC = () => {
       // 2. Mark assigned responses as completed (non-blocking; rating still works without it)
       const { error: respErr } = await supabase
         .from('responses')
-        .update({ status: 'completed' as any })
+        .update({ status: 'completed' })
         .eq('request_id', requestId)
         .eq('status', 'assigned');
       if (respErr) console.warn('responses update warning:', respErr.message);
@@ -246,11 +247,11 @@ const HRRequests: React.FC = () => {
         setCurrentRatingIndex(0);
         setShowRatingDialog(true);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error confirming request:', error);
       toast({
         title: 'Ошибка',
-        description: error?.message || 'Не удалось подтвердить выполнение',
+        description: errorMessage(error) || 'Не удалось подтвердить выполнение',
         variant: 'destructive',
       });
     } finally {
@@ -319,7 +320,7 @@ const HRRequests: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('requests')
-        .update({ status: 'cancelled' as any })
+        .update({ status: 'cancelled' })
         .eq('id', request.id)
         .select('id, status');
       if (error) throw error;
@@ -328,14 +329,14 @@ const HRRequests: React.FC = () => {
       // Reject any pending responses to free workers
       await supabase
         .from('responses')
-        .update({ status: 'rejected' as any })
+        .update({ status: 'rejected' })
         .eq('request_id', request.id)
         .in('status', ['pending', 'assigned']);
 
       setRequests((prev) => prev.map((r) => (r.id === request.id ? { ...r, status: 'cancelled' } : r)));
       toast({ title: 'Заявка отменена' });
-    } catch (e: any) {
-      toast({ title: 'Ошибка', description: e?.message || 'Не удалось отменить заявку', variant: 'destructive' });
+    } catch (e: unknown) {
+      toast({ title: 'Ошибка', description: errorMessage(e) || 'Не удалось отменить заявку', variant: 'destructive' });
     } finally {
       setCancellingId(null);
       setCancelTarget(null);

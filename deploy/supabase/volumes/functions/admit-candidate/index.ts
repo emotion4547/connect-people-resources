@@ -60,15 +60,16 @@ Deno.serve(async (req) => {
     if (createErr || !created.user) return json({ error: createErr?.message ?? "Не удалось создать учётную запись" }, 400);
     createdUserId = created.user.id;
 
-    const { error: admitErr } = await admin.rpc("admit_candidate_internal", {
-      _candidate_id: candidate_id, _user_id: createdUserId, _actor: userData.user.id,
-    });
-    if (admitErr) throw admitErr;
-
+    // Ссылка готовится до допуска: после переноса документов удалять исполнителя нельзя.
     const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
       type: "recovery", email: email(login), options: { redirectTo: `${publicUrl}/set-password` },
     });
     if (linkErr) throw linkErr;
+
+    const { error: admitErr } = await admin.rpc("admit_candidate_internal", {
+      _candidate_id: candidate_id, _user_id: createdUserId, _actor: userData.user.id,
+    });
+    if (admitErr) throw admitErr;
 
     return json({ success: true, worker_id: createdUserId, login, action_link: link.properties?.action_link ?? null });
   } catch (e: unknown) {

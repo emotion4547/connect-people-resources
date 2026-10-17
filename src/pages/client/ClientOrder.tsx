@@ -9,14 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { useOrg } from '@/contexts/OrgContext';
 import { db, rpc } from '@/lib/db';
 import { addDays, fmtMoney, today } from '@/lib/format';
 import { WEEKDAYS, hhmm, type Order } from '@/lib/ordersMeta';
 import { type ClientTariff } from '@/lib/cabinetMeta';
 import PageMeta from '@/components/PageMeta';
 
-interface Site { id: string; name: string; client_id: string }
+interface Site { org_id: string; id: string; name: string; client_id: string }
 
 // ISO-день недели: 1 — понедельник … 7 — воскресенье.
 const isoDow = (iso: string) => ((new Date(`${iso}T00:00:00Z`).getUTCDay() + 6) % 7) + 1;
@@ -24,7 +23,6 @@ const isoDow = (iso: string) => ((new Date(`${iso}T00:00:00Z`).getUTCDay() + 6) 
 const ClientOrder: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { orgId } = useOrg();
   const [tariffs, setTariffs] = useState<ClientTariff[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [recent, setRecent] = useState<Order[]>([]);
@@ -39,12 +37,13 @@ const ClientOrder: React.FC = () => {
   const [headcount, setHeadcount] = useState('1');
   const [comment, setComment] = useState('');
   const [busy, setBusy] = useState(false);
+  const [quote, setQuote] = useState<{ key: string; amount: number | null; error: string } | null>(null);
 
   useEffect(() => {
     (async () => {
       const [t, s, o] = await Promise.all([
         rpc('client_tariffs'),
-        db('sites').select('id,name,client_id').eq('status', 'active'),
+        db('sites').select('id,name,client_id,org_id').eq('status', 'active'),
         db('orders').select('*').order('created_at', { ascending: false }).limit(10),
       ]);
       setTariffs(t.data ?? []); setSites(s.data ?? []); setRecent(o.data ?? []);
@@ -78,8 +77,21 @@ const ClientOrder: React.FC = () => {
     return Math.max(0, m / 60 - (Number(brk) || 0) / 60);
   }, [start, end, brk]);
 
-  // Сумма до отправки: ставка × часы × люди × дни. Ночные и праздничные коэффициенты в расчёт не входят.
-  const estimate = tariff ? tariff.client_rate * Math.max(hours, tariff.min_paid_hours) * (Number(headcount) || 0) * days.length : 0;
+  const quoteKey = JSON.stringify([siteId, positionId, tariff?.unit, from, to, start, end, headcount, brk, weekdays]);
+  const currentQuote = quote?.key === quoteKey ? quote : null;
+  useEffect(() => {
+    if (!siteId || !positionId || !tariff) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const { data, error } = await rpc('quote_client_order', {
+        _site_id: siteId, _position_id: positionId, _unit: tariff.unit, _from: from, _to: to,
+        _start: start, _end: end, _headcount: Number(headcount), _break: Number(brk),
+        _weekdays: weekdays.length ? weekdays : null,
+      });
+      if (!cancelled) setQuote({ key: quoteKey, amount: error ? null : Number(data), error: error?.message ?? '' });
+    }, 250);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [siteId, positionId, tariff, from, to, start, end, headcount, brk, weekdays, quoteKey]);
 
   const prefill = (o: Order) => {
     setSiteId(o.site_id); setPositionId(o.position_id); setStart(hhmm(o.start_time)); setEnd(hhmm(o.end_time));
@@ -89,10 +101,10 @@ const ClientOrder: React.FC = () => {
   const toggleDay = (id: number) => setWeekdays((w) => (w.includes(id) ? w.filter((x) => x !== id) : [...w, id]));
 
   const send = async () => {
-    if (!site || !tariff || !orgId) return;
+    if (!site || !tariff || currentQuote?.amount == null || currentQuote.error) return;
     setBusy(true);
     const { error } = await db('orders').insert({
-      org_id: orgId, client_id: site.client_id, site_id: site.id, position_id: tariff.position_id, unit: tariff.unit, source: 'cabinet',
+      org_id: site.org_id, client_id: site.client_id, site_id: site.id, position_id: tariff.position_id, unit: tariff.unit, source: 'cabinet',
       date_from: from, date_to: to, weekdays: weekdays.length ? weekdays : null, start_time: start, end_time: end,
       break_minutes: Number(brk) || 0, headcount: Number(headcount) || 1, reserve_count: 0, comment: comment || null,
     });
@@ -161,9 +173,10 @@ const ClientOrder: React.FC = () => {
               <span>Дней: {days.length} · часов в смене: {hours.toFixed(2)}</span>
               {tariff && <Badge variant="secondary">{fmtMoney(tariff.client_rate)}/ч</Badge>}
             </div>
-            <div className="text-2xl font-bold">{fmtMoney(estimate)}</div>
-            <p className="text-xs text-muted-foreground">Ориентировочная сумма заказа без учёта ночных, праздничных коэффициентов и переработки. Итог — по подтверждённому табелю.</p>
-            <Button className="w-full min-h-12" onClick={send} disabled={busy || !tariff || days.length === 0 || hours <= 0}>Отправить заказ</Button>
+            {currentQuote?.error && <p role="alert" className="text-destructive">{currentQuote.error}</p>}
+            <div className="text-2xl font-bold">{currentQuote?.amount == null ? 'Расчёт…' : fmtMoney(currentQuote.amount)}</div>
+            <p className="text-xs text-muted-foreground">Ориентировочная сумма с учётом тарифов, ночных и праздничных коэффициентов. Итог — по подтверждённому табелю.</p>
+            <Button className="w-full min-h-12" onClick={send} disabled={busy || !tariff || currentQuote?.amount == null || !!currentQuote.error || days.length === 0 || hours <= 0}>Отправить заказ</Button>
           </CardContent>
         </Card>
       </div>

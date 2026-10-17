@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,10 +57,10 @@ const AdminProfile: React.FC = () => {
         title: 'Профиль обновлён',
         description: 'Ваши данные успешно сохранены.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Ошибка',
-        description: error.message || 'Не удалось сохранить данные.',
+        description: errorMessage(error) || 'Не удалось сохранить данные.',
         variant: 'destructive',
       });
     } finally {

@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', userData.user.id)
 
-    const roleSet = new Set((roles ?? []).map((r: any) => r.role))
+    const roleSet = new Set((roles ?? []).map((r: { role: string }) => r.role))
     const isAdmin = roleSet.has('admin')
     const isHr = roleSet.has('hr')
 

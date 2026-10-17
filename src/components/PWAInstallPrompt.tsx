@@ -37,7 +37,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
     }
 
     // Check if iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as Window & { MSStream?: unknown }).MSStream;
     setIsIOS(isIOSDevice);
 
     // Listen for install prompt (works in Chrome, Edge, Samsung Internet, Opera)

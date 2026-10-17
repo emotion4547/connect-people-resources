@@ -1,3 +1,4 @@
+import { errorMessage } from '@/lib/errors';
 import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -278,11 +279,11 @@ const AdminWorkers: React.FC = () => {
       setNewWorker({ login: '', password: '', fullName: '', phone: '', city: '' });
 
       setTimeout(fetchWorkers, 1000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding worker:', error);
       toast({
         title: 'Ошибка',
-        description: error.message || 'Не удалось добавить исполнителя',
+        description: errorMessage(error) || 'Не удалось добавить исполнителя',
         variant: 'destructive',
       });
     } finally {
@@ -298,7 +299,7 @@ const AdminWorkers: React.FC = () => {
         body: { user_id: workerToDelete.user_id },
       });
       if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      if (data?.error) throw new Error(data.error);
 
       setWorkers(prev => prev.filter(w => w.id !== workerToDelete.id));
       toast({
@@ -308,11 +309,11 @@ const AdminWorkers: React.FC = () => {
       setShowDeleteDialog(false);
       setWorkerToDelete(null);
       if (selectedWorker?.id === workerToDelete.id) setSelectedWorker(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting worker:', error);
       toast({
         title: 'Ошибка удаления',
-        description: error.message || 'Не удалось удалить исполнителя',
+        description: errorMessage(error) || 'Не удалось удалить исполнителя',
         variant: 'destructive',
       });
     } finally {
