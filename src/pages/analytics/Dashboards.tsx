@@ -53,6 +53,11 @@ const Dashboards: React.FC = () => {
   const [tab, setTab] = useState<string>('');
   const current = tab || tabs[0]?.id || '';
 
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => { if (document.visibilityState === 'visible') setTick((n) => n + 1); }, 60000);
+    return () => clearInterval(t);
+  }, []);
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [sites, setSites] = useState<SiteRow[]>([]);
   const [unconfirmed, setUnconfirmed] = useState<Unconfirmed[]>([]);
@@ -99,7 +104,7 @@ const Dashboards: React.FC = () => {
         setCash({ balance: num(bal), gapDay: gap[0]?.day ?? null, gapDepth: gap.length ? Math.min(...gap.map((d: { balance_close: number }) => num(d.balance_close))) : 0 });
       }
     })();
-  }, [ids, from, to, current, orgId, call]);
+  }, [ids, from, to, current, orgId, call, tick]);
 
   const counterCards = (grp: string, only?: string[]) => {
     const list = counters.filter((c) => c.grp === grp && (!only || only.includes(c.key)));

@@ -78,6 +78,8 @@ interface NavItem {
   href: string;
   icon: React.ReactNode;
   badge?: number;
+  // Заголовок раздела меню: показывается перед первым пунктом раздела.
+  group?: string;
 }
 
 interface DashboardLayoutProps {
@@ -152,30 +154,30 @@ const adminNavItems: NavItem[] = [
 // Разделы рабочего места сотрудника: показываются, если у роли есть право «смотреть» в этом модуле.
 // Список растёт вместе с шагами этапа 1 (заказы, табель, найм и т. д.).
 const staffNavItems: (NavItem & { module: string })[] = [
-  { label: 'Импорт из Excel', href: '/import', icon: <Upload className="w-5 h-5" />, module: 'clients' },
   { label: 'Дашборды', href: '/dashboards', icon: <Home className="w-5 h-5" />, module: 'analytics' },
   { label: 'Аналитика', href: '/analytics', icon: <BarChart3 className="w-5 h-5" />, module: 'analytics' },
-  { label: 'Сделки', href: '/deals', icon: <Handshake className="w-5 h-5" />, module: 'deals' },
-  { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
-  { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
-  { label: 'Планирование', href: '/planning', icon: <CalendarDays className="w-5 h-5" />, module: 'assignments' },
-  { label: 'Мой день', href: '/hiring/today', icon: <Sun className="w-5 h-5" />, module: 'candidates' },
-  { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" />, module: 'candidates' },
-  { label: 'Исполнители', href: '/workers', icon: <HardHat className="w-5 h-5" />, module: 'workers' },
-  { label: 'Контроль документов', href: '/document-control', icon: <ShieldCheck className="w-5 h-5" />, module: 'worker_documents' },
-  { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders' },
-  { label: 'Вахты', href: '/rotations', icon: <BedDouble className="w-5 h-5" />, module: 'orders' },
-  { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" />, module: 'timesheets' },
-  { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" />, module: 'accruals' },
-  { label: 'Документы', href: '/documents', icon: <FileText className="w-5 h-5" />, module: 'client_documents' },
-  { label: 'Оплаты', href: '/payments', icon: <Banknote className="w-5 h-5" />, module: 'client_documents' },
-  { label: 'Дебиторка', href: '/receivables', icon: <Scale className="w-5 h-5" />, module: 'client_documents' },
-  { label: 'Деньги (ДДС)', href: '/cash', icon: <Landmark className="w-5 h-5" />, module: 'cashflow' },
-  { label: 'Закрытие месяца', href: '/month-close', icon: <CalendarCheck className="w-5 h-5" />, module: 'client_documents' },
-  { label: 'Выгрузка в 1С', href: '/export-1c', icon: <FileSpreadsheet className="w-5 h-5" />, module: 'client_documents' },
-  { label: 'Реквизиты исполнителей', href: '/payout-requisites', icon: <CreditCard className="w-5 h-5" />, module: 'worker_payout_details' },
-  { label: 'Реестры выплат', href: '/payout-registries', icon: <ListChecks className="w-5 h-5" />, module: 'payout_registries' },
-  { label: 'Авансы', href: '/advances', icon: <Banknote className="w-5 h-5" />, module: 'payout_registries' },
+  { label: 'Сделки', href: '/deals', icon: <Handshake className="w-5 h-5" />, module: 'deals', group: 'Продажи' },
+  { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients', group: 'Продажи' },
+  { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites', group: 'Операции' },
+  { label: 'Планирование', href: '/planning', icon: <CalendarDays className="w-5 h-5" />, module: 'assignments', group: 'Операции' },
+  { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders', group: 'Операции' },
+  { label: 'Вахты', href: '/rotations', icon: <BedDouble className="w-5 h-5" />, module: 'orders', group: 'Операции' },
+  { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" />, module: 'timesheets', group: 'Операции' },
+  { label: 'Мой день', href: '/hiring/today', icon: <Sun className="w-5 h-5" />, module: 'candidates', group: 'Люди' },
+  { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" />, module: 'candidates', group: 'Люди' },
+  { label: 'Исполнители', href: '/workers', icon: <HardHat className="w-5 h-5" />, module: 'workers', group: 'Люди' },
+  { label: 'Контроль документов', href: '/document-control', icon: <ShieldCheck className="w-5 h-5" />, module: 'worker_documents', group: 'Люди' },
+  { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" />, module: 'accruals', group: 'Деньги' },
+  { label: 'Документы', href: '/documents', icon: <FileText className="w-5 h-5" />, module: 'client_documents', group: 'Деньги' },
+  { label: 'Оплаты', href: '/payments', icon: <Banknote className="w-5 h-5" />, module: 'client_documents', group: 'Деньги' },
+  { label: 'Дебиторка', href: '/receivables', icon: <Scale className="w-5 h-5" />, module: 'client_documents', group: 'Деньги' },
+  { label: 'Деньги (ДДС)', href: '/cash', icon: <Landmark className="w-5 h-5" />, module: 'cashflow', group: 'Деньги' },
+  { label: 'Закрытие месяца', href: '/month-close', icon: <CalendarCheck className="w-5 h-5" />, module: 'client_documents', group: 'Деньги' },
+  { label: 'Выгрузка в 1С', href: '/export-1c', icon: <FileSpreadsheet className="w-5 h-5" />, module: 'client_documents', group: 'Деньги' },
+  { label: 'Реквизиты исполнителей', href: '/payout-requisites', icon: <CreditCard className="w-5 h-5" />, module: 'worker_payout_details', group: 'Деньги' },
+  { label: 'Реестры выплат', href: '/payout-registries', icon: <ListChecks className="w-5 h-5" />, module: 'payout_registries', group: 'Деньги' },
+  { label: 'Авансы', href: '/advances', icon: <Banknote className="w-5 h-5" />, module: 'payout_registries', group: 'Деньги' },
+  { label: 'Импорт из Excel', href: '/import', icon: <Upload className="w-5 h-5" />, module: 'clients', group: 'Сервис' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {
@@ -276,8 +278,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
 
           {/* Navigation */}
           <nav className={cn("flex-1 p-2 space-y-1 overflow-y-auto", collapsed ? "px-1" : "p-4")}>
-            {navItems.map((item) => (
-              <Tooltip key={item.href}>
+            {navItems.map((item, idx) => (
+              <React.Fragment key={item.href}>
+              {!collapsed && item.group && item.group !== navItems.slice(0, idx).reverse().find((x) => x.group)?.group && (
+                <div className="px-4 pt-4 pb-1 text-xs uppercase tracking-wide text-sidebar-foreground/50">{item.group}</div>
+              )}
+              <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
                     to={item.href}
@@ -319,6 +325,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
                   </TooltipContent>
                 )}
               </Tooltip>
+              </React.Fragment>
             ))}
           </nav>
 

@@ -43,6 +43,11 @@ export const MetricGrid: React.FC<Props> = ({ orgIds, from, to, clientId = null,
   }, [orgIds, from, to, clientId, toast]);
 
   useEffect(() => { load(); }, [load, refreshKey]);
+  // Ан-2: операционные показатели обновляются сами раз в минуту, пока вкладка открыта.
+  useEffect(() => {
+    const t = setInterval(() => { if (document.visibilityState === 'visible') load(); }, 60000);
+    return () => clearInterval(t);
+  }, [load]);
 
   const show = async (m: Metric) => {
     setOpen(m); setRecords([]);
