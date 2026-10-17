@@ -109,6 +109,7 @@ select pg_temp.check('аноним не видит платёжный кален
 select pg_temp.check('аноним не видит БДР', pg_temp.denied($$select * from public.bdr_report(array[private.default_org_id()], current_date - 30, current_date)$$));
 select pg_temp.check('аноним не видит аналитику', pg_temp.denied($$select * from public.analytics_metrics(array[private.default_org_id()], current_date - 30, current_date)$$));
 select pg_temp.check('аноним не видит счётчики дашбордов', pg_temp.denied($$select * from public.analytics_counters(array[private.default_org_id()], current_date - 30, current_date)$$));
+select pg_temp.check('аноним не видит реестр документов', pg_temp.denied($$select * from public.document_registry(private.default_org_id())$$));
 select pg_temp.check('аноним не читает сделки', pg_temp.denied($$select count(*) from public.deals$$));
 select pg_temp.check('аноним не читает КП', pg_temp.denied($$select count(*) from public.deal_quotes$$));
 select pg_temp.check('аноним не читает агрегаты аналитики', pg_temp.denied($$select count(*) from public.analytics_daily$$));

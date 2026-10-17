@@ -12,8 +12,9 @@ import { fmtDate } from '@/lib/format';
 import { fmtTime } from '@/lib/ordersMeta';
 import { ACTIVE_ASSIGNMENT, ASSIGNMENT_STATUSES, type StaffingRow } from '@/lib/planningMeta';
 
+export interface DocConflict { assignment_id: string; shift_id: string; worker_id: string; worker_name: string; shift_date: string; site_name: string; problem: string }
 interface Props {
-  shift: StaffingRow | null; tz: string; title: string; canManage: boolean; onClose: () => void; onChanged: () => void;
+  shift: StaffingRow | null; tz: string; title: string; canManage: boolean; conflicts?: DocConflict[]; onClose: () => void; onChanged: () => void;
 }
 interface AssignmentRow {
   id: string; worker_id: string; status: string; is_reserve: boolean; late_cancel: boolean; source: string; full_name?: string;
@@ -27,7 +28,7 @@ interface Option { id: string; name: string }
 
 const RESULT_LABELS: Record<string, string> = { assigned: 'назначен', reserve: 'в резерве', rejected: 'отклонён' };
 
-export const ShiftPanel: React.FC<Props> = ({ shift, tz, title, canManage, onClose, onChanged }) => {
+export const ShiftPanel: React.FC<Props> = ({ shift, tz, title, canManage, conflicts = [], onClose, onChanged }) => {
   const { toast } = useToast();
   const [rows, setRows] = useState<AssignmentRow[]>([]);
   const [query, setQuery] = useState('');
@@ -127,6 +128,12 @@ export const ShiftPanel: React.FC<Props> = ({ shift, tz, title, canManage, onClo
             </SheetHeader>
 
             <div className="space-y-6 mt-6">
+              {conflicts.length > 0 && (
+                <div role="alert" className="rounded border border-red-600 bg-red-50 text-red-900 p-3 text-sm space-y-1">
+                  <p className="font-semibold">Назначены без действующих документов — решите, заменить ли людей</p>
+                  {conflicts.map((c) => <p key={`${c.assignment_id}-${c.problem}`}>{c.worker_name}: {c.problem}</p>)}
+                </div>
+              )}
               <section className="space-y-2">
                 <h3 className="font-semibold">Состав</h3>
                 {canManage && (
@@ -144,7 +151,7 @@ export const ShiftPanel: React.FC<Props> = ({ shift, tz, title, canManage, onClo
                   <TableBody>
                     {active.map((r) => (
                       <TableRow key={r.id}>
-                        <TableCell className="font-medium">{r.full_name}{r.is_reserve && <Badge variant="outline" className="ml-2">резерв</Badge>}</TableCell>
+                        <TableCell className={`font-medium ${conflicts.some((c) => c.worker_id === r.worker_id) ? 'text-red-600' : ''}`}>{r.full_name}{conflicts.some((c) => c.worker_id === r.worker_id) && ' ⚠'}{r.is_reserve && <Badge variant="outline" className="ml-2">резерв</Badge>}</TableCell>
                         <TableCell><Badge variant="secondary">{ASSIGNMENT_STATUSES[r.status]}</Badge></TableCell>
                         <TableCell className="text-right space-x-1 whitespace-nowrap">
                           {canManage && r.is_reserve && <Button size="sm" variant="outline" disabled={busy} onClick={() => act('promote_reserve', { _assignment_id: r.id }, 'Переведён в основной состав')}>В основной</Button>}

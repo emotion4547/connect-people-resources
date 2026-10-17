@@ -177,4 +177,8 @@ select entity, result, note, count(*) from public.legacy_migration_log where res
 */10 * * * * root docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.notify_deal_tasks()" >/dev/null 2>&1
 ```
   КП формируется в PDF средствами браузера («Печать / сохранить в PDF»); письмо клиенту пока открывается в почтовой программе сотрудника (серверной отправки почты нет).
+- **Контроль документов.** Менеджеру объекта раз в сутки приходит уведомление о назначенных на ближайшие две недели исполнителях с недействующим документом или договором. Добавьте в cron:
+```
+30 6 * * * root docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.notify_document_conflicts()" >/dev/null 2>&1
+```
 - **Права.** Появился модуль `deals` (сделки). Руководитель видит все сделки, менеджер продаж — свои; остальным роли доступа не дают.

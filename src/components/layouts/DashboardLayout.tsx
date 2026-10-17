@@ -159,6 +159,7 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Мой день', href: '/hiring/today', icon: <Sun className="w-5 h-5" />, module: 'candidates' },
   { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" />, module: 'candidates' },
   { label: 'Исполнители', href: '/workers', icon: <HardHat className="w-5 h-5" />, module: 'workers' },
+  { label: 'Контроль документов', href: '/document-control', icon: <ShieldCheck className="w-5 h-5" />, module: 'worker_documents' },
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders' },
   { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" />, module: 'timesheets' },
   { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" />, module: 'accruals' },

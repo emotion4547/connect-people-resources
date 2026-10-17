@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useOrg } from '@/contexts/OrgContext';
 import { usePermissions } from '@/hooks/usePermissions';
-import { db } from '@/lib/db';
+import { db, rpc } from '@/lib/db';
 import { addDays, fmtDate, today } from '@/lib/format';
 import { fmtTime } from '@/lib/ordersMeta';
 import { COLOR_CLASSES, mondayOf, staffingColor, type StaffingRow } from '@/lib/planningMeta';
@@ -15,6 +15,7 @@ import { ShiftPanel } from '@/components/planning/ShiftPanel';
 import PageMeta from '@/components/PageMeta';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import type { DocConflict } from '@/components/planning/ShiftPanel';
 interface Option { id: string; name: string }
 interface SiteOption extends Option { timezone: string; client_id: string | null }
 
@@ -38,6 +39,7 @@ const PlanningGrid: React.FC = () => {
   const [positions, setPositions] = useState<Option[]>([]);
   const [selected, setSelected] = useState<StaffingRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [conflicts, setConflicts] = useState<DocConflict[]>([]);
 
   const days = Number(span);
   const to = addDays(from, days - 1);
@@ -57,6 +59,8 @@ const PlanningGrid: React.FC = () => {
     ]);
     setLoading(false);
     if (s.error) { toast({ title: 'Не удалось загрузить сетку', description: s.error.message, variant: 'destructive' }); return; }
+    const dc = await rpc('document_conflicts', { _org_id: orgId, _from: from, _to: to });
+    setConflicts(dc.error ? [] : (dc.data ?? []));
     setRows(s.data ?? []); setSites(st.data ?? []); setClients(c.data ?? []); setPositions(p.data ?? []);
   }, [orgId, from, to, client, site, position, toast]);
 
@@ -158,12 +162,13 @@ const PlanningGrid: React.FC = () => {
                                 key={cell.shift_id}
                                 type="button"
                                 onClick={() => setSelected(cell)}
-                                className={`w-full rounded border px-2 py-1 text-xs font-medium ${COLOR_CLASSES[staffingColor(cell)]}`}
+                                className={`w-full rounded border px-2 py-1 text-xs font-medium ${COLOR_CLASSES[staffingColor(cell)]} ${conflicts.some((c) => c.shift_id === cell.shift_id) ? 'ring-2 ring-red-600' : ''}`}
                                 aria-label={`${fmtDate(d)}: назначено ${cell.assigned_count} из ${cell.headcount}`}
                               >
                                 {cell.assigned_count}/{cell.headcount}
                                 {cell.responses_count > 0 && <span className="ml-1" title="Есть отклики">●</span>}
                                 {!cell.published_at && cell.status !== 'cancelled' && <span className="ml-1" title="Ждёт запуска объекта">⏸</span>}
+                                {conflicts.some((c) => c.shift_id === cell.shift_id) && <span className="ml-1 text-red-600" title="У назначенного не действует документ или договор">⚠</span>}
                               </button>
                             ))}
                           </td>
@@ -180,7 +185,7 @@ const PlanningGrid: React.FC = () => {
       </div>
 
       <ShiftPanel shift={selected} tz={selected ? tzOf(selected.site_id) : 'Asia/Yekaterinburg'} title={shiftTitle}
-        canManage={canManage} onClose={() => setSelected(null)} onChanged={load} />
+        canManage={canManage} conflicts={conflicts.filter((c) => c.shift_id === selected?.shift_id)} onClose={() => setSelected(null)} onChanged={load} />
     </AppLayout>
   );
 };
