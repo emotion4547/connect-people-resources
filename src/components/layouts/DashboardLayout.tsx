@@ -129,6 +129,8 @@ const adminNavItems: NavItem[] = [
   { label: 'Закрытие месяца', href: '/month-close', icon: <CalendarCheck className="w-5 h-5" /> },
   { label: 'Выгрузка в 1С', href: '/export-1c', icon: <FileSpreadsheet className="w-5 h-5" /> },
   { label: 'Реквизиты исполнителей', href: '/payout-requisites', icon: <CreditCard className="w-5 h-5" /> },
+  { label: 'Реестры выплат', href: '/payout-registries', icon: <ListChecks className="w-5 h-5" /> },
+  { label: 'Авансы', href: '/advances', icon: <Banknote className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
@@ -158,6 +160,8 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Закрытие месяца', href: '/month-close', icon: <CalendarCheck className="w-5 h-5" />, module: 'client_documents' },
   { label: 'Выгрузка в 1С', href: '/export-1c', icon: <FileSpreadsheet className="w-5 h-5" />, module: 'client_documents' },
   { label: 'Реквизиты исполнителей', href: '/payout-requisites', icon: <CreditCard className="w-5 h-5" />, module: 'worker_payout_details' },
+  { label: 'Реестры выплат', href: '/payout-registries', icon: <ListChecks className="w-5 h-5" />, module: 'payout_registries' },
+  { label: 'Авансы', href: '/advances', icon: <Banknote className="w-5 h-5" />, module: 'payout_registries' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {

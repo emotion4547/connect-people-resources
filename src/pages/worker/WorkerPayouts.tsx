@@ -13,6 +13,7 @@ import { fmtDate } from '@/lib/format';
 import { CHANNELS } from '@/lib/payoutMeta';
 import PageMeta from '@/components/PageMeta';
 
+interface Limit { accrued: number; open_advances: number; room: number; pct: number }
 interface Row { id: string; channel: string; masked: string; status: string; submitted_at: string; reject_reason: string | null }
 
 const STATUS: Record<string, string> = { pending: 'Ждёт подтверждения', confirmed: 'Подтверждены', rejected: 'Отклонены' };
@@ -25,13 +26,26 @@ const WorkerPayouts: React.FC = () => {
   const [channel, setChannel] = useState('bank_card');
   const [details, setDetails] = useState('');
   const [busy, setBusy] = useState(false);
+  const [limit, setLimit] = useState<Limit | null>(null);
+  const [advance, setAdvance] = useState('');
 
   const load = useCallback(async () => {
     const { data } = await rpc('my_payout_requisites', {});
     setRows(data ?? []);
-  }, []);
+    if (user) { const l = await rpc('advance_limit', { _worker_id: user.id }); setLimit(l.data?.[0] ?? null); }
+  }, [user]);
 
   useEffect(() => { load(); }, [load]);
+
+  const askAdvance = async () => {
+    setBusy(true);
+    const { error } = await rpc('request_advance', { _amount: Number(advance.replace(',', '.')) });
+    setBusy(false);
+    if (error) { toast({ title: 'Запрос не отправлен', description: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Запрос на аванс отправлен', description: 'Бухгалтер рассмотрит его.' });
+    setAdvance('');
+    load();
+  };
 
   const send = async () => {
     if (!user) return;
@@ -75,6 +89,18 @@ const WorkerPayouts: React.FC = () => {
             <Button className="w-full min-h-11" disabled={busy || details.trim().length < 6} onClick={send}>Отправить на проверку</Button>
           </CardContent>
         </Card>
+        {limit && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Аванс</CardTitle>
+              <CardDescription>Можно запросить до {limit.pct}% уже начисленного за месяц. Сейчас доступно: {Number(limit.room).toLocaleString('ru-RU')} ₽. Аванс удерживается из следующей выплаты.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex gap-2">
+              <Input inputMode="decimal" value={advance} onChange={(e) => setAdvance(e.target.value)} aria-label="Сумма аванса" placeholder="Сумма, ₽" />
+              <Button disabled={busy || !advance || Number(limit.room) <= 0} onClick={askAdvance}>Запросить</Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardLayout>
   );

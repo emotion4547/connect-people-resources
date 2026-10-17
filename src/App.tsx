@@ -76,6 +76,9 @@ const MonthClosePage = lazy(() => import("./pages/payments/MonthClosePage"));
 const Export1CPage = lazy(() => import("./pages/payments/Export1CPage"));
 const RequisitesQueue = lazy(() => import("./pages/payouts/RequisitesQueue"));
 const WorkerPayouts = lazy(() => import("./pages/worker/WorkerPayouts"));
+const PayoutRegistries = lazy(() => import("./pages/payouts/PayoutRegistries"));
+const PayoutRegistryDetail = lazy(() => import("./pages/payouts/PayoutRegistryDetail"));
+const Advances = lazy(() => import("./pages/payouts/Advances"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -365,6 +368,21 @@ const App = () => (
             <Route path="/worker/payouts" element={
               <ProtectedRoute allowedRoles={['worker']}>
                 <WorkerPayouts />
+              </ProtectedRoute>
+            } />
+            <Route path="/payout-registries" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <PayoutRegistries />
+              </ProtectedRoute>
+            } />
+            <Route path="/payout-registries/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <PayoutRegistryDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/advances" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <Advances />
               </ProtectedRoute>
             } />
             <Route path="/documents/:id" element={
