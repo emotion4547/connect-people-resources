@@ -62,7 +62,7 @@ test('Отказ прав не создаёт учётную запись', asyn
   assert.equal(r.status, 403);
 });
 test('На выкладку идёт та же функция, что проверена тестами', async () => {
-  for (const name of ['admit-candidate', 'invite-staff', 'delete-user', 'send-webhook', 'deliver-notifications']) {
+  for (const name of ['admit-candidate', 'invite-staff', 'delete-user', 'send-webhook', 'deliver-notifications', 'check-npd-status']) {
     assert.equal(await readFile(`supabase/functions/${name}/index.ts`, 'utf8'),
       await readFile(`deploy/supabase/volumes/functions/${name}/index.ts`, 'utf8'), name);
   }

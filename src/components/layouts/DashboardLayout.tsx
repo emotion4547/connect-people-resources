@@ -49,6 +49,7 @@ import {
   Building2,
   FileCheck,
   Wallet,
+  CreditCard,
   FileSpreadsheet,
   CalendarCheck,
   Banknote,
@@ -97,6 +98,7 @@ const workerNavItems: NavItem[] = [
   { label: 'Мои смены', href: '/worker/my-shifts', icon: <Clock className="w-5 h-5" /> },
   { label: 'Открытые смены', href: '/worker/open-shifts', icon: <Search className="w-5 h-5" /> },
   { label: 'Заработок', href: '/worker/earnings', icon: <Wallet className="w-5 h-5" /> },
+  { label: 'Реквизиты', href: '/worker/payouts', icon: <CreditCard className="w-5 h-5" /> },
   { label: 'Главная', href: '/worker/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
   { label: 'Календарь', href: '/worker/calendar', icon: <Calendar className="w-5 h-5" /> },
@@ -126,6 +128,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Дебиторка', href: '/receivables', icon: <Scale className="w-5 h-5" /> },
   { label: 'Закрытие месяца', href: '/month-close', icon: <CalendarCheck className="w-5 h-5" /> },
   { label: 'Выгрузка в 1С', href: '/export-1c', icon: <FileSpreadsheet className="w-5 h-5" /> },
+  { label: 'Реквизиты исполнителей', href: '/payout-requisites', icon: <CreditCard className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
@@ -154,6 +157,7 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Дебиторка', href: '/receivables', icon: <Scale className="w-5 h-5" />, module: 'client_documents' },
   { label: 'Закрытие месяца', href: '/month-close', icon: <CalendarCheck className="w-5 h-5" />, module: 'client_documents' },
   { label: 'Выгрузка в 1С', href: '/export-1c', icon: <FileSpreadsheet className="w-5 h-5" />, module: 'client_documents' },
+  { label: 'Реквизиты исполнителей', href: '/payout-requisites', icon: <CreditCard className="w-5 h-5" />, module: 'worker_payout_details' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {

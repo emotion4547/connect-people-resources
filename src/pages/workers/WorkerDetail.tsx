@@ -17,6 +17,7 @@ import { db, rpc } from '@/lib/db';
 import { fmtDate } from '@/lib/format';
 import { WORKER_STATUSES, DOC_STATUSES } from '@/lib/hiringMeta';
 import { ASSIGNMENT_STATUSES } from '@/lib/planningMeta';
+import { WorkerPayoutCard } from '@/components/workers/WorkerPayoutCard';
 import PageMeta from '@/components/PageMeta';
 import { ArrowLeft } from 'lucide-react';
 
@@ -122,6 +123,7 @@ const WorkerDetail: React.FC = () => {
               {scope('worker_documents', 'view') !== 'none' && <TabsTrigger value="docs">Документы</TabsTrigger>}
               <TabsTrigger value="shifts">Смены и неявки</TabsTrigger>
               <TabsTrigger value="blocks">Стоп-листы</TabsTrigger>
+              {scope('worker_payout_details', 'view') !== 'none' && <TabsTrigger value="payouts">Выплаты</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="profile">
@@ -159,6 +161,10 @@ const WorkerDetail: React.FC = () => {
                 <p className="text-sm text-muted-foreground">Реферальный код: <span className="font-mono">{w.referral_code}</span></p>
                 {canEdit && <Button onClick={save} disabled={saving || !form.full_name.trim()}>Сохранить</Button>}
               </CardContent></Card>
+            </TabsContent>
+
+            <TabsContent value="payouts">
+              <WorkerPayoutCard workerId={id!} canEdit={scope('worker_payout_details', 'update') === 'all'} />
             </TabsContent>
 
             <TabsContent value="docs">

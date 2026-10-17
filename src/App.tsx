@@ -74,6 +74,8 @@ const ReceivablesPage = lazy(() => import("./pages/payments/ReceivablesPage"));
 const ReconciliationPrint = lazy(() => import("./pages/documents/ReconciliationPrint"));
 const MonthClosePage = lazy(() => import("./pages/payments/MonthClosePage"));
 const Export1CPage = lazy(() => import("./pages/payments/Export1CPage"));
+const RequisitesQueue = lazy(() => import("./pages/payouts/RequisitesQueue"));
+const WorkerPayouts = lazy(() => import("./pages/worker/WorkerPayouts"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -353,6 +355,16 @@ const App = () => (
             <Route path="/export-1c" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
                 <Export1CPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/payout-requisites" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant', 'recruiter']}>
+                <RequisitesQueue />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/payouts" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerPayouts />
               </ProtectedRoute>
             } />
             <Route path="/documents/:id" element={
