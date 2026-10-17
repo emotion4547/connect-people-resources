@@ -179,7 +179,7 @@ const Dashboards: React.FC = () => {
 
           <TabsContent value="sites" className="space-y-6">
             <MetricGrid orgIds={ids} from={from} to={to} only={['staffing', 'attendance', 'no_show', 'order_close_hours']} />
-            {counterCards('ops', ['unconfirmed_tomorrow', 'timesheets_pending', 'timesheets_disputed', 'rating_avg'])}
+            {counterCards('ops', ['unconfirmed_tomorrow', 'replacements', 'timesheets_pending', 'timesheets_disputed', 'rating_avg'])}
             <Card>
               <CardHeader className="flex-row items-center justify-between space-y-0"><CardTitle className="text-lg">Укомплектованность по объектам</CardTitle>
                 <Button variant="outline" size="sm" className="gap-2" onClick={exportSites} disabled={!sites.length}><Download className="w-4 h-4" /> Excel</Button></CardHeader>
