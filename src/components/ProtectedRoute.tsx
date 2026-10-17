@@ -1,11 +1,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, type AppRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { MfaGate, MFA_ROLES } from '@/components/MfaGate';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: ('hr' | 'worker' | 'admin')[];
+  allowedRoles: AppRole[];
 }
 
 export const NoRoleScreen: React.FC = () => {
@@ -57,8 +58,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
     if (role === 'hr') return <Navigate to="/hr/dashboard" replace />;
     if (role === 'worker') return <Navigate to="/worker/dashboard" replace />;
     if (role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-    return <Navigate to="/login" replace />;
+    // Рабочие места остальных ролей сотрудников появляются на следующих шагах.
+    return <Navigate to="/workspace" replace />;
   }
+
+  if (MFA_ROLES.includes(role)) return <MfaGate>{children}</MfaGate>;
 
   return <>{children}</>;
 };

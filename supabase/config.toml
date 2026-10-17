@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.delete-user]
 verify_jwt = true
+
+[functions.invite-staff]
+verify_jwt = true

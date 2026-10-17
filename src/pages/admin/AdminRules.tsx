@@ -12,12 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useOrg } from '@/contexts/OrgContext';
 import PageMeta from '@/components/PageMeta';
 import { SlidersHorizontal } from 'lucide-react';
 
 // Таблицы шага 2 появились после генерации src/integrations/supabase/types.ts,
 // поэтому типы строк описаны здесь, а обращение к ним идёт мимо сгенерированных типов.
-interface Organization { id: string; name: string }
 interface Definition {
   key: string; group_name: string; label: string; description: string | null;
   value_type: 'number' | 'time' | 'text' | 'boolean' | 'json';
@@ -55,8 +55,7 @@ function formatValue(def: Definition, value: unknown): string {
 
 const AdminRules: React.FC = () => {
   const { toast } = useToast();
-  const [orgs, setOrgs] = useState<Organization[]>([]);
-  const [orgId, setOrgId] = useState<string>('');
+  const { orgId, loading: orgLoading } = useOrg();
   const [defs, setDefs] = useState<Definition[]>([]);
   const [settings, setSettings] = useState<SettingRow[]>([]);
   const [rates, setRates] = useState<TaxRate[]>([]);
@@ -87,18 +86,12 @@ const AdminRules: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const [o, d] = await Promise.all([
-        db('organizations').select('id,name').order('created_at'),
-        db('setting_definitions').select('*').order('sort_order'),
-      ]);
-      if (o.error || d.error) {
-        toast({ title: 'Не удалось загрузить данные', description: (o.error ?? d.error).message, variant: 'destructive' });
-        setLoading(false);
-        return;
+      const d = await db('setting_definitions').select('*').order('sort_order');
+      if (d.error) {
+        toast({ title: 'Не удалось загрузить данные', description: d.error.message, variant: 'destructive' });
+      } else {
+        setDefs(d.data ?? []);
       }
-      setOrgs(o.data ?? []);
-      setDefs(d.data ?? []);
-      if (o.data?.length) setOrgId(o.data[0].id);
       setLoading(false);
     })();
   }, [toast]);
@@ -198,17 +191,9 @@ const AdminRules: React.FC = () => {
               Изменение действует с выбранной даты и не пересчитывает прошлые начисления.
             </p>
           </div>
-          {orgs.length > 1 && (
-            <Select value={orgId} onValueChange={setOrgId}>
-              <SelectTrigger className="w-64"><SelectValue placeholder="Организация" /></SelectTrigger>
-              <SelectContent>
-                {orgs.map((o) => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )}
         </div>
 
-        {loading ? (
+        {loading || orgLoading ? (
           <p className="text-muted-foreground">Загрузка…</p>
         ) : !orgId ? (
           <p className="text-muted-foreground">Нет доступных организаций.</p>

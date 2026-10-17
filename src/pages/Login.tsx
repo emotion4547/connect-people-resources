@@ -63,6 +63,7 @@ const Login: React.FC = () => {
       if (role === 'hr') navigate('/hr/dashboard', { replace: true });
       else if (role === 'worker') navigate('/worker/dashboard', { replace: true });
       else if (role === 'admin') navigate('/admin/dashboard', { replace: true });
+      else navigate('/workspace', { replace: true });
     }
   }, [user, role, authLoading, navigate]);
 

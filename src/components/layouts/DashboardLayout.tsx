@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { OrgSwitcher } from '@/components/OrgSwitcher';
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +27,11 @@ import {
   Copy,
   Settings,
   SlidersHorizontal,
+  Building,
+  UserCog,
+  ShieldCheck,
+  BookOpen,
+  KeyRound,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -81,6 +87,11 @@ const adminNavItems: NavItem[] = [
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
   { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
   { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
+  { label: 'Сотрудники', href: '/admin/staff', icon: <UserCog className="w-5 h-5" /> },
+  { label: 'Права ролей', href: '/admin/permissions', icon: <ShieldCheck className="w-5 h-5" /> },
+  { label: 'Справочники', href: '/admin/directories', icon: <BookOpen className="w-5 h-5" /> },
+  { label: 'Безопасность', href: '/security', icon: <KeyRound className="w-5 h-5" /> },
   { label: 'Правила и ставки', href: '/admin/rules', icon: <SlidersHorizontal className="w-5 h-5" /> },
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
@@ -172,6 +183,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
               {!collapsed && <span className="font-bold text-lg">РАБОТА ДЛЯ ВСЕХ</span>}
             </Link>
           </div>
+
+          {role === 'admin' && <div className="pt-3"><OrgSwitcher collapsed={collapsed} /></div>}
 
           {/* Navigation */}
           <nav className={cn("flex-1 p-2 space-y-1 overflow-y-auto", collapsed ? "px-1" : "p-4")}>

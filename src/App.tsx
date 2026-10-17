@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { OrgProvider } from "@/contexts/OrgContext";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -43,6 +44,13 @@ const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
 const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminRules = lazy(() => import("./pages/admin/AdminRules"));
+const AdminOrganizations = lazy(() => import("./pages/admin/AdminOrganizations"));
+const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
+const AdminPermissions = lazy(() => import("./pages/admin/AdminPermissions"));
+const AdminDirectories = lazy(() => import("./pages/admin/AdminDirectories"));
+const Workspace = lazy(() => import("./pages/Workspace"));
+const SetPassword = lazy(() => import("./pages/SetPassword"));
+const Security = lazy(() => import("./pages/Security"));
 const AdminContactMessages = lazy(() => import("./pages/admin/AdminContactMessages"));
 
 import CookieConsent from "./components/CookieConsent";
@@ -59,6 +67,7 @@ const PageLoader = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <OrgProvider>
         <TooltipProvider>
           <Toaster />
         <BrowserRouter>
@@ -178,6 +187,33 @@ const App = () => (
                 <AdminMessages />
               </ProtectedRoute>
             } />
+            <Route path="/set-password" element={<SetPassword />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/workspace" element={
+              <ProtectedRoute allowedRoles={['director', 'sales', 'site_manager', 'recruiter', 'accountant', 'client_admin', 'client_manager']}>
+                <Workspace />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/organizations" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminOrganizations />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/staff" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminStaff />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/permissions" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminPermissions />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/directories" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDirectories />
+              </ProtectedRoute>
+            } />
             <Route path="/admin/rules" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminRules />
@@ -202,6 +238,7 @@ const App = () => (
           </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
+        </OrgProvider>
       </AuthProvider>
   </QueryClientProvider>
 );

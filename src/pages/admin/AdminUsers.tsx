@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import type { AppRole } from '@/contexts/AuthContext';
+import { ROLE_LABELS } from '@/lib/roles';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,7 +31,7 @@ interface User {
   email: string;
   full_name: string | null;
   company: string | null;
-  role: 'hr' | 'worker' | 'admin';
+  role: AppRole;
   created_at: string;
   is_active: boolean;
   block_reason: string | null;
@@ -159,7 +161,7 @@ const AdminUsers: React.FC = () => {
 
       setUsers(users.map(u =>
         u.user_id === selectedUser.user_id
-          ? { ...u, role: newRole as 'hr' | 'worker' | 'admin' }
+          ? { ...u, role: newRole as AppRole }
           : u
       ));
 
@@ -269,7 +271,7 @@ const AdminUsers: React.FC = () => {
       case 'admin': return 'Администратор';
       case 'hr': return 'HR';
       case 'worker': return 'Исполнитель';
-      default: return role;
+      default: return ROLE_LABELS[role as AppRole] ?? role;
     }
   };
 
@@ -282,7 +284,7 @@ const AdminUsers: React.FC = () => {
       case 'worker':
         return <Badge className="bg-secondary/20 text-secondary gap-1"><HardHat className="w-3 h-3" />Исполнитель</Badge>;
       default:
-        return <Badge>{role}</Badge>;
+        return <Badge>{ROLE_LABELS[role as AppRole] ?? role}</Badge>;
     }
   };
 

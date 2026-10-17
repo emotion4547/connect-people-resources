@@ -2,7 +2,17 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-type AppRole = 'hr' | 'worker' | 'admin';
+import type { Database } from '@/integrations/supabase/types';
+
+export type AppRole = Database['public']['Enums']['app_role'];
+// Самостоятельно зарегистрироваться можно только заказчиком или исполнителем.
+type SignUpRole = 'hr' | 'worker';
+
+// Если у человека несколько ролей (по одной на организацию), берём старшую.
+const ROLE_PRIORITY: AppRole[] = [
+  'admin', 'director', 'accountant', 'sales', 'site_manager', 'recruiter',
+  'client_admin', 'client_manager', 'hr', 'worker',
+];
 
 interface AuthContextType {
   user: User | null;
@@ -10,7 +20,7 @@ interface AuthContextType {
   role: AppRole | null;
   profile: any | null;
   loading: boolean;
-  signUp: (email: string, password: string, metadata: { role: AppRole; full_name?: string; company?: string; login?: string }) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, metadata: { role: SignUpRole; full_name?: string; company?: string; login?: string }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refetchProfile: () => Promise<void>;
@@ -41,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // С организациями у человека может быть несколько строк ролей (по одной на организацию):
       // берём старшую. Выбор организации в интерфейсе появится на шаге 3.
       const roles = (roleData ?? []).map((r) => r.role as AppRole);
-      setRole((['admin', 'hr', 'worker'] as AppRole[]).find((r) => roles.includes(r)) ?? roles[0] ?? null);
+      setRole(ROLE_PRIORITY.find((r) => roles.includes(r)) ?? roles[0] ?? null);
       setProfile(profileData ?? null);
     } catch (error) {
       console.error('Error fetching user data:', error);
