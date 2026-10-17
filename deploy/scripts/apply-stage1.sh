@@ -12,6 +12,8 @@ set -euo pipefail
 
 HOST="${HOST:-root@89.125.121.144}"
 DB="docker exec -i supabase-db psql -U supabase_admin -d postgres"
+# Без -i: иначе docker exec читает остаток скрипта из stdin ssh и шаги после него не выполняются.
+DBQ="docker exec supabase-db psql -U supabase_admin -d postgres"
 MIGRATIONS=(
   20261017100000_organizations_and_audit_log.sql
   20261017110000_settings_and_tax_rates.sql
@@ -71,6 +73,8 @@ echo "== Выполнение на сервере"
 ssh "$HOST" "REMOTE_DIR=$REMOTE_DIR STAMP=$STAMP bash -s" <<'REMOTE'
 set -euo pipefail
 DB="docker exec -i supabase-db psql -U supabase_admin -d postgres"
+# Без -i: иначе docker exec читает остаток скрипта из stdin ssh и шаги после него не выполняются.
+DBQ="docker exec supabase-db psql -U supabase_admin -d postgres"
 cd /opt/supabase
 
 echo "-- 1. Бэкап"
@@ -103,7 +107,7 @@ applied() {  # 0, если миграция уже применена
     20261017130000*) q="select to_regclass('public.tariffs') is not null" ;;
     20261017120200*) q="select to_regclass('public.setting_definitions') is not null and exists (select 1 from public.setting_definitions where key = 'auth.mfa_enforced')" ;;
   esac
-  [ "$($DB -tAc "$q")" = "t" ]
+  [ "$($DBQ -tAc "$q")" = "t" ]
 }
 
 echo "-- 2. Миграции"
@@ -118,10 +122,10 @@ for f in $(ls "$REMOTE_DIR"/2026*.sql | sort); do
 done
 
 echo "-- 2а. Ключ шифрования персональных данных"
-if [ "$($DB -tAc "select coalesce(current_setting('app.pii_key', true), '') = ''")" = "t" ]; then
+if [ "$($DBQ -tAc "select coalesce(current_setting('app.pii_key', true), '') = ''")" = "t" ]; then
   PII_KEY="$(openssl rand -hex 32)"
-  $DB -qc "ALTER SYSTEM SET app.pii_key = '$PII_KEY'" >/dev/null
-  $DB -qc "select pg_reload_conf()" >/dev/null
+  $DBQ -qc "ALTER SYSTEM SET app.pii_key = '$PII_KEY'" >/dev/null
+  $DBQ -qc "select pg_reload_conf()" >/dev/null
   echo "   ключ создан. СОХРАНИТЕ ЕГО В ПАРОЛЬНОМ МЕНЕДЖЕРЕ ОТДЕЛЬНО ОТ СЕРВЕРА: без него зашифрованные номера документов не прочитать."
   echo "   КЛЮЧ: $PII_KEY"
 else
