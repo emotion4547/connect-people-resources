@@ -42,6 +42,7 @@ const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
 const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminRules = lazy(() => import("./pages/admin/AdminRules"));
 const AdminContactMessages = lazy(() => import("./pages/admin/AdminContactMessages"));
 
 import CookieConsent from "./components/CookieConsent";
@@ -175,6 +176,11 @@ const App = () => (
             <Route path="/admin/messages" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminMessages />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/rules" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminRules />
               </ProtectedRoute>
             } />
             <Route path="/admin/settings" element={

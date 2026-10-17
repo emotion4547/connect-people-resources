@@ -25,6 +25,7 @@ import {
   Mail,
   Copy,
   Settings,
+  SlidersHorizontal,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -80,6 +81,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
   { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
   { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Правила и ставки', href: '/admin/rules', icon: <SlidersHorizontal className="w-5 h-5" /> },
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
