@@ -158,6 +158,14 @@ if (!failed) {
   }
 }
 
+if (!failed && !only) {
+  console.log("\nФРОНТЕНД ↔ БАЗА (функции, таблицы, столбцы)");
+  const { checkFrontend } = await import("./frontend-contract.mjs");
+  const problems = await checkFrontend(db);
+  for (const p of problems) fail(`  ✗ ${p}`);
+  if (!problems.length) console.log("  ✓ все вызовы функций и обращения к таблицам совпадают со схемой");
+}
+
 console.log(failed ? `\nПРОВАЛ: ошибок ${failed}` : "\nВСЁ ЗЕЛЁНОЕ");
 await db.close();
 process.exit(failed ? 1 : 0);
