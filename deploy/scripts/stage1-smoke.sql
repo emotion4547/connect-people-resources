@@ -105,6 +105,7 @@ select pg_temp.check('аноним не читает табели', pg_temp.deni
 select pg_temp.check('аноним не читает начисления', pg_temp.denied($$select count(*) from public.accruals$$));
 select pg_temp.check('аноним не читает документы заказчикам', pg_temp.denied($$select count(*) from public.client_documents$$));
 select pg_temp.check('аноним не читает платежи', pg_temp.denied($$select count(*) from public.client_payments$$));
+select pg_temp.check('аноним не видит платёжный календарь', pg_temp.denied($$select * from public.payment_calendar(private.default_org_id())$$));
 select pg_temp.check('аноним не читает правила ДДС', pg_temp.denied($$select count(*) from public.cashflow_rules$$));
 select pg_temp.check('аноним не читает операции ДДС', pg_temp.denied($$select count(*) from public.cashflow_entries$$));
 select pg_temp.check('аноним не выгружает реестр выплат', pg_temp.denied($$select * from public.payout_registry_export(gen_random_uuid())$$));

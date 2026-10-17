@@ -141,6 +141,7 @@ const CashPage: React.FC = () => {
           </div>
           {can('cashflow', 'create') && (
             <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline"><Link to="/cash/calendar">Календарь</Link></Button>
               <Button asChild variant="outline"><Link to="/cash/report">Отчёт ДДС</Link></Button>
               <Button asChild variant="outline"><Link to="/cash/rules">Правила</Link></Button>
               <Button variant="outline" className="gap-2" disabled={busy} onClick={() => stmt.current?.click()}><Upload className="w-4 h-4" /> Выписка</Button>
