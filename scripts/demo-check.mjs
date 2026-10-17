@@ -15,6 +15,9 @@ for (const [k, role, dept] of users) {
 const sql = await readFile("deploy/scripts/demo-org.sql", "utf8");
 const t = performance.now();
 try { await db.exec(sql); } catch (e) { console.log("ОШИБКА:", e.message, e.where ?? ""); await db.close(); process.exit(1); }
+await db.exec(`insert into auth.users (id, email) values (gen_random_uuid(), 'test-worker@test.rabota-vsem-56.ru')`);
+const wsql = await readFile("deploy/scripts/demo-worker.sql", "utf8");
+try { await db.exec(wsql); } catch (e) { console.log("ОШИБКА исполнителя:", e.message, e.where ?? ""); await db.close(); process.exit(1); }
 console.log(`демо создано за ${Math.round(performance.now() - t)} мс`);
 const q = async (label, sqlText) => console.log(label.padEnd(34), JSON.stringify((await db.query(sqlText)).rows[0]));
 const org = "(select id from public.organizations where name = 'ТЕСТ Демо-организация')";
@@ -33,4 +36,6 @@ const m = await db.query(`select metric, value from public.analytics_metrics(arr
 console.log("метрики:", m.rows.map((r) => `${r.metric}=${r.value}`).join(", "));
 const conf = await db.query(`select count(*) from public.document_conflicts(${org}, current_date, current_date + 30)`);
 console.log("смены под угрозой:", conf.rows[0].count);
+const tw = await db.query(`select (select count(*) from public.assignments a join auth.users u on u.id = a.worker_id where u.email like 'test-worker%') asg, (select count(*) from public.accruals x join auth.users u on u.id = x.worker_id where u.email like 'test-worker%') accr`);
+console.log("тестовый исполнитель:", JSON.stringify(tw.rows[0]));
 await db.close();
