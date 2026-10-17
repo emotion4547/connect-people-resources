@@ -49,6 +49,8 @@ const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
 const AdminPermissions = lazy(() => import("./pages/admin/AdminPermissions"));
 const AdminDirectories = lazy(() => import("./pages/admin/AdminDirectories"));
 const Workspace = lazy(() => import("./pages/Workspace"));
+const OrdersList = lazy(() => import("./pages/orders/OrdersList"));
+const OrderDetail = lazy(() => import("./pages/orders/OrderDetail"));
 const SitesList = lazy(() => import("./pages/sites/SitesList"));
 const SiteDetail = lazy(() => import("./pages/sites/SiteDetail"));
 const SiteQrPrint = lazy(() => import("./pages/sites/SiteQrPrint"));
@@ -204,6 +206,16 @@ const App = () => (
             <Route path="/clients/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <ClientDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <OrdersList />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <OrderDetail />
               </ProtectedRoute>
             } />
             <Route path="/sites" element={

@@ -49,6 +49,8 @@ select pg_temp.check('у всех объектов есть организаци
   (select count(*) from public.sites s where not exists (select 1 from public.site_secrets x where x.site_id = s.id)) = 0);
 select pg_temp.check('типы документов заведены', (select count(*) from public.directories where kind = 'document_type') >= 8);
 
+select pg_temp.check('у каждой смены есть ставки', (select count(*) from public.shifts sh where not exists (select 1 from public.shift_rates r where r.shift_id = sh.id)) = 0);
+
 -- Сценарий: администраторы двух организаций, обычный сотрудник
 insert into public.organizations (id, name) values ('b2000000-0000-0000-0000-000000000002', 'ПРОВЕРКА организация 2');
 insert into auth.users (id, email) values

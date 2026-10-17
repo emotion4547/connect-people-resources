@@ -20,6 +20,7 @@ MIGRATIONS=(
   20261017120200_mfa_setting.sql
   20261017130000_clients_contracts_tariffs.sql
   20261017140000_sites_launch.sql
+  20261017150000_orders_shifts.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -73,6 +74,7 @@ applied() {  # 0, если миграция уже применена
     20261017110000*) q="select to_regclass('public.setting_definitions') is not null" ;;
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
+    20261017150000*) q="select to_regclass('public.shifts') is not null" ;;
     20261017140000*) q="select to_regclass('public.site_secrets') is not null" ;;
     20261017130000*) q="select to_regclass('public.tariffs') is not null" ;;
     20261017120200*) q="select to_regclass('public.setting_definitions') is not null and exists (select 1 from public.setting_definitions where key = 'auth.mfa_enforced')" ;;

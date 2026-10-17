@@ -48,7 +48,7 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
 1. Миграции по одной, как в разделе «Новая миграция БД», строго в этом порядке:
    `20261017100000_organizations_and_audit_log.sql`, `20261017110000_settings_and_tax_rates.sql`,
    `20261017120000_new_roles.sql`, `20261017120100_staff_permissions_directories.sql`,
-   `20261017120200_mfa_setting.sql`, `20261017130000_clients_contracts_tariffs.sql`, `20261017140000_sites_launch.sql`. Миграция `…120000_new_roles.sql` обязательно отдельным
+   `20261017120200_mfa_setting.sql`, `20261017130000_clients_contracts_tariffs.sql`, `20261017140000_sites_launch.sql`, `20261017150000_orders_shifts.sql`. Миграция `…120000_new_roles.sql` обязательно отдельным
    запуском: новые значения enum нельзя использовать в той же транзакции.
 2. Edge-функция `invite-staff`: скопировать `deploy/supabase/volumes/functions/invite-staff/` на сервер
    в `/opt/supabase/volumes/functions/` и `docker restart supabase-edge-functions`.
@@ -61,3 +61,10 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
    «Основная организация», название поменять в разделе «Организации».
 Двухфакторный вход по умолчанию выключен; включается в «Правилах и ставках» после того, как все
 сотрудники подключили код в разделе «Безопасность».
+
+### Расписание статусов смен
+Смены «идут» и «завершаются» по времени, вместе с ними двигается статус заказа. Для этого раз в 5 минут нужно
+вызывать функцию базы; на сервере добавьте в cron (`crontab -e`):
+```
+*/5 * * * * docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.advance_shift_statuses()" >/dev/null 2>&1
+```

@@ -34,6 +34,7 @@ import {
   BookOpen,
   KeyRound,
   Briefcase,
+  ClipboardList,
   Rocket,
   ListChecks,
   LogOut,
@@ -92,6 +93,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
   { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" /> },
+  { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
@@ -108,6 +110,7 @@ const adminNavItems: NavItem[] = [
 const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
   { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
+  { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {
