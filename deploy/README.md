@@ -197,3 +197,8 @@ select entity, result, note, count(*) from public.legacy_migration_log where res
 
 Если нужно восстановить базу вручную: создать базу, поставить расширения в схему `extensions`, задать `ALTER DATABASE … SET search_path TO public, extensions`
 (иначе не создадутся ограничения «без пересечений» на `gist`) и выполнить `pg_restore --no-owner --no-privileges`.
+
+## Мониторинг
+`ops-check.sh` (раз в 5 минут, `/etc/cron.d/rabotavsem-ops`) проверяет сайт, сервис входа, базу, свежесть бэкапа, место на диске, свободную память и очередь
+уведомлений. При сбое пишет в `/var/log/rabotavsem-ops.log` и отправляет оповещение (событие `ops_alert`, каналы MAX и push) администраторам и руководителям —
+одно в сутки на вид сбоя. Если упала сама база, оповестить нельзя: смотрите журнал.
