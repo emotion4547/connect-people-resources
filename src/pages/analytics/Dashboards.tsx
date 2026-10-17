@@ -16,6 +16,7 @@ import { downloadCsv } from '@/lib/csv';
 import { addDays, fmtDate, fmtMoney, monthEnd, monthStart, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { MetricGrid } from '@/components/analytics/MetricGrid';
+import { stageLabel } from '@/lib/dealMeta';
 import { Download } from 'lucide-react';
 
 interface ClientRow { client_id: string; client_name: string; revenue: number; margin: number; margin_pct: number | null; prev_margin_pct: number | null; margin_falling: boolean }
@@ -24,6 +25,8 @@ interface Unconfirmed { assignment_id: string; worker_name: string; phone: strin
 interface Cand { dimension: string; key: string; name: string; total: number; admitted: number }
 interface Counter { key: string; name: string; unit: string; value: number | null; link: string | null; grp: string }
 interface PlanFact { revenue_plan: number | null; revenue_fact: number; margin_plan: number | null; margin_fact: number }
+interface Funnel { stage: string; deals: number; revenue: number; weighted: number }
+interface Lost { reason: string; deals: number }
 interface Receivable { debt: number; not_due: number; overdue_30: number; overdue_60: number; overdue_60p: number }
 
 const pct = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 1000) / 10}%` : '—');
@@ -55,6 +58,8 @@ const Dashboards: React.FC = () => {
   const [cands, setCands] = useState<Cand[]>([]);
   const [counters, setCounters] = useState<Counter[]>([]);
   const [plan, setPlan] = useState<PlanFact | null>(null);
+  const [funnel, setFunnel] = useState<Funnel[]>([]);
+  const [lost, setLost] = useState<Lost[]>([]);
   const [aging, setAging] = useState<Receivable | null>(null);
   const [cash, setCash] = useState<{ balance: number; gapDay: string | null; gapDepth: number } | null>(null);
 
@@ -73,6 +78,10 @@ const Dashboards: React.FC = () => {
         setClients(((await call('analytics_by_client', base)) ?? []).map((c: ClientRow) => ({ ...c, revenue: num(c.revenue), margin: num(c.margin) })));
         const p = await call('analytics_plan_fact', base);
         setPlan(p?.[0] ? { revenue_plan: p[0].revenue_plan === null ? null : num(p[0].revenue_plan), revenue_fact: num(p[0].revenue_fact), margin_plan: p[0].margin_plan === null ? null : num(p[0].margin_plan), margin_fact: num(p[0].margin_fact) } : null);
+      }
+      if (current === 'sales' && orgId) {
+        setFunnel(((await call('deal_funnel', { _org_id: orgId })) ?? []).map((x: Funnel) => ({ ...x, deals: num(x.deals), revenue: num(x.revenue), weighted: num(x.weighted) })));
+        setLost(((await call('deal_lost_reasons', { _org_id: orgId, _from: from, _to: to })) ?? []).map((x: Lost) => ({ ...x, deals: num(x.deals) })));
       }
       if (current === 'sites') {
         setSites(((await call('analytics_by_site', base)) ?? []).map((s: SiteRow) => ({ ...s, needed: num(s.needed), confirmed: num(s.confirmed), started_needed: num(s.started_needed), on_site: num(s.on_site), started_assigned: num(s.started_assigned), no_shows: num(s.no_shows), today_needed: num(s.today_needed), today_confirmed: num(s.today_confirmed), week_needed: num(s.week_needed), week_confirmed: num(s.week_confirmed) })));
@@ -220,7 +229,16 @@ const Dashboards: React.FC = () => {
             <MetricGrid orgIds={ids} from={from} to={to} only={['revenue', 'margin_amount', 'margin_pct']} />
             {counterCards('ops', ['idle_clients_30'])}
             <ClientTables clients={clients} onExport={exportClients} />
-            <p className="text-sm text-muted-foreground">Воронка сделок и причины отказов появятся вместе с разделом «Сделки».</p>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card><CardHeader className="flex-row items-center justify-between space-y-0"><CardTitle className="text-lg">Воронка сделок</CardTitle><Button asChild variant="link"><Link to="/deals">Открыть сделки</Link></Button></CardHeader><CardContent>
+                <Table><TableHeader><TableRow><TableHead>Этап</TableHead><TableHead className="text-right">Сделок</TableHead><TableHead className="text-right">В месяц</TableHead><TableHead className="text-right">Взвешенно</TableHead></TableRow></TableHeader>
+                  <TableBody>{funnel.map((f) => <TableRow key={f.stage}><TableCell>{stageLabel(f.stage)}</TableCell><TableCell className="text-right">{f.deals}</TableCell><TableCell className="text-right">{fmtMoney(f.revenue)}</TableCell><TableCell className="text-right">{fmtMoney(f.weighted)}</TableCell></TableRow>)}</TableBody></Table>
+              </CardContent></Card>
+              <Card><CardHeader><CardTitle className="text-lg">Причины отказов за период</CardTitle></CardHeader><CardContent>
+                {lost.map((l) => <div key={l.reason} className="flex justify-between py-2 border-b last:border-0 text-sm"><span>{l.reason}</span><span>{l.deals}</span></div>)}
+                {!lost.length && <p className="text-sm text-muted-foreground">Отказов за период нет.</p>}
+              </CardContent></Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="accounting" className="space-y-6">

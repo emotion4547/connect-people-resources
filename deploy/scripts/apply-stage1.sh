@@ -45,6 +45,7 @@ MIGRATIONS=(
   20261019130000_bdr.sql
   20261019140000_analytics.sql
   20261019150000_dashboards.sql
+  20261019160000_sales_funnel.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -109,6 +110,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261019160000*) q="select to_regclass('public.deals') is not null" ;;
     20261019150000*) q="select to_regprocedure('public.analytics_counters(uuid[],date,date)') is not null" ;;
     20261019140000*) q="select to_regprocedure('public.analytics_metrics(uuid[],date,date,uuid)') is not null" ;;
     20261019130000*) q="select to_regprocedure('public.bdr_report(uuid[],date,date)') is not null" ;;

@@ -28,6 +28,7 @@ const MODULES: Record<string, string> = {
   payout_registries: 'Реестры выплат',
   cashflow: 'ДДС и БДР',
   analytics: 'Аналитика',
+  deals: 'Сделки и воронка продаж',
   users_directories: 'Пользователи и справочники',
 };
 const ACTIONS: Record<string, string> = {

@@ -24,6 +24,7 @@ import {
   CheckCircle,
   Users,
   BarChart3,
+  Handshake,
   Mail,
   Copy,
   Settings,
@@ -151,6 +152,7 @@ const adminNavItems: NavItem[] = [
 const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Дашборды', href: '/dashboards', icon: <Home className="w-5 h-5" />, module: 'analytics' },
   { label: 'Аналитика', href: '/analytics', icon: <BarChart3 className="w-5 h-5" />, module: 'analytics' },
+  { label: 'Сделки', href: '/deals', icon: <Handshake className="w-5 h-5" />, module: 'deals' },
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
   { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
   { label: 'Планирование', href: '/planning', icon: <CalendarDays className="w-5 h-5" />, module: 'assignments' },

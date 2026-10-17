@@ -42,8 +42,8 @@ select is(
     and enumlabel in ('director', 'sales', 'site_manager', 'recruiter', 'accountant', 'client_admin', 'client_manager')),
   7, 'Роли отделов из ТЗ добавлены'
 );
-select is((select count(*)::int from public.role_permissions where org_id = private.default_org_id()), 480,
-  'Матрица: 6 ролей × 16 модулей × 5 действий');
+select is((select count(*)::int from public.role_permissions where org_id = private.default_org_id()), 510,
+  'Матрица: 6 ролей × 17 модулей × 5 действий');
 select is((select scope from public.role_permissions where org_id = private.default_org_id() and role = 'director' and module = 'clients' and action = 'view'), 'all', 'Руководитель видит всех заказчиков');
 select is((select scope from public.role_permissions where org_id = private.default_org_id() and role = 'sales' and module = 'clients' and action = 'view'), 'own', 'Продажи видят только своих заказчиков');
 select is((select scope from public.role_permissions where org_id = private.default_org_id() and role = 'sales' and module = 'clients' and action = 'delete'), 'none', 'Продажи не удаляют заказчиков');
@@ -161,7 +161,7 @@ set local request.jwt.claim.sub = 'a0000000-0000-0000-0000-00000000000a';
 select public.create_organization('Организация для проверки заготовок');
 select is(
   (select count(*)::int from public.role_permissions rp join public.organizations o on o.id = rp.org_id where o.name = 'Организация для проверки заготовок'),
-  480, 'Новая организация получает матрицу прав'
+  510, 'Новая организация получает матрицу прав'
 );
 
 select * from finish();

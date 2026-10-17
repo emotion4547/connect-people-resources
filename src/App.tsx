@@ -82,6 +82,9 @@ const Advances = lazy(() => import("./pages/payouts/Advances"));
 const WorkerPayments = lazy(() => import("./pages/worker/WorkerPayments"));
 const WorkerCertificate = lazy(() => import("./pages/worker/WorkerCertificate"));
 const PaymentCalendar = lazy(() => import("./pages/cash/PaymentCalendar"));
+const Deals = lazy(() => import("./pages/deals/Deals"));
+const DealDetail = lazy(() => import("./pages/deals/DealDetail"));
+const DealQuotePrint = lazy(() => import("./pages/deals/DealQuotePrint"));
 const Dashboards = lazy(() => import("./pages/analytics/Dashboards"));
 const ClientAnalytics = lazy(() => import("./pages/client/ClientAnalytics"));
 const AnalyticsPage = lazy(() => import("./pages/analytics/AnalyticsPage"));
@@ -403,6 +406,21 @@ const App = () => (
             <Route path="/worker/certificate" element={
               <ProtectedRoute allowedRoles={['worker']}>
                 <WorkerCertificate />
+              </ProtectedRoute>
+            } />
+            <Route path="/deals/:id/quote/:version" element={
+              <ProtectedRoute allowedRoles={['director', 'sales']}>
+                <DealQuotePrint />
+              </ProtectedRoute>
+            } />
+            <Route path="/deals/:id" element={
+              <ProtectedRoute allowedRoles={['director', 'sales']}>
+                <DealDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/deals" element={
+              <ProtectedRoute allowedRoles={['director', 'sales']}>
+                <Deals />
               </ProtectedRoute>
             } />
             <Route path="/dashboards" element={
