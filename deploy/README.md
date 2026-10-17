@@ -181,4 +181,9 @@ select entity, result, note, count(*) from public.legacy_migration_log where res
 ```
 30 6 * * * root docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.notify_document_conflicts()" >/dev/null 2>&1
 ```
+- **Вахты.** Суточные и проезд вахтовиков начисляются раз в сутки (за месяцы, в которых пребывание закончилось, и после заезда). Добавьте в cron:
+```
+50 6 * * * root docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.generate_due_rotation_accruals()" >/dev/null 2>&1
+```
+  Расходы на проживание и питание (место и питание в сутки × дни пребывания) попадают в БДР отдельной статьёй «Проживание и питание вахт»; платёж арендодателю в ДДС относите к статье без привязки к БДР, иначе расход посчитается дважды.
 - **Права.** Появился модуль `deals` (сделки). Руководитель видит все сделки, менеджер продаж — свои; остальным роли доступа не дают.

@@ -22,10 +22,10 @@ interface Plan { month: string; article: string; client_id: string | null; amoun
 
 const MONTHS = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
 const mlabel = (m: string) => `${MONTHS[Number(m.slice(5, 7)) - 1]} ${m.slice(2, 4)}`;
-const COSTS = new Set(['worker_costs', 'worker_taxes', 'payout_fees', 'other_staff_costs', 'admin_costs', 'usn_tax']);
+const COSTS = new Set(['worker_costs', 'worker_taxes', 'payout_fees', 'other_staff_costs', 'rotation_costs', 'admin_costs', 'usn_tax']);
 const PLAN_ARTICLES: [string, string][] = [
   ['revenue', 'Выручка'], ['worker_costs', 'Затраты на исполнителей'], ['worker_taxes', 'Налоги и взносы по исполнителям'],
-  ['payout_fees', 'Комиссии выплат'], ['other_staff_costs', 'Прочие расходы на персонал'], ['admin_costs', 'Управленческие расходы'],
+  ['payout_fees', 'Комиссии выплат'], ['other_staff_costs', 'Прочие расходы на персонал'], ['rotation_costs', 'Проживание и питание вахт'], ['admin_costs', 'Управленческие расходы'],
 ];
 const DIMENSIONS: [string, string][] = [['client', 'Заказчики'], ['site', 'Объекты'], ['manager', 'Менеджеры продаж'], ['org', 'Организации']];
 

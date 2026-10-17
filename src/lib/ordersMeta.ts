@@ -13,7 +13,7 @@ export interface Order {
   id: string; org_id: string; client_id: string; site_id: string; position_id: string; unit: string;
   date_from: string; date_to: string; weekdays: number[] | null; dates: string[] | null;
   start_time: string; end_time: string; break_minutes: number; headcount: number; reserve_count: number;
-  requirements: string | null; comment: string | null; status: string; source: string; starts_at: string | null;
+  requirements: string | null; comment: string | null; status: string; source: string; starts_at: string | null; kind?: string;
 }
 
 export interface Shift {
