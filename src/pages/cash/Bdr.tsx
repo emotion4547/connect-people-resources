@@ -17,7 +17,7 @@ import PageMeta from '@/components/PageMeta';
 import { Download } from 'lucide-react';
 
 interface Row { month: string; article: string; article_name: string; sort_order: number; plan: number; fact: number }
-interface Slice { key: string; name: string; revenue: number; worker_costs: number; margin: number; margin_pct: number | null }
+interface Slice { key: string; name: string; revenue: number; worker_costs: number; margin: number; margin_pct: number | null; revenue_plan: number | null }
 interface Plan { month: string; article: string; client_id: string | null; amount: number }
 
 const MONTHS = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
@@ -55,7 +55,7 @@ const Bdr: React.FC = () => {
     ]);
     if (r.error) { toast({ title: 'Не удалось построить БДР', description: r.error.message, variant: 'destructive' }); return; }
     setRows((r.data ?? []).map((x: Row) => ({ ...x, plan: Number(x.plan), fact: Number(x.fact) })));
-    setSlices(s.error ? [] : (s.data ?? []).map((x: Slice) => ({ ...x, revenue: Number(x.revenue), worker_costs: Number(x.worker_costs), margin: Number(x.margin) })));
+    setSlices(s.error ? [] : (s.data ?? []).map((x: Slice) => ({ ...x, revenue: Number(x.revenue), worker_costs: Number(x.worker_costs), margin: Number(x.margin), revenue_plan: x.revenue_plan === null || x.revenue_plan === undefined ? null : Number(x.revenue_plan) })));
   }, [ids, from, to, dimension, toast]);
 
   useEffect(() => { load(); }, [load]);
@@ -69,12 +69,12 @@ const Bdr: React.FC = () => {
   const cell = (a: string, m: string) => rows.find((r) => r.article === a && r.month === m);
 
   const exportCsv = () => {
-    const header = ['Статья', 'План', 'Факт', 'Отклонение, ₽', 'Отклонение, %', ...months.flatMap((m) => [`${mlabel(m)} план`, `${mlabel(m)} факт`])];
-    const body = totals.map((t) => [t.name, t.plan, t.fact, deviation(t), devPct(t) ?? '', ...months.flatMap((m) => { const c = cell(t.article, m); return [c?.plan ?? 0, c?.fact ?? 0]; })]);
+    const header = ['Статья', 'План', 'Факт', 'Отклонение, ₽', 'Отклонение, %', ...months.flatMap((m) => [`${mlabel(m)} план`, `${mlabel(m)} факт`, `${mlabel(m)} откл., ₽`, `${mlabel(m)} откл., %`])];
+    const body = totals.map((t) => [t.name, t.plan, t.fact, deviation(t), devPct(t) ?? '', ...months.flatMap((m) => { const c = cell(t.article, m); return [c?.plan ?? 0, c?.fact ?? 0, c ? deviation(c) : 0, c ? devPct(c) ?? '' : '']; })]);
     downloadExcel(`bdr-${from}-${to}.xlsx`, header, body);
   };
-  const exportSlices = () => downloadExcel(`bdr-${dimension}-${from}-${to}.xlsx`, ['Название', 'Выручка', 'Затраты на исполнителей', 'Маржа', 'Маржа, %'],
-    slices.map((s) => [s.name, s.revenue, s.worker_costs, s.margin, s.margin_pct ?? '']));
+  const exportSlices = () => downloadExcel(`bdr-${dimension}-${from}-${to}.xlsx`, ['Название', 'План выручки', 'Выручка', 'Затраты на исполнителей', 'Маржа', 'Маржа, %'],
+    slices.map((s) => [s.name, s.revenue_plan ?? '', s.revenue, s.worker_costs, s.margin, s.margin_pct ?? '']));
 
   return (
     <AppLayout>
@@ -146,6 +146,7 @@ const Bdr: React.FC = () => {
                               <TableCell key={m} className="text-right whitespace-nowrap">
                                 <div className={c && c.plan && bad({ article: a.article, ...c }) ? 'text-destructive' : ''}>{fmtMoney(c?.fact ?? 0)}</div>
                                 <div className="text-xs text-muted-foreground">план {fmtMoney(c?.plan ?? 0)}</div>
+                                {c && c.plan > 0 && <div className={`text-xs ${bad({ article: a.article, ...c }) ? 'text-destructive' : 'text-muted-foreground'}`}>{deviation({ article: a.article, ...c }) > 0 ? '+' : ''}{fmtMoney(deviation({ article: a.article, ...c }))} ({devPct(c)}%)</div>}
                               </TableCell>
                             );
                           })}
@@ -168,11 +169,12 @@ const Bdr: React.FC = () => {
                 <Button variant="outline" className="gap-2" onClick={exportSlices} disabled={!slices.length}><Download className="w-4 h-4" /> В Excel</Button>
               </div>
               <Table>
-                <TableHeader><TableRow><TableHead>Название</TableHead><TableHead className="text-right">Выручка</TableHead><TableHead className="text-right">Затраты на исполнителей</TableHead><TableHead className="text-right">Маржа</TableHead><TableHead className="text-right">%</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Название</TableHead>{dimension === 'client' && <TableHead className="text-right">План выручки</TableHead>}<TableHead className="text-right">Выручка</TableHead><TableHead className="text-right">Затраты на исполнителей</TableHead><TableHead className="text-right">Маржа</TableHead><TableHead className="text-right">%</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {slices.map((s) => (
                     <TableRow key={s.key}>
                       <TableCell>{s.name}</TableCell>
+                      {dimension === 'client' && <TableCell className="text-right">{s.revenue_plan === null ? '—' : fmtMoney(s.revenue_plan)}</TableCell>}
                       <TableCell className="text-right">{fmtMoney(s.revenue)}</TableCell>
                       <TableCell className="text-right">{fmtMoney(s.worker_costs)}</TableCell>
                       <TableCell className="text-right">{fmtMoney(s.margin)}</TableCell>

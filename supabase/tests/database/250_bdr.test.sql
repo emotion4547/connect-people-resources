@@ -5,7 +5,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(28);
+select plan(30);
 
 create function pg_temp.w(i int) returns uuid language sql immutable as $$
   select (('770000' || lpad(i::text, 2, '0')) || '-0000-0000-0000-000000000000')::uuid
@@ -94,6 +94,8 @@ select is((select plan from public.bdr_report(array[private.default_org_id()], (
 -- Разрезы
 select is((select revenue from public.bdr_breakdown(array[private.default_org_id()], (select month from m), (select last_day from m), 'client')), 13500.00, 'Разрез по заказчику: выручка 13 500');
 select is((select margin_pct from public.bdr_breakdown(array[private.default_org_id()], (select month from m), (select last_day from m), 'client')), round((13500 - 9000) / 13500.0 * 100, 1), 'и маржинальность в процентах');
+select is((select revenue_plan from public.bdr_breakdown(array[private.default_org_id()], (select month from m), (select last_day from m), 'client')), 12000.00, 'и план выручки по заказчику из плана БДР');
+select is((select revenue_plan from public.bdr_breakdown(array[private.default_org_id()], (select month from m), (select last_day from m), 'site')), null, 'в других разрезах плана выручки нет');
 select is((select name from public.bdr_breakdown(array[private.default_org_id()], (select month from m), (select last_day from m), 'manager')), 'Продавец', 'Разрез по менеджеру продаж');
 select is((select name from public.bdr_breakdown(array[private.default_org_id()], (select month from m), (select last_day from m), 'site')), 'Склад 1', 'Разрез по объекту');
 select throws_ok($$select * from public.bdr_breakdown(array[private.default_org_id()], current_date - 30, current_date, 'planet')$$, '22023', null, 'Неизвестный разрез отвергается');

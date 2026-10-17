@@ -55,6 +55,7 @@ MIGRATIONS=(
   20261020130000_analytics_records_privacy.sql
   20261020140000_ops_alert.sql
   20261020150000_client_errors.sql
+  20261020160000_bdr_breakdown_plan.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -119,6 +120,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261020160000*) q="select exists (select 1 from pg_proc where proname = 'bdr_breakdown' and pg_get_function_result(oid) like '%revenue_plan%')" ;;
     20261020150000*) q="select to_regclass('public.client_errors') is not null" ;;
     20261020140000*) q="select to_regprocedure('private.ops_alert(text,text,text)') is not null" ;;
     20261020130000*) q="select pg_get_functiondef('public.analytics_records(uuid[],text,date,date,uuid)'::regprocedure) like '%permission_scope(uid, o, ''workers''%'" ;;
