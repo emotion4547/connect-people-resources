@@ -2,7 +2,7 @@
 // на наш расчётный счёт. Файл обычно в кодировке Windows-1251, иногда DOS (866) или UTF-8.
 
 export interface ParsedPayment { date: string; amount: number; number: string; payer_name: string; payer_inn: string; purpose: string }
-export interface ParsedOutgoing { date: string; amount: number; number: string; recipient_name: string; purpose: string }
+export interface ParsedOutgoing { date: string; amount: number; number: string; recipient_name: string; recipient_inn: string; purpose: string }
 export interface ParsedStatement { account: string; payments: ParsedPayment[]; outgoing: ParsedOutgoing[]; skipped: number }
 
 export function decodeStatement(bytes: ArrayBuffer): string {
@@ -45,7 +45,7 @@ export function parseStatement(text: string): ParsedStatement {
       const amt = Number((d['Сумма'] ?? '').replace(/\s/g, '').replace(',', '.'));
       const dt = isoDate(d['ДатаСписано'] || d['Дата'] || '');
       if (dt && amt > 0) {
-        outgoing.push({ date: dt, amount: amt, number: (d['Номер'] ?? '').trim(), recipient_name: (d['Получатель1'] || (d['Получатель'] ?? '').replace(/^ИНН\s*\d*\s*/i, '')).trim(), purpose: (d['НазначениеПлатежа'] ?? '').trim() });
+        outgoing.push({ date: dt, amount: amt, number: (d['Номер'] ?? '').trim(), recipient_inn: (d['ПолучательИНН'] ?? '').trim(), recipient_name: (d['Получатель1'] || (d['Получатель'] ?? '').replace(/^ИНН\s*\d*\s*/i, '')).trim(), purpose: (d['НазначениеПлатежа'] ?? '').trim() });
       } else skipped++;
       continue;
     }
@@ -60,4 +60,14 @@ export function parseStatement(text: string): ParsedStatement {
     });
   }
   return { account, payments, outgoing, skipped };
+}
+
+// Все строки выписки в виде операций ДДС: поступления и расходы с контрагентом, его ИНН и назначением.
+export interface StatementRow { date: string; direction: 'in' | 'out'; amount: number; number: string; counterparty_name: string; counterparty_inn: string; purpose: string }
+
+export function statementRows(p: ParsedStatement): StatementRow[] {
+  return [
+    ...p.payments.map((x) => ({ date: x.date, direction: 'in' as const, amount: x.amount, number: x.number, counterparty_name: x.payer_name, counterparty_inn: x.payer_inn, purpose: x.purpose })),
+    ...p.outgoing.map((x) => ({ date: x.date, direction: 'out' as const, amount: x.amount, number: x.number, counterparty_name: x.recipient_name, counterparty_inn: x.recipient_inn, purpose: x.purpose })),
+  ];
 }
