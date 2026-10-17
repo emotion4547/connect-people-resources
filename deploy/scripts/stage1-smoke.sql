@@ -45,6 +45,10 @@ select pg_temp.check('расчёт маржи совпадает с пример
   (select margin from public.calc_margins(private.default_org_id(), 450, 300) where status = 'self_employed') = 144.00);
 select pg_temp.check('у заказчиков нет брошенных ссылок на организацию', (select count(*) from public.clients c where not exists (select 1 from public.organizations o where o.id = c.org_id)) = 0);
 
+select pg_temp.check('у всех объектов есть организация и секрет QR',
+  (select count(*) from public.sites s where not exists (select 1 from public.site_secrets x where x.site_id = s.id)) = 0);
+select pg_temp.check('типы документов заведены', (select count(*) from public.directories where kind = 'document_type') >= 8);
+
 -- Сценарий: администраторы двух организаций, обычный сотрудник
 insert into public.organizations (id, name) values ('b2000000-0000-0000-0000-000000000002', 'ПРОВЕРКА организация 2');
 insert into auth.users (id, email) values

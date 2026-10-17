@@ -49,6 +49,11 @@ const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
 const AdminPermissions = lazy(() => import("./pages/admin/AdminPermissions"));
 const AdminDirectories = lazy(() => import("./pages/admin/AdminDirectories"));
 const Workspace = lazy(() => import("./pages/Workspace"));
+const SitesList = lazy(() => import("./pages/sites/SitesList"));
+const SiteDetail = lazy(() => import("./pages/sites/SiteDetail"));
+const SiteQrPrint = lazy(() => import("./pages/sites/SiteQrPrint"));
+const SiteTablet = lazy(() => import("./pages/sites/SiteTablet"));
+const AdminPositions = lazy(() => import("./pages/admin/AdminPositions"));
 const ClientsList = lazy(() => import("./pages/clients/ClientsList"));
 const ClientDetail = lazy(() => import("./pages/clients/ClientDetail"));
 const SetPassword = lazy(() => import("./pages/SetPassword"));
@@ -199,6 +204,31 @@ const App = () => (
             <Route path="/clients/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <ClientDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/sites" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <SitesList />
+              </ProtectedRoute>
+            } />
+            <Route path="/sites/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <SiteDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/sites/:id/qr-print" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <SiteQrPrint />
+              </ProtectedRoute>
+            } />
+            <Route path="/sites/:id/tablet" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <SiteTablet />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/positions" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminPositions />
               </ProtectedRoute>
             } />
             <Route path="/workspace" element={

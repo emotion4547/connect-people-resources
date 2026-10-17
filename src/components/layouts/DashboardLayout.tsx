@@ -34,6 +34,8 @@ import {
   BookOpen,
   KeyRound,
   Briefcase,
+  Rocket,
+  ListChecks,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -90,6 +92,8 @@ const adminNavItems: NavItem[] = [
   { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
   { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" /> },
+  { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
+  { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
   { label: 'Сотрудники', href: '/admin/staff', icon: <UserCog className="w-5 h-5" /> },
   { label: 'Права ролей', href: '/admin/permissions', icon: <ShieldCheck className="w-5 h-5" /> },
@@ -103,6 +107,7 @@ const adminNavItems: NavItem[] = [
 // Список растёт вместе с шагами этапа 1 (заказы, табель, найм и т. д.).
 const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
+  { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {

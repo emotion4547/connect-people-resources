@@ -213,7 +213,7 @@ select throws_ok($$select public.set_tariff_status('f3000000-0000-0000-0000-0000
 
 -- Объектный тариф важнее общего
 reset role;
-insert into public.sites (id, name) values ('51e00000-0000-0000-0000-000000000001', 'Склад 1');
+insert into public.sites (id, name, client_id) values ('51e00000-0000-0000-0000-000000000001', 'Склад 1', 'c1000000-0000-0000-0000-000000000001');
 insert into public.tariffs (id, org_id, client_id, site_id, position_id, client_rate, worker_rate, valid_from, status)
   select 'f4000000-0000-0000-0000-000000000004', private.default_org_id(), 'c1000000-0000-0000-0000-000000000001', '51e00000-0000-0000-0000-000000000001', p.id, 520, 330, current_date, 'approved'
   from public.positions p where p.org_id = private.default_org_id() and p.name = 'Грузчик';
