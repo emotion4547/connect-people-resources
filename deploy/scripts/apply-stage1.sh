@@ -42,6 +42,7 @@ MIGRATIONS=(
   20261019100000_cashflow.sql
   20261019110000_cashflow_import.sql
   20261019120000_payment_calendar.sql
+  20261019130000_bdr.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -106,6 +107,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261019130000*) q="select to_regprocedure('public.bdr_report(uuid[],date,date)') is not null" ;;
     20261019120000*) q="select to_regprocedure('public.payment_calendar(uuid,date,integer)') is not null" ;;
     20261019110000*) q="select to_regclass('public.cashflow_rules') is not null" ;;
     20261019100000*) q="select to_regclass('public.cashflow_entries') is not null" ;;

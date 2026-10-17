@@ -82,6 +82,7 @@ const Advances = lazy(() => import("./pages/payouts/Advances"));
 const WorkerPayments = lazy(() => import("./pages/worker/WorkerPayments"));
 const WorkerCertificate = lazy(() => import("./pages/worker/WorkerCertificate"));
 const PaymentCalendar = lazy(() => import("./pages/cash/PaymentCalendar"));
+const Bdr = lazy(() => import("./pages/cash/Bdr"));
 const CashReport = lazy(() => import("./pages/cash/CashReport"));
 const CashRules = lazy(() => import("./pages/cash/CashRules"));
 const CashPage = lazy(() => import("./pages/cash/CashPage"));
@@ -404,6 +405,11 @@ const App = () => (
             <Route path="/cash/calendar" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
                 <PaymentCalendar />
+              </ProtectedRoute>
+            } />
+            <Route path="/cash/bdr" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <Bdr />
               </ProtectedRoute>
             } />
             <Route path="/cash/report" element={
