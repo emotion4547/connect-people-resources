@@ -68,7 +68,7 @@ const norm = (s: string) => s.toLowerCase().replace(/ё/g, 'е').replace(/[^a-z�
 
 export const matchColumn = (header: string, entity: ImportEntity): ImportColumn | undefined => {
   const h = norm(header);
-  return entity.columns.find((c) => norm(c.header) === h || c.key === h || (c.aliases ?? []).some((a) => norm(a) === h));
+  return entity.columns.find((c) => norm(c.header) === h || norm(c.key) === h || (c.aliases ?? []).some((a) => norm(a) === h));
 };
 
 // Ячейка → строка для сервера: даты Excel — в ISO, числа без экспоненты, русские слова — в коды.

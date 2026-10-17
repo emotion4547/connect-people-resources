@@ -151,3 +151,82 @@ describe('страницы этапа 3 отрисовываются на отв
     expect(screen.getByText('Скачать шаблон')).toBeTruthy();
   });
 });
+
+describe('импорт: загрузка файла', () => {
+  beforeEach(() => resetFixtures('recruiter'));
+
+  it('показывает итог предпросмотра с причинами по строкам и загружает по кнопке', async () => {
+    fixtures.rpc.import_rows = (args?: Record<string, unknown>) => {
+      const rows = (args?._rows as Record<string, string>[]) ?? [];
+      return rows.map((r, i) => (r.phone && r.phone.length >= 10
+        ? { row_no: i + 2, result: 'created', message: 'Создан кандидат', entity_id: null }
+        : { row_no: i + 2, result: 'error', message: 'Телефон указан неверно: нужно 10 цифр номера', entity_id: null }));
+    };
+    renderPage(<ImportPage />);
+    const input = document.getElementById('import-file') as HTMLInputElement;
+    const csv = 'ФИО;Телефон;Город;Лишнее\nИванов Иван;+7 900 123-45-67;Оренбург;x\nПетров Пётр;нет;Самара;y';
+    fireEvent.change(input, { target: { files: [new File([csv], 'kandidaty.csv', { type: 'text/csv' })] } });
+    expect(await screen.findByText(/создать: 1/)).toBeTruthy();
+    expect(screen.getByText(/ошибок: 1/)).toBeTruthy();
+    expect(screen.getByText('Телефон указан неверно: нужно 10 цифр номера')).toBeTruthy();
+    expect(screen.getByText(/не распознаны/).textContent).toContain('Лишнее');
+    const call = fixtures.calls.find((c) => c.fn === 'import_rows')!;
+    expect(call.args?._apply).toBe(false);
+    fireEvent.click(screen.getByRole('button', { name: /Загрузить 1 строк/ }));
+    await waitFor(() => expect(fixtures.calls.filter((c) => c.fn === 'import_rows').some((c) => c.args?._apply === true)).toBe(true));
+    expect((await screen.findAllByText('Загрузка завершена')).length).toBeGreaterThan(0);
+  });
+
+  it('без обязательного столбца загрузка невозможна', async () => {
+    renderPage(<ImportPage />);
+    const input = document.getElementById('import-file') as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [new File(['ФИО;Город\nИванов;Оренбург'], 'x.csv', { type: 'text/csv' })] } });
+    expect(await screen.findByText('Нет обязательных столбцов')).toBeTruthy();
+    expect(fixtures.calls.some((c) => c.fn === 'import_rows')).toBe(false);
+  });
+});
+
+import { OrderRotation } from '@/components/orders/OrderRotation';
+import { CashAccountsDialog } from '@/components/cash/CashAccountsDialog';
+
+describe('формы этапа 3 отправляют на сервер то, что ввёл человек', () => {
+  beforeEach(() => resetFixtures('director'));
+
+  it('вахта: условия уходят числами', async () => {
+    renderPage(<OrderRotation orderId="o1" dateFrom="2026-11-05" dateTo="2026-11-10" closed={false} canEdit canAccrue onChanged={() => {}} />);
+    fireEvent.click(await screen.findByText('Оформить как вахту'));
+    fireEvent.change(await screen.findByLabelText('Адрес проживания'), { target: { value: 'Общежитие 3' } });
+    fireEvent.change(screen.getByLabelText('Мест'), { target: { value: '4' } });
+    fireEvent.change(screen.getByLabelText('Место в сутки, ₽'), { target: { value: '300' } });
+    fireEvent.change(screen.getByLabelText('Суточные исполнителю, ₽/сут'), { target: { value: '700' } });
+    fireEvent.change(screen.getByLabelText('Проезд исполнителю, ₽'), { target: { value: '1500' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    await waitFor(() => expect(fixtures.calls.some((c) => c.fn === 'set_order_rotation')).toBe(true));
+    const args = fixtures.calls.find((c) => c.fn === 'set_order_rotation')!.args!;
+    expect(args).toMatchObject({ _order_id: 'o1', _arrival: '2026-11-04', _departure: '2026-11-11', _address: 'Общежитие 3', _beds: 4, _bed_cost: 300, _per_diem_worker: 700, _travel_worker: 1500, _meals: false });
+  });
+
+  it('счета: новый счёт с остатком уходит на сервер', async () => {
+    const accounts = [{ id: 'a1', kind: 'bank', name: 'Т-Банк', bank_name: null, account_number: null, opening_balance: 100, opening_date: '2026-10-01', is_active: true }];
+    renderPage(<CashAccountsDialog orgId="org1" accounts={accounts} open onOpenChange={() => {}} onSaved={() => {}} />);
+    fireEvent.click(await screen.findByText('Добавить счёт'));
+    fireEvent.change(await screen.findByLabelText('Название'), { target: { value: 'Касса офиса' } });
+    fireEvent.change(screen.getByLabelText('Остаток на начало, ₽'), { target: { value: '12 500,50' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    await waitFor(() => expect(fixtures.calls.some((c) => c.fn === 'save_cash_account')).toBe(true));
+    expect(fixtures.calls.find((c) => c.fn === 'save_cash_account')!.args).toMatchObject({ _org_id: 'org1', _id: null, _name: 'Касса офиса', _opening_balance: 12500.5 });
+  });
+
+  it('БДР: ячейка плана сохраняется при выходе из неё', async () => {
+    fixtures.rpc.bdr_report = [];
+    renderPage(<Bdr />);
+    fireEvent.mouseDown(await screen.findByRole('tab', { name: 'План' }), { button: 0 });
+    const cell = await screen.findByLabelText(/Выручка, янв/);
+    fireEvent.change(cell, { target: { value: '150 000' } });
+    fireEvent.blur(cell);
+    await waitFor(() => expect(fixtures.calls.some((c) => c.fn === 'save_bdr_plan')).toBe(true));
+    const args = fixtures.calls.find((c) => c.fn === 'save_bdr_plan')!.args!;
+    expect(args).toMatchObject({ _org_id: 'org1', _article: 'revenue', _amount: 150000, _client_id: null });
+    expect(String(args._month)).toMatch(/-01-01$/);
+  });
+});
