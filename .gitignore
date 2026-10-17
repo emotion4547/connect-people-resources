@@ -30,3 +30,4 @@ deploy/supabase/volumes/storage
 .agents/
 supabase/.temp/
 supabase/.branches/
+.live-accounts.json
