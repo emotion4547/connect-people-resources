@@ -51,6 +51,9 @@ select pg_temp.check('типы документов заведены', (select c
 
 select pg_temp.check('у каждой смены есть ставки', (select count(*) from public.shifts sh where not exists (select 1 from public.shift_rates r where r.shift_id = sh.id)) = 0);
 
+select pg_temp.check('у каждого исполнителя есть запись workers',
+  (select count(*) from public.user_roles ur where ur.role = 'worker' and not exists (select 1 from public.workers w where w.user_id = ur.user_id)) = 0);
+
 -- Сценарий: администраторы двух организаций, обычный сотрудник
 insert into public.organizations (id, name) values ('b2000000-0000-0000-0000-000000000002', 'ПРОВЕРКА организация 2');
 insert into auth.users (id, email) values

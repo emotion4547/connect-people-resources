@@ -49,6 +49,7 @@ const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
 const AdminPermissions = lazy(() => import("./pages/admin/AdminPermissions"));
 const AdminDirectories = lazy(() => import("./pages/admin/AdminDirectories"));
 const Workspace = lazy(() => import("./pages/Workspace"));
+const PlanningGrid = lazy(() => import("./pages/planning/PlanningGrid"));
 const OrdersList = lazy(() => import("./pages/orders/OrdersList"));
 const OrderDetail = lazy(() => import("./pages/orders/OrderDetail"));
 const SitesList = lazy(() => import("./pages/sites/SitesList"));
@@ -206,6 +207,11 @@ const App = () => (
             <Route path="/clients/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <ClientDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/planning" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <PlanningGrid />
               </ProtectedRoute>
             } />
             <Route path="/orders" element={
