@@ -14,6 +14,9 @@ const Workspace: React.FC = () => {
   // Сотрудникам, у которых уже есть рабочие разделы, сразу открываем первый из них.
   if (loading) return null;
   if (role === 'client_admin' || role === 'client_manager') return <Navigate to="/client/today" replace />;
+  // У каждой роли своя стартовая страница: то, с чего начинается рабочий день.
+  const HOME: Record<string, string> = { director: '/dashboards', accountant: '/dashboards', sales: '/deals', site_manager: '/planning', recruiter: '/hiring/today' };
+  if (role && HOME[role]) return <Navigate to={HOME[role]} replace />;
   if (can('clients', 'view')) return <Navigate to="/clients" replace />;
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

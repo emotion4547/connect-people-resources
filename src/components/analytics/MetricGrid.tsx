@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtDate, fmtMoney } from '@/lib/format';
 import { ArrowDown, ArrowUp, Download } from 'lucide-react';
 
@@ -83,8 +83,8 @@ export const MetricGrid: React.FC<Props> = ({ orgIds, from, to, clientId = null,
           <DialogHeader><DialogTitle>{open?.name}: {open ? fmtMetric(open.value, open.unit) : ''}</DialogTitle></DialogHeader>
           <div className="flex justify-end">
             <Button variant="outline" size="sm" className="gap-2" disabled={!records.length}
-              onClick={() => downloadCsv(`${open?.metric}-${from}-${to}.csv`, ['Запись', 'Подробности', 'Дата', 'Значение'], records.map((r) => [r.label, r.detail, fmtDate(r.record_date), r.amount]))}>
-              <Download className="w-4 h-4" /> В Excel (CSV)
+              onClick={() => downloadExcel(`${open?.metric}-${from}-${to}.xlsx`, ['Запись', 'Подробности', 'Дата', 'Значение'], records.map((r) => [r.label, r.detail, fmtDate(r.record_date), r.amount]))}>
+              <Download className="w-4 h-4" /> В Excel
             </Button>
           </div>
           <Table>

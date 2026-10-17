@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useOrg } from '@/contexts/OrgContext';
 import { useToast } from '@/hooks/use-toast';
 import { rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { addDays, fmtDate, today } from '@/lib/format';
 import { mondayOf } from '@/lib/planningMeta';
 import PageMeta from '@/components/PageMeta';
@@ -43,7 +43,7 @@ const RotationCalendar: React.FC = () => {
   const housing = Array.from(new Map(load.map((l) => [l.order_id, l])).values());
   const loadOf = (orderId: string, d: string) => load.find((l) => l.order_id === orderId && l.day === d);
 
-  const exportCsv = () => downloadCsv(`rotations-${from}.csv`, ['Заказчик', 'Объект', 'Исполнитель', 'Заезд', 'Выезд', 'Жильё'], rows.map((r) => [r.client_name, r.site_name, r.worker_name, fmtDate(r.arrival_date), fmtDate(r.departure_date), r.housing_address]));
+  const exportCsv = () => downloadExcel(`rotations-${from}.xlsx`, ['Заказчик', 'Объект', 'Исполнитель', 'Заезд', 'Выезд', 'Жильё'], rows.map((r) => [r.client_name, r.site_name, r.worker_name, fmtDate(r.arrival_date), fmtDate(r.departure_date), r.housing_address]));
 
   return (
     <AppLayout>
@@ -54,7 +54,7 @@ const RotationCalendar: React.FC = () => {
             <h1 className="text-3xl font-bold mb-2">Календарь вахт</h1>
             <p className="text-muted-foreground">Строки — исполнители на вахте, столбцы — дни. Условия вахты задаются в карточке заказа.</p>
           </div>
-          <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> CSV</Button>
+          <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> Excel</Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

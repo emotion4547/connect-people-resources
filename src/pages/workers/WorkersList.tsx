@@ -15,7 +15,7 @@ import { db, rpc } from '@/lib/db';
 import { fmtDate } from '@/lib/format';
 import { WORKER_STATUSES } from '@/lib/hiringMeta';
 import PageMeta from '@/components/PageMeta';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { Download, Search } from 'lucide-react';
 
 interface WorkerRow { user_id: string; full_name: string; phone: string | null; city: string | null; status: string; tax_status: string | null; citizenship: string | null; rating: number | null; admitted_at: string | null }
@@ -69,7 +69,7 @@ const WorkersList: React.FC = () => {
     if (term) q = q.or(`full_name.ilike.%${term}%,phone.ilike.%${term}%`);
     const { data, error } = await q;
     if (error) { toast({ title: 'Не удалось выгрузить', description: error.message, variant: 'destructive' }); return; }
-    downloadCsv('ispolniteli.csv', ['ФИО', 'Телефон', 'Город', 'Статус', 'Налоговый статус', 'Гражданство', 'Рейтинг', 'Допущен'],
+    downloadExcel('ispolniteli.xlsx', ['ФИО', 'Телефон', 'Город', 'Статус', 'Налоговый статус', 'Гражданство', 'Рейтинг', 'Допущен'],
       (data ?? []).map((w: WorkerRow) => [w.full_name, w.phone, w.city, WORKER_STATUSES[w.status], w.tax_status ? TAX[w.tax_status] : '', w.citizenship, w.rating, w.admitted_at ? fmtDate(w.admitted_at.slice(0, 10)) : '']));
   };
 
@@ -108,7 +108,7 @@ const WorkersList: React.FC = () => {
                 <Select value={status} onValueChange={setStatus}><SelectTrigger className="w-44" aria-label="Статус"><SelectValue /></SelectTrigger><SelectContent><SelectItem value={ALL}>Все статусы</SelectItem>{Object.entries(WORKER_STATUSES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select>
                 <Select value={tax} onValueChange={setTax}><SelectTrigger className="w-48" aria-label="Налоговый статус"><SelectValue /></SelectTrigger><SelectContent><SelectItem value={ALL}>Любой налоговый статус</SelectItem>{Object.entries(TAX).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select>
                 <Select value={citizenship} onValueChange={setCitizenship}><SelectTrigger className="w-44" aria-label="Гражданство"><SelectValue /></SelectTrigger><SelectContent><SelectItem value={ALL}>Любое гражданство</SelectItem><SelectItem value="ru">Россия</SelectItem><SelectItem value="foreign">Иностранные</SelectItem></SelectContent></Select>
-                <Button variant="outline" className="gap-2" onClick={exportCsv}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
+                <Button variant="outline" className="gap-2" onClick={exportCsv}><Download className="w-4 h-4" /> В Excel</Button>
               </div>
               {permsLoading ? <p className="text-muted-foreground">Загрузка…</p> : (<>
                 <Table>

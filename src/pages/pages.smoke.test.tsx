@@ -53,6 +53,13 @@ describe('страницы этапа 3 отрисовываются на отв
     { metric: 'revenue', name: 'Выручка', unit: '₽', value: 13500, prev_value: null, delta: null, sort_order: 50 },
   ];
 
+  it('Аналитика: график за 12 месяцев', async () => {
+    fixtures.rpc.analytics_compare = metrics;
+    fixtures.rpc.analytics_series = [{ bucket: month, needed: 6, confirmed: 4, started_needed: 4, on_site: 2, started_assigned: 4, no_shows: 1, revenue: '13500', worker_costs: '9000', margin: '4500' }];
+    renderPage(<AnalyticsPage />);
+    expect(await screen.findByRole('img', { name: /График выручки/ })).toBeTruthy();
+  });
+
   it('Аналитика: карточки и открытие записей по клику', async () => {
     fixtures.rpc.analytics_compare = metrics;
     fixtures.rpc.analytics_records = [{ record_id: 'r1', kind: 'shift', label: 'Заказчик · Склад', detail: 'нужно 4, подтвердили 3', record_date: today, amount: 3, link: '/orders/1' }];

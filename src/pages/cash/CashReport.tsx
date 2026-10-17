@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useOrg } from '@/contexts/OrgContext';
 import { rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtMoney, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { Download } from 'lucide-react';
@@ -65,7 +65,7 @@ const CashReport: React.FC = () => {
       return r;
     });
     body.push(['Сальдо', '', ...months.map((m) => total(m, 'in') - total(m, 'out')), months.reduce((s, m) => s + total(m, 'in') - total(m, 'out'), 0)]);
-    downloadCsv(`dds-${from}-${to}.csv`, header, [...body, ['Остаток на начало', '', opening], ['Остаток на конец', '', closing]]);
+    downloadExcel(`dds-${from}-${to}.xlsx`, header, [...body, ['Остаток на начало', '', opening], ['Остаток на конец', '', closing]]);
   };
 
   return (
@@ -77,7 +77,7 @@ const CashReport: React.FC = () => {
             <h1 className="text-3xl font-bold mb-2">Отчёт ДДС</h1>
             <p className="text-muted-foreground">Статьи × месяцы. Перемещения между своими счетами в отчёт не входят. Нажмите на сумму, чтобы увидеть операции.</p>
           </div>
-          <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
+          <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel</Button>
         </div>
         <div className="flex flex-wrap items-end gap-3">
           <div><Label htmlFor="r-from">С</Label><Input id="r-from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></div>

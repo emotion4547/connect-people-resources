@@ -18,7 +18,7 @@ import { db, rpc } from '@/lib/db';
 import { addDays, fmtDate, today } from '@/lib/format';
 import { TIMESHEET_STATUSES, fmtDateTime, type Timesheet } from '@/lib/timesheetsMeta';
 import PageMeta from '@/components/PageMeta';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { Download, Plus } from 'lucide-react';
 
 interface Option { id: string; name: string }
@@ -70,7 +70,7 @@ const TimesheetsList: React.FC = () => {
 
   const name = (list: Option[], id: string) => list.find((x) => x.id === id)?.name ?? '—';
 
-  const exportCsv = () => downloadCsv('tabeli.csv', ['Объект', 'С', 'По', 'Статус'],
+  const exportCsv = () => downloadExcel('tabeli.xlsx', ['Объект', 'С', 'По', 'Статус'],
     rows.map((t) => [name(sites, t.site_id), fmtDate(t.period_from), fmtDate(t.period_to), TIMESHEET_STATUSES[t.status]]));
 
   const build = async () => {
@@ -137,7 +137,7 @@ const TimesheetsList: React.FC = () => {
                 {Object.entries(TIMESHEET_STATUSES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Button variant="outline" className="gap-2 ml-3" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
+            <Button variant="outline" className="gap-2 ml-3" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel</Button>
             {permsLoading || loading ? <p className="text-muted-foreground">Загрузка…</p> : (
               <Table>
                 <TableHeader><TableRow><TableHead>Объект</TableHead><TableHead>Период</TableHead><TableHead>Статус</TableHead><TableHead>Ответить до</TableHead></TableRow></TableHeader>

@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtDate, fmtMoney } from '@/lib/format';
 import { LINE_STATUSES, TIMESHEET_STATUSES, fmtDateTime, hm, type Timesheet, type TimesheetLine } from '@/lib/timesheetsMeta';
 import PageMeta from '@/components/PageMeta';
@@ -70,7 +70,7 @@ const ClientTimesheetDetail: React.FC = () => {
   const open = ts.status === 'pending' || ts.status === 'disputed';
   const hasPending = lines.some((l) => l.line_status === 'pending');
 
-  const exportCsv = () => downloadCsv(`tabel-${siteName}-${ts.period_from}-${ts.period_to}.csv`,
+  const exportCsv = () => downloadExcel(`tabel-${siteName}-${ts.period_from}-${ts.period_to}.xlsx`,
     ['Дата', 'Исполнитель', 'Приход', 'Уход', 'Часы', 'Статус'],
     lines.map((l) => [fmtDate(l.shift_date), l.worker_name, hm(l.check_in_at), hm(l.check_out_at), Number(l.approved_hours ?? 0), l.line_status ? LINE_STATUSES[l.line_status] : '']));
 

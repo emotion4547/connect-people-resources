@@ -8,6 +8,7 @@ import { useOrg } from '@/contexts/OrgContext';
 import { addDays, monthEnd, monthStart, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { MetricGrid } from '@/components/analytics/MetricGrid';
+import { TrendChart } from '@/components/analytics/TrendChart';
 
 // Все показатели, доступные пользователю, за выбранный период. Дашборды отделов собираются из тех же карточек.
 const AnalyticsPage: React.FC = () => {
@@ -40,6 +41,7 @@ const AnalyticsPage: React.FC = () => {
           )}
         </div>
         <MetricGrid orgIds={ids} from={from} to={to} />
+        <TrendChart orgIds={ids} />
       </div>
     </AppLayout>
   );

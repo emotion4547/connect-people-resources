@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { useToast } from '@/hooks/use-toast';
 import { useOrg } from '@/contexts/OrgContext';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtDate, fmtMoney, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { AlertTriangle, Download } from 'lucide-react';
@@ -68,7 +68,7 @@ const PaymentCalendar: React.FC = () => {
 
   const remove = async (i: Item) => { await db('planned_cash_items').delete().eq('id', i.id); load(); };
 
-  const exportCsv = () => downloadCsv(`kalendar-${today()}.csv`,
+  const exportCsv = () => downloadExcel(`kalendar-${today()}.xlsx`,
     ['Дата', 'Остаток на начало', 'Поступления по счетам', 'Поступления по плану', 'Прочие поступления', 'Реестры в работе', 'К выплате', 'Выплаты по плану смен', 'Прочие расходы', 'Остаток на конец'],
     days.map((d) => [d.day, Number(d.balance_open), Number(d.in_invoices), Number(d.in_plan), Number(d.in_manual), Number(d.out_registries), Number(d.out_accrued), Number(d.out_plan), Number(d.out_manual), Number(d.balance_close)]));
 
@@ -86,7 +86,7 @@ const PaymentCalendar: React.FC = () => {
               <SelectTrigger className="w-36" aria-label="Горизонт"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="14">2 недели</SelectItem><SelectItem value="28">4 недели</SelectItem><SelectItem value="56">8 недель</SelectItem></SelectContent>
             </Select>
-            <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!days.length}><Download className="w-4 h-4" /> CSV</Button>
+            <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!days.length}><Download className="w-4 h-4" /> Excel</Button>
           </div>
         </div>
 

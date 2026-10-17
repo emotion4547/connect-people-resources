@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useOrg } from '@/contexts/OrgContext';
 import { useToast } from '@/hooks/use-toast';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { addDays, fmtDate, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { Download } from 'lucide-react';
@@ -80,7 +80,7 @@ const DocumentControl: React.FC = () => {
     return <span className={cls}>{fmtDate(r.valid_until)} <span className="text-xs">({r.days_left! < 0 ? `просрочен на ${-r.days_left!} дн.` : `${r.days_left} дн.`})</span></span>;
   };
 
-  const exportCsv = () => downloadCsv(`documents-${today()}.csv`, ['Исполнитель', 'Телефон', 'Документ', 'Номер', 'Действует до', 'Дней', 'Статус', 'Ближайший объект'],
+  const exportCsv = () => downloadExcel(`documents-${today()}.xlsx`, ['Исполнитель', 'Телефон', 'Документ', 'Номер', 'Действует до', 'Дней', 'Статус', 'Ближайший объект'],
     rows.map((r) => [r.worker_name, r.phone, r.type_name, r.number_masked, r.valid_until ? fmtDate(r.valid_until) : 'бессрочно', r.days_left ?? '', r.status === 'verified' ? 'проверен' : 'не проверен', r.next_site]));
 
   return (
@@ -104,7 +104,7 @@ const DocumentControl: React.FC = () => {
                 <SelectContent><SelectItem value={ALL}>Все объекты</SelectItem>{sites.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select>
               <Input aria-label="Поиск" className="w-56" placeholder="Имя или телефон" value={search} onChange={(e) => setSearch(e.target.value)} />
               <div className="ml-auto flex gap-2">
-                <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> CSV</Button>
+                <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> Excel</Button>
                 <Button onClick={remind} disabled={!chosen.size || busy}>Напомнить выбранным ({chosen.size})</Button>
               </div>
             </div>

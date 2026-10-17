@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useOrg } from '@/contexts/OrgContext';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtMoney } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { Download } from 'lucide-react';
@@ -71,9 +71,9 @@ const Bdr: React.FC = () => {
   const exportCsv = () => {
     const header = ['Статья', 'План', 'Факт', 'Отклонение, ₽', 'Отклонение, %', ...months.flatMap((m) => [`${mlabel(m)} план`, `${mlabel(m)} факт`])];
     const body = totals.map((t) => [t.name, t.plan, t.fact, deviation(t), devPct(t) ?? '', ...months.flatMap((m) => { const c = cell(t.article, m); return [c?.plan ?? 0, c?.fact ?? 0]; })]);
-    downloadCsv(`bdr-${from}-${to}.csv`, header, body);
+    downloadExcel(`bdr-${from}-${to}.xlsx`, header, body);
   };
-  const exportSlices = () => downloadCsv(`bdr-${dimension}-${from}-${to}.csv`, ['Название', 'Выручка', 'Затраты на исполнителей', 'Маржа', 'Маржа, %'],
+  const exportSlices = () => downloadExcel(`bdr-${dimension}-${from}-${to}.xlsx`, ['Название', 'Выручка', 'Затраты на исполнителей', 'Маржа', 'Маржа, %'],
     slices.map((s) => [s.name, s.revenue, s.worker_costs, s.margin, s.margin_pct ?? '']));
 
   return (
@@ -107,7 +107,7 @@ const Bdr: React.FC = () => {
 
           <TabsContent value="report">
             <Card><CardContent className="pt-6 overflow-x-auto space-y-3">
-              <div className="flex justify-end"><Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel (CSV)</Button></div>
+              <div className="flex justify-end"><Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel</Button></div>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -165,7 +165,7 @@ const Bdr: React.FC = () => {
                   <SelectTrigger className="w-60" aria-label="Разрез"><SelectValue /></SelectTrigger>
                   <SelectContent>{DIMENSIONS.map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
                 </Select>
-                <Button variant="outline" className="gap-2" onClick={exportSlices} disabled={!slices.length}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
+                <Button variant="outline" className="gap-2" onClick={exportSlices} disabled={!slices.length}><Download className="w-4 h-4" /> В Excel</Button>
               </div>
               <Table>
                 <TableHeader><TableRow><TableHead>Название</TableHead><TableHead className="text-right">Выручка</TableHead><TableHead className="text-right">Затраты на исполнителей</TableHead><TableHead className="text-right">Маржа</TableHead><TableHead className="text-right">%</TableHead></TableRow></TableHeader>

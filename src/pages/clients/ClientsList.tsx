@@ -16,7 +16,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { db } from '@/lib/db';
 import { CLIENT_STATUSES, type StaffOption } from '@/lib/clientsMeta';
 import PageMeta from '@/components/PageMeta';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { Download, Plus, Search } from 'lucide-react';
 
 interface ClientRow {
@@ -79,7 +79,7 @@ const ClientsList: React.FC = () => {
     const { data, error } = await q;
     if (error) { toast({ title: 'Не удалось выгрузить', description: error.message, variant: 'destructive' }); return; }
     const who = (id: string | null) => staff.find((x) => x.user_id === id)?.full_name ?? '';
-    downloadCsv('zakazchiki.csv', ['Название', 'ИНН', 'Город', 'Статус', 'Менеджер продаж', 'Менеджер объектов'],
+    downloadExcel('zakazchiki.xlsx', ['Название', 'ИНН', 'Город', 'Статус', 'Менеджер продаж', 'Менеджер объектов'],
       (data ?? []).map((c: ClientRow) => [c.name, c.inn, c.city, CLIENT_STATUSES[c.status], who(c.sales_manager_id), who(c.sites_manager_id)]));
   };
 
@@ -139,7 +139,7 @@ const ClientsList: React.FC = () => {
                   {Object.entries(CLIENT_STATUSES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Button variant="outline" className="gap-2" onClick={exportCsv}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
+              <Button variant="outline" className="gap-2" onClick={exportCsv}><Download className="w-4 h-4" /> В Excel</Button>
             </div>
 
             {permsLoading || loading ? <p className="text-muted-foreground">Загрузка…</p> : !can('clients', 'view') ? (

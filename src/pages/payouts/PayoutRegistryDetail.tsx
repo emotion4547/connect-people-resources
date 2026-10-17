@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { db, invokeFunction, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { buildPaymentOrders, encodeCp1251, type PayLine } from '@/lib/bankFiles';
 import { fmtDate, fmtMoney } from '@/lib/format';
 import { LINE_STATUSES, REGISTRY_CHANNELS, REGISTRY_KINDS, REGISTRY_STATUSES, type Registry, type RegistryLine } from '@/lib/payoutMeta';
@@ -53,7 +53,7 @@ const PayoutRegistryDetail: React.FC = () => {
   const downloadTable = async () => {
     const rows = await exportRows();
     if (!rows || !reg) return;
-    downloadCsv(`reestr-${reg.number?.replace(/[^\w-]+/g, '_')}.csv`, ['Получатель', 'Реквизиты', 'Сумма', 'Назначение'], rows.map((r) => [r.worker_name, r.requisites, r.amount, r.purpose]));
+    downloadExcel(`reestr-${reg.number?.replace(/[^\w-]+/g, '_')}.csv`, ['Получатель', 'Реквизиты', 'Сумма', 'Назначение'], rows.map((r) => [r.worker_name, r.requisites, r.amount, r.purpose]));
   };
 
   const downloadBankFile = async () => {

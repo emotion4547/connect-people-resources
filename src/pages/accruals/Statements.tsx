@@ -12,7 +12,7 @@ import { useOrg } from '@/contexts/OrgContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useAuth } from '@/contexts/AuthContext';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtDate, fmtMoney, monthEnd, monthStart } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { Download, Printer } from 'lucide-react';
@@ -70,10 +70,10 @@ const Statements: React.FC = () => {
     load();
   };
 
-  const exportWorkers = () => downloadCsv(`vedomost-ispolniteli-${from}-${to}.csv`,
+  const exportWorkers = () => downloadExcel(`vedomost-ispolniteli-${from}-${to}.xlsx`,
     ['Исполнитель', 'Налоговый статус', 'Смен', 'Часов', 'Начислено', 'Бонусы', 'Удержания', 'Корректировки', 'К выплате', 'Налоги и взносы', 'Комиссия выплаты'],
     workers.map((r) => [r.worker_name, r.tax_status ? TAX[r.tax_status] : '', r.shifts, n(r.hours), n(r.accrued), n(r.bonuses), n(r.deductions), n(r.corrections), n(r.to_pay), n(r.taxes), n(r.payout_fee)]));
-  const exportClients = () => downloadCsv(`vedomost-zakazchiki-${from}-${to}.csv`,
+  const exportClients = () => downloadExcel(`vedomost-zakazchiki-${from}-${to}.xlsx`,
     ['Заказчик', 'Объект', 'Часов', 'К выставлению', 'К выплате', 'Налоги и комиссии', 'Себестоимость', 'Маржа', 'Маржа, %'],
     clients.map((r) => [r.client_name, r.site_name, n(r.hours), n(r.to_invoice), n(r.payout), n(r.taxes_and_fees), n(r.cost), n(r.margin), r.margin_pct]));
 
@@ -132,7 +132,7 @@ const Statements: React.FC = () => {
               </Tabs>
               <Button variant="outline" className="gap-2 ml-auto" onClick={() => window.print()} disabled={loading}><Printer className="w-4 h-4" /> Печать</Button>
               <Button variant="outline" className="gap-2" onClick={tab === 'workers' ? exportWorkers : exportClients} disabled={loading}>
-                <Download className="w-4 h-4" /> В Excel (CSV)
+                <Download className="w-4 h-4" /> В Excel
               </Button>
             </div>
 

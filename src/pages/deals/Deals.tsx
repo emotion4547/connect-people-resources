@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOrg } from '@/contexts/OrgContext';
 import { useToast } from '@/hooks/use-toast';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtDate, fmtMoney, today } from '@/lib/format';
 import { DEAL_STAGES, SOURCES, stageLabel, type Deal } from '@/lib/dealMeta';
 import PageMeta from '@/components/PageMeta';
@@ -96,7 +96,7 @@ const Deals: React.FC = () => {
   const monthKeys = Array.from({ length: 12 }, (_, i) => `${year}-${String(i + 1).padStart(2, '0')}-01`);
   const factCell = (m: string, k: string) => facts.find((f) => f.manager_id === m && f.month === k);
 
-  const exportCsv = () => downloadCsv(`deals-${today()}.csv`, ['Сделка', 'Заказчик', 'Этап', 'Ответственный', 'Выручка в месяц', 'Маржа в месяц', 'Следующий шаг', 'Дата шага'],
+  const exportCsv = () => downloadExcel(`deals-${today()}.xlsx`, ['Сделка', 'Заказчик', 'Этап', 'Ответственный', 'Выручка в месяц', 'Маржа в месяц', 'Следующий шаг', 'Дата шага'],
     visible.map((d) => [d.title, d.company, stageLabel(d.stage), ownerName(d.owner_id), d.expected_revenue, d.expected_margin, d.next_step, d.next_step_date ? fmtDate(d.next_step_date) : '']));
 
   return (
@@ -109,7 +109,7 @@ const Deals: React.FC = () => {
             <p className="text-muted-foreground">Новые заявки с сайта и из саморегистрации попадают сюда сами. Сумма этапа — ожидаемая выручка в месяц, в скобках — взвешенная по вероятности этапа.</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!visible.length}><Download className="w-4 h-4" /> CSV</Button>
+            <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!visible.length}><Download className="w-4 h-4" /> Excel</Button>
             <Button className="gap-2" onClick={() => setCreating(true)}><Plus className="w-4 h-4" /> Новая сделка</Button>
           </div>
         </div>

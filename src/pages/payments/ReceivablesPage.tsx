@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtMoney, monthStart, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { Download } from 'lucide-react';
@@ -33,7 +33,7 @@ const ReceivablesPage: React.FC = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  const exportCsv = () => downloadCsv(`debitorka-${today()}.csv`,
+  const exportCsv = () => downloadExcel(`debitorka-${today()}.xlsx`,
     ['Заказчик', 'Выставлено', 'Оплачено', 'Долг', 'Не просрочено', 'Просрочка 0–30', '31–60', 'Больше 60', 'Не разнесено'],
     rows.map((r) => [r.client_name, Number(r.invoiced), Number(r.paid), Number(r.debt), Number(r.not_due), Number(r.overdue_30), Number(r.overdue_60), Number(r.overdue_60p), Number(r.unallocated)]));
 
@@ -46,7 +46,7 @@ const ReceivablesPage: React.FC = () => {
             <h1 className="text-3xl font-bold mb-2">Дебиторка</h1>
             <p className="text-muted-foreground">Просрочка считается от срока оплаты по договору. Заказчик на контроле: долг больше лимита или просрочка дольше допустимой — заказы принимает только руководитель.</p>
           </div>
-          <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel (CSV)</Button>
+          <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!rows.length}><Download className="w-4 h-4" /> В Excel</Button>
         </div>
         <Card>
           <CardContent className="pt-6">

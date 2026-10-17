@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { db, rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { fmtMoney, monthEnd, monthStart } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { Download } from 'lucide-react';
@@ -58,8 +58,8 @@ const ClientAnalytics: React.FC = () => {
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0"><CardTitle className="text-lg">По объектам</CardTitle>
             <Button variant="outline" size="sm" className="gap-2" disabled={!all.length}
-              onClick={() => downloadCsv(`objects-${from}-${to}.csv`, ['Объект', 'Нужно', 'Подтвердили', 'На месте', 'Часы', 'Сумма', 'Оценка'], all.map((r) => [r.site_name, r.needed, r.confirmed, r.on_site, r.hours, r.amount, r.avg_rating ?? '']))}>
-              <Download className="w-4 h-4" /> В Excel (CSV)</Button></CardHeader>
+              onClick={() => downloadExcel(`objects-${from}-${to}.xlsx`, ['Объект', 'Нужно', 'Подтвердили', 'На месте', 'Часы', 'Сумма', 'Оценка'], all.map((r) => [r.site_name, r.needed, r.confirmed, r.on_site, r.hours, r.amount, r.avg_rating ?? '']))}>
+              <Download className="w-4 h-4" /> В Excel</Button></CardHeader>
           <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader><TableRow><TableHead>Объект</TableHead><TableHead className="text-right">Нужно</TableHead><TableHead className="text-right">Подтвердили</TableHead><TableHead className="text-right">На месте</TableHead><TableHead className="text-right">Часы</TableHead><TableHead className="text-right">Сумма</TableHead><TableHead className="text-right">Оценка</TableHead></TableRow></TableHeader>

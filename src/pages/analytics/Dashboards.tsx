@@ -12,10 +12,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOrg } from '@/contexts/OrgContext';
 import { useToast } from '@/hooks/use-toast';
 import { rpc } from '@/lib/db';
-import { downloadCsv } from '@/lib/csv';
+import { downloadExcel } from '@/lib/csv';
 import { addDays, fmtDate, fmtMoney, monthEnd, monthStart, today } from '@/lib/format';
 import PageMeta from '@/components/PageMeta';
 import { MetricGrid } from '@/components/analytics/MetricGrid';
+import { TrendChart } from '@/components/analytics/TrendChart';
 import { stageLabel } from '@/lib/dealMeta';
 import { Download } from 'lucide-react';
 
@@ -116,8 +117,8 @@ const Dashboards: React.FC = () => {
     );
   };
 
-  const exportClients = () => downloadCsv(`clients-${from}-${to}.csv`, ['Заказчик', 'Выручка', 'Маржа', 'Маржа, %', 'Прошлый период, %'], clients.map((c) => [c.client_name, c.revenue, c.margin, c.margin_pct ?? '', c.prev_margin_pct ?? '']));
-  const exportSites = () => downloadCsv(`sites-${from}-${to}.csv`, ['Заказчик', 'Объект', 'Нужно', 'Подтвердили', 'На месте', 'Неявки'], sites.map((s) => [s.client_name, s.site_name, s.needed, s.confirmed, s.on_site, s.no_shows]));
+  const exportClients = () => downloadExcel(`clients-${from}-${to}.xlsx`, ['Заказчик', 'Выручка', 'Маржа', 'Маржа, %', 'Прошлый период, %'], clients.map((c) => [c.client_name, c.revenue, c.margin, c.margin_pct ?? '', c.prev_margin_pct ?? '']));
+  const exportSites = () => downloadExcel(`sites-${from}-${to}.xlsx`, ['Заказчик', 'Объект', 'Нужно', 'Подтвердили', 'На месте', 'Неявки'], sites.map((s) => [s.client_name, s.site_name, s.needed, s.confirmed, s.on_site, s.no_shows]));
 
   const planCard = plan && (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -160,6 +161,7 @@ const Dashboards: React.FC = () => {
           <TabsContent value="director" className="space-y-6">
             <MetricGrid orgIds={ids} from={from} to={to} only={['revenue', 'margin_amount', 'margin_pct', 'staffing', 'no_show', 'overdue_receivables']} />
             {planCard}
+            <TrendChart orgIds={ids} />
             {cash && (
               <Card><CardContent className="pt-5 flex flex-wrap items-center justify-between gap-3">
                 <div><p className="text-sm text-muted-foreground">Остаток денег</p><p className="text-2xl font-bold">{fmtMoney(cash.balance)}</p></div>
@@ -175,7 +177,7 @@ const Dashboards: React.FC = () => {
             {counterCards('ops', ['unconfirmed_tomorrow', 'timesheets_pending', 'timesheets_disputed', 'rating_avg'])}
             <Card>
               <CardHeader className="flex-row items-center justify-between space-y-0"><CardTitle className="text-lg">Укомплектованность по объектам</CardTitle>
-                <Button variant="outline" size="sm" className="gap-2" onClick={exportSites} disabled={!sites.length}><Download className="w-4 h-4" /> CSV</Button></CardHeader>
+                <Button variant="outline" size="sm" className="gap-2" onClick={exportSites} disabled={!sites.length}><Download className="w-4 h-4" /> Excel</Button></CardHeader>
               <CardContent className="overflow-x-auto">
                 <Table>
                   <TableHeader><TableRow><TableHead>Объект</TableHead><TableHead className="text-right">Сегодня</TableHead><TableHead className="text-right">Неделя вперёд</TableHead><TableHead className="text-right">Период</TableHead><TableHead className="text-right">Выход</TableHead><TableHead className="text-right">Неявки</TableHead></TableRow></TableHeader>
@@ -262,7 +264,7 @@ const ClientTables: React.FC<{ clients: ClientRow[]; onExport: () => void }> = (
   <div className="grid gap-4 lg:grid-cols-2">
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0"><CardTitle className="text-lg">Топ-10 заказчиков</CardTitle>
-        <Button variant="outline" size="sm" className="gap-2" onClick={onExport} disabled={!clients.length}><Download className="w-4 h-4" /> CSV</Button></CardHeader>
+        <Button variant="outline" size="sm" className="gap-2" onClick={onExport} disabled={!clients.length}><Download className="w-4 h-4" /> Excel</Button></CardHeader>
       <CardContent>
         <Table><TableHeader><TableRow><TableHead>Заказчик</TableHead><TableHead className="text-right">Выручка</TableHead><TableHead className="text-right">Маржа</TableHead><TableHead className="text-right">%</TableHead></TableRow></TableHeader>
           <TableBody>{clients.slice(0, 10).map((c) => (
