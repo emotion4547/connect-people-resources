@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { OrgSwitcher } from '@/components/OrgSwitcher';
+import { usePermissions } from '@/hooks/usePermissions';
 import {
   Tooltip,
   TooltipContent,
@@ -32,6 +33,7 @@ import {
   ShieldCheck,
   BookOpen,
   KeyRound,
+  Briefcase,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -58,7 +60,7 @@ interface NavItem {
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  role: 'hr' | 'worker' | 'admin';
+  role: 'hr' | 'worker' | 'admin' | 'staff';
 }
 
 const hrNavItems: NavItem[] = [
@@ -87,6 +89,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Отчеты', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
   { label: 'Сообщения', href: '/admin/messages', icon: <Mail className="w-5 h-5" /> },
   { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
+  { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
   { label: 'Сотрудники', href: '/admin/staff', icon: <UserCog className="w-5 h-5" /> },
   { label: 'Права ролей', href: '/admin/permissions', icon: <ShieldCheck className="w-5 h-5" /> },
@@ -96,10 +99,17 @@ const adminNavItems: NavItem[] = [
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
+// Разделы рабочего места сотрудника: показываются, если у роли есть право «смотреть» в этом модуле.
+// Список растёт вместе с шагами этапа 1 (заказы, табель, найм и т. д.).
+const staffNavItems: (NavItem & { module: string })[] = [
+  { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
+];
+
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, signOut, role: userRole } = useAuth();
+  const { can } = usePermissions();
   const [collapsed, setCollapsed] = React.useState(() => {
     const saved = localStorage.getItem('sidebar-collapsed');
     return saved === 'true';
@@ -129,6 +139,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   const getNavItems = () => {
     if (role === 'hr') return hrNavItems;
     if (role === 'worker') return workerNavItems;
+    if (role === 'staff') return staffNavItems.filter((i) => can(i.module, 'view'));
     
     return adminNavItems.map(item => {
       if (item.href === '/admin/contact-messages' && unreadCount > 0) {
@@ -159,6 +170,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
   const getProfileLink = () => {
     if (userRole === 'hr') return '/hr/profile';
     if (userRole === 'admin') return '/admin/profile';
+    if (role === 'staff') return '/security';
     return '/worker/profile';
   };
 
@@ -184,7 +196,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
             </Link>
           </div>
 
-          {role === 'admin' && <div className="pt-3"><OrgSwitcher collapsed={collapsed} /></div>}
+          {(role === 'admin' || role === 'staff') && <div className="pt-3"><OrgSwitcher collapsed={collapsed} /></div>}
 
           {/* Navigation */}
           <nav className={cn("flex-1 p-2 space-y-1 overflow-y-auto", collapsed ? "px-1" : "p-4")}>

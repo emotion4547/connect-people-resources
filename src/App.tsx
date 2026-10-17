@@ -49,6 +49,8 @@ const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
 const AdminPermissions = lazy(() => import("./pages/admin/AdminPermissions"));
 const AdminDirectories = lazy(() => import("./pages/admin/AdminDirectories"));
 const Workspace = lazy(() => import("./pages/Workspace"));
+const ClientsList = lazy(() => import("./pages/clients/ClientsList"));
+const ClientDetail = lazy(() => import("./pages/clients/ClientDetail"));
 const SetPassword = lazy(() => import("./pages/SetPassword"));
 const Security = lazy(() => import("./pages/Security"));
 const AdminContactMessages = lazy(() => import("./pages/admin/AdminContactMessages"));
@@ -189,6 +191,16 @@ const App = () => (
             } />
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/security" element={<Security />} />
+            <Route path="/clients" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <ClientsList />
+              </ProtectedRoute>
+            } />
+            <Route path="/clients/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <ClientDetail />
+              </ProtectedRoute>
+            } />
             <Route path="/workspace" element={
               <ProtectedRoute allowedRoles={['director', 'sales', 'site_manager', 'recruiter', 'accountant', 'client_admin', 'client_manager']}>
                 <Workspace />

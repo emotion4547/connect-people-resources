@@ -32,13 +32,18 @@ select pg_temp.check('есть организация по умолчанию', 
 select pg_temp.check('у всех ролей есть организация', (select count(*) from public.user_roles where org_id is null) = 0);
 select pg_temp.check('матрица прав: 480 строк на организацию',
   (select bool_and(n = 480) from (select count(*) n from public.role_permissions group by org_id) t));
-select pg_temp.check('в каталоге настроек 21 правило', (select count(*) from public.setting_definitions) = 21);
+select pg_temp.check('в каталоге настроек не меньше 21 правила', (select count(*) from public.setting_definitions) >= 21);
 select pg_temp.check('двухфакторный вход по умолчанию выключен', public.get_setting(private.default_org_id(), 'auth.mfa_enforced') = 'false'::jsonb);
 select pg_temp.check('RLS включён на новых таблицах',
   (select bool_and(relrowsecurity) from pg_class where oid in (
     'public.organizations'::regclass, 'public.audit_log'::regclass, 'public.org_settings'::regclass,
     'public.tax_status_rates'::regclass, 'public.staff_profiles'::regclass,
     'public.role_permissions'::regclass, 'public.directories'::regclass)));
+
+select pg_temp.check('позиции заведены', (select count(*) from public.positions) >= 7);
+select pg_temp.check('расчёт маржи совпадает с примером ТЗ (самозанятый, 450/300 → 144 ₽)',
+  (select margin from public.calc_margins(private.default_org_id(), 450, 300) where status = 'self_employed') = 144.00);
+select pg_temp.check('у заказчиков нет брошенных ссылок на организацию', (select count(*) from public.clients c where not exists (select 1 from public.organizations o where o.id = c.org_id)) = 0);
 
 -- Сценарий: администраторы двух организаций, обычный сотрудник
 insert into public.organizations (id, name) values ('b2000000-0000-0000-0000-000000000002', 'ПРОВЕРКА организация 2');

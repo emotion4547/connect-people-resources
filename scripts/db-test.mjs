@@ -15,6 +15,7 @@
  */
 import { PGlite } from "@electric-sql/pglite";
 import { pgtap } from "@electric-sql/pglite-pgtap";
+import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -95,7 +96,7 @@ const fail = (msg) => {
   console.log(msg);
 };
 
-const db = new PGlite({ extensions: { pgtap } });
+const db = new PGlite({ extensions: { pgtap, btree_gist } });
 
 console.log("ОКРУЖЕНИЕ (имитация Supabase)");
 await db.exec(SUPABASE_STUBS);
