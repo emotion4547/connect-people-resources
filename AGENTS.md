@@ -61,7 +61,23 @@ React + Vite + TypeScript + shadcn/ui, бэкенд — самохостинг S
 
 ## Проверка перед коммитом
 
-Нужны Node.js 22+ и запущенный локальный Docker Engine (на macOS — Docker Desktop
+**Основной способ, без Docker** (на текущем Mac Docker нет):
+
+```bash
+npm ci
+npm run db:local              # все миграции с нуля + все SQL-тесты
+npm run db:local -- 010       # только тесты, в имени которых есть «010»
+```
+
+`scripts/db-test.mjs` поднимает настоящий Postgres (PGlite, WASM) в памяти, имитирует окружение
+Supabase (роли `anon`/`authenticated`/`service_role`, схемы `auth`/`storage`/`realtime`, `auth.uid()`
+из `request.jwt.claim.sub`), накатывает `supabase/migrations/` и выполняет `supabase/tests/database/*.test.sql`.
+RLS-политики таблиц `public` проверяются честно; политики хранилища и Realtime только применяются как SQL.
+Чтобы проверить права, в тесте нужно переключить роль и пользователя:
+`set local role authenticated; set local request.jwt.claim.sub = '<uuid>';`.
+Перед коммитом миграции или теста `npm run db:local` должен быть зелёным.
+
+**Запасной способ** — через Docker. Нужны Node.js 22+ и запущенный локальный Docker Engine (на macOS — Docker Desktop
 или совместимый движок). Supabase CLI закреплён в `devDependencies` и lock-файле;
 отдельно устанавливать CLI или входить в Supabase не требуется.
 
@@ -96,7 +112,7 @@ SQL-тесты лежат в `supabase/tests/database/*.test.sql`. Каждый 
 Если расчёт появится в edge-функции, вместе с ним добавить тесты в её среде Deno.
 
 Сборка должна проходить. На 2026-10-17 сборка проходит, lint имеет 42 прежние ошибки
-и 20 предупреждений. Docker на текущем Mac отсутствует: прогон миграций и pgTAP
+и 20 предупреждений. Docker на текущем Mac отсутствует, поэтому миграции и pgTAP гоняются через `npm run db:local` (PGlite): на 2026-10-17 все 18 миграций и smoke-тест проходят. Через Docker прогон
 пока не подтверждён; после установки Docker выполнить команды выше.
 Основа процесса: [локальная разработка Supabase](https://supabase.com/docs/guides/local-development/cli/getting-started)
 и [тестирование базы](https://supabase.com/docs/guides/database/testing).
