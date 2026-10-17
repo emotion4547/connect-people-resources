@@ -27,3 +27,4 @@ dist-ssr
 deploy/supabase/.env
 deploy/supabase/volumes/db/data
 deploy/supabase/volumes/storage
+.agents/
