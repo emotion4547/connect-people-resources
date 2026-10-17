@@ -49,6 +49,8 @@ import {
   Building2,
   FileCheck,
   Wallet,
+  Banknote,
+  Scale,
   Bell,
   Clock,
   Search,
@@ -118,6 +120,8 @@ const adminNavItems: NavItem[] = [
   { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" /> },
   { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" /> },
   { label: 'Документы', href: '/documents', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Оплаты', href: '/payments', icon: <Banknote className="w-5 h-5" /> },
+  { label: 'Дебиторка', href: '/receivables', icon: <Scale className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
@@ -142,6 +146,8 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" />, module: 'timesheets' },
   { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" />, module: 'accruals' },
   { label: 'Документы', href: '/documents', icon: <FileText className="w-5 h-5" />, module: 'client_documents' },
+  { label: 'Оплаты', href: '/payments', icon: <Banknote className="w-5 h-5" />, module: 'client_documents' },
+  { label: 'Дебиторка', href: '/receivables', icon: <Scale className="w-5 h-5" />, module: 'client_documents' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {

@@ -69,6 +69,9 @@ const DocumentsList = lazy(() => import("./pages/documents/DocumentsList"));
 const DocumentDetail = lazy(() => import("./pages/documents/DocumentDetail"));
 const DocumentPrint = lazy(() => import("./pages/documents/DocumentPrint"));
 const ClientDocuments = lazy(() => import("./pages/client/ClientDocuments"));
+const PaymentsPage = lazy(() => import("./pages/payments/PaymentsPage"));
+const ReceivablesPage = lazy(() => import("./pages/payments/ReceivablesPage"));
+const ReconciliationPrint = lazy(() => import("./pages/documents/ReconciliationPrint"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -323,6 +326,21 @@ const App = () => (
             <Route path="/documents" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant']}>
                 <DocumentsList />
+              </ProtectedRoute>
+            } />
+            <Route path="/documents/reconciliation/:clientId" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant', 'hr', 'client_admin', 'client_manager']}>
+                <ReconciliationPrint />
+              </ProtectedRoute>
+            } />
+            <Route path="/payments" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant']}>
+                <PaymentsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/receivables" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant']}>
+                <ReceivablesPage />
               </ProtectedRoute>
             } />
             <Route path="/documents/:id" element={

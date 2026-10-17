@@ -14,6 +14,7 @@ export interface Client {
   ogrn: string | null; legal_address: string | null; bank_name: string | null; bank_account: string | null;
   bik: string | null; city: string | null; status: string; archive_reason: string | null;
   sales_manager_id: string | null; sites_manager_id: string | null; notes: string | null;
+  credit_limit: number | null; max_overdue_days: number | null;
 }
 
 interface Props { client: Client; staff: StaffOption[]; canEdit: boolean; onSaved: () => void }
@@ -43,6 +44,7 @@ export const ClientRequisites: React.FC<Props> = ({ client, staff, canEdit, onSa
       bank_account: form.bank_account || null, bik: form.bik || null, city: form.city || null, status: form.status,
       archive_reason: form.status === 'archived' ? form.archive_reason : null,
       sales_manager_id: form.sales_manager_id, notes: form.notes || null,
+      credit_limit: form.credit_limit, max_overdue_days: form.max_overdue_days,
     }).eq('id', client.id);
     setSaving(false);
     if (error) {
@@ -125,6 +127,16 @@ export const ClientRequisites: React.FC<Props> = ({ client, staff, canEdit, onSa
                 <Input id="c-archive" value={form.archive_reason ?? ''} disabled={!canEdit} onChange={(e) => set('archive_reason', e.target.value)} />
               </div>
             )}
+            <div className="space-y-2">
+              <Label htmlFor="c-limit">Кредитный лимит, ₽</Label>
+              <Input id="c-limit" inputMode="decimal" value={form.credit_limit ?? ''} disabled={!canEdit} placeholder="без лимита"
+                onChange={(e) => set('credit_limit', e.target.value.trim() === '' ? null : Number(e.target.value.replace(',', '.')))} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="c-overdue">Допустимая просрочка, дней</Label>
+              <Input id="c-overdue" inputMode="numeric" value={form.max_overdue_days ?? ''} disabled={!canEdit} placeholder="без ограничения"
+                onChange={(e) => set('max_overdue_days', e.target.value.trim() === '' ? null : Number(e.target.value))} />
+            </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="c-notes">Заметки</Label>
               <Textarea id="c-notes" value={form.notes ?? ''} disabled={!canEdit} onChange={(e) => set('notes', e.target.value)} />

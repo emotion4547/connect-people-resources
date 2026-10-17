@@ -49,7 +49,10 @@ const ClientDocuments: React.FC = () => {
       <DashboardLayout role="hr">
         <PageMeta title="Документы" description="Акты и счета" />
         <div className="max-w-3xl mx-auto space-y-4 animate-slide-up">
-          <h1 className="text-2xl font-bold">Документы</h1>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-2xl font-bold">Документы</h1>
+            {docs[0] && <Button asChild variant="outline" size="sm"><Link to={`/documents/reconciliation/${docs[0].client_id}?from=${new Date().getFullYear()}-01-01&to=${new Date().toISOString().slice(0, 10)}`}>Акт сверки с начала года</Link></Button>}
+          </div>
           <Card><CardContent className="pt-6">
             <Table>
               <TableHeader><TableRow><TableHead>Документ</TableHead><TableHead>Период</TableHead><TableHead className="text-right">Сумма</TableHead><TableHead>Статус</TableHead></TableRow></TableHeader>
