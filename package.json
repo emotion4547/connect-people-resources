@@ -19,7 +19,8 @@
     "db:check": "npm run db:reset && npm run test:db",
     "db:local": "node scripts/db-test.mjs",
     "preview": "vite preview",
-    "test:ui": "vitest run"
+    "test:ui": "vitest run",
+    "bench": "node scripts/bench.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

@@ -101,6 +101,7 @@ export const MetricGrid: React.FC<Props> = ({ orgIds, from, to, clientId = null,
             </TableBody>
           </Table>
           {!records.length && <p className="text-sm text-muted-foreground">Записей нет.</p>}
+          {records.length >= 500 && <p className="text-xs text-muted-foreground">Показаны первые 500 записей: сузьте период, чтобы увидеть остальные.</p>}
         </DialogContent>
       </Dialog>
     </>
