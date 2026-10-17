@@ -18,6 +18,7 @@ import { db, rpc } from '@/lib/db';
 import { fmtDate, fmtMoney, monthStart, today } from '@/lib/format';
 import { decodeStatement, parseStatement, statementRows } from '@/lib/kl1c';
 import { ACCOUNT_KINDS, type CashAccount, type CashCategory, type CashEntry } from '@/lib/cashMeta';
+import { CashAccountsDialog } from '@/components/cash/CashAccountsDialog';
 import PageMeta from '@/components/PageMeta';
 import { ArrowLeftRight, Plus, Upload } from 'lucide-react';
 
@@ -43,6 +44,7 @@ const CashPage: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const file = useRef<HTMLInputElement>(null);
 
+  const [accountsOpen, setAccountsOpen] = useState(false);
   const [adding, setAdding] = useState(false);
   const [f, setF] = useState({ account: '', date: today(), direction: 'out', amount: '', category: '', counterparty: '', comment: '' });
   const [moving, setMoving] = useState(false);
@@ -145,6 +147,7 @@ const CashPage: React.FC = () => {
               <Button asChild variant="outline"><Link to="/cash/report">Отчёт ДДС</Link></Button>
               <Button asChild variant="outline"><Link to="/cash/bdr">БДР</Link></Button>
               <Button asChild variant="outline"><Link to="/cash/rules">Правила</Link></Button>
+              <Button variant="outline" onClick={() => setAccountsOpen(true)}>Счета</Button>
               <Button variant="outline" className="gap-2" disabled={busy} onClick={() => stmt.current?.click()}><Upload className="w-4 h-4" /> Выписка</Button>
               <input ref={stmt} type="file" accept=".txt" className="hidden" onChange={(e) => uploadStatement(e.target.files?.[0])} />
               <Button variant="outline" className="gap-2" onClick={() => setMoving(true)}><ArrowLeftRight className="w-4 h-4" /> Перемещение</Button>
@@ -262,6 +265,7 @@ const CashPage: React.FC = () => {
           <DialogFooter><Button variant="outline" onClick={() => setMoving(false)}>Отмена</Button><Button disabled={busy || !m.from || !m.to || !m.amount} onClick={transfer}>Переместить</Button></DialogFooter>
         </DialogContent>
       </Dialog>
+      <CashAccountsDialog orgId={orgId} accounts={accounts} open={accountsOpen} onOpenChange={setAccountsOpen} onSaved={load} />
     </AppLayout>
   );
 };

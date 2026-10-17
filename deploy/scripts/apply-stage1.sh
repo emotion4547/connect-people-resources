@@ -50,6 +50,7 @@ MIGRATIONS=(
   20261019180000_rotations.sql
   20261019190000_excel_import.sql
   20261020100000_analytics_perf.sql
+  20261020110000_cash_accounts_handoff.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -114,6 +115,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261020110000*) q="select to_regprocedure('public.save_cash_account(uuid,uuid,text,text,text,text,numeric,date,boolean)') is not null" ;;
     20261020100000*) q="select exists (select 1 from pg_indexes where indexname = 'shifts_org_date_idx')" ;;
     20261019190000*) q="select to_regprocedure('public.import_rows(uuid,text,jsonb,boolean,text)') is not null" ;;
     20261019180000*) q="select to_regclass('public.order_rotations') is not null" ;;

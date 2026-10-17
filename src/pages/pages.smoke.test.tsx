@@ -11,6 +11,7 @@ import DealDetail from '@/pages/deals/DealDetail';
 import DocumentControl from '@/pages/workers/DocumentControl';
 import RotationCalendar from '@/pages/orders/RotationCalendar';
 import ImportPage from '@/pages/import/ImportPage';
+import CashPage from '@/pages/cash/CashPage';
 
 const today = new Date().toISOString().slice(0, 10);
 const month = `${today.slice(0, 7)}-01`;
@@ -122,6 +123,16 @@ describe('страницы этапа 3 отрисовываются на отв
     renderPage(<RotationCalendar />);
     expect(await screen.findByText('Календарь вахт')).toBeTruthy();
     expect(await screen.findByText('Проживание: свободные места')).toBeTruthy();
+  });
+
+  it('Деньги: остатки и окно счетов', async () => {
+    fixtures.tables.cash_accounts = [{ id: 'a1', kind: 'bank', name: 'Т-Банк', bank_name: 'Т-Банк', account_number: '4070', opening_balance: 250000, opening_date: today, is_active: true, sort_order: 10 }];
+    fixtures.rpc.cash_balances = [{ account_id: 'a1', balance: '250000' }];
+    renderPage(<CashPage />);
+    expect((await screen.findAllByText('Т-Банк')).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Счета' }));
+    expect(await screen.findByText(/Остаток на начало и его дата/)).toBeTruthy();
+    expect(screen.getByText('Добавить счёт')).toBeTruthy();
   });
 
   it('Импорт: вкладки и шаблон', async () => {
