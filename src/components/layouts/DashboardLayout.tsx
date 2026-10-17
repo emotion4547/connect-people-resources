@@ -148,6 +148,7 @@ const adminNavItems: NavItem[] = [
 // Разделы рабочего места сотрудника: показываются, если у роли есть право «смотреть» в этом модуле.
 // Список растёт вместе с шагами этапа 1 (заказы, табель, найм и т. д.).
 const staffNavItems: (NavItem & { module: string })[] = [
+  { label: 'Аналитика', href: '/analytics', icon: <BarChart3 className="w-5 h-5" />, module: 'analytics' },
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
   { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
   { label: 'Планирование', href: '/planning', icon: <CalendarDays className="w-5 h-5" />, module: 'assignments' },
