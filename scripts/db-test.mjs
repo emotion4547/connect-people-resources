@@ -42,8 +42,10 @@ const SUPABASE_STUBS = `
     encrypted_password text,
     raw_user_meta_data jsonb default '{}'::jsonb,
     raw_app_meta_data jsonb default '{}'::jsonb,
+    banned_until timestamptz,
     created_at timestamptz default now()
   );
+  create table auth.sessions (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id) on delete cascade);
 
   -- как в GoTrue: идентификатор и роль берутся из claims текущего запроса
   create function auth.uid() returns uuid language sql stable as $$
