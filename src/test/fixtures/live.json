@@ -1,0 +1,1977 @@
+{
+ "rpc": {
+  "analytics_compare": [
+   {
+    "metric": "staffing",
+    "name": "Укомплектованность",
+    "unit": "%",
+    "value": 91.9,
+    "prev_value": null,
+    "delta": null,
+    "sort_order": 10
+   },
+   {
+    "metric": "attendance",
+    "name": "Выход на объект",
+    "unit": "%",
+    "value": 94.5,
+    "prev_value": null,
+    "delta": null,
+    "sort_order": 20
+   },
+   {
+    "metric": "no_show",
+    "name": "Неявки",
+    "unit": "%",
+    "value": 5.7,
+    "prev_value": null,
+    "delta": null,
+    "sort_order": 30
+   },
+   {
+    "metric": "order_close_hours",
+    "name": "Время закрытия заказа",
+    "unit": "ч",
+    "value": 5,
+    "prev_value": 0,
+    "delta": 5,
+    "sort_order": 40
+   },
+   {
+    "metric": "hours",
+    "name": "Отработано часов",
+    "unit": "ч",
+    "value": 1856,
+    "prev_value": 0,
+    "delta": 1856,
+    "sort_order": 45
+   },
+   {
+    "metric": "revenue",
+    "name": "Выручка",
+    "unit": "₽",
+    "value": 799280,
+    "prev_value": 0,
+    "delta": 799280,
+    "sort_order": 50
+   },
+   {
+    "metric": "worker_costs",
+    "name": "Затраты на исполнителей",
+    "unit": "₽",
+    "value": 534960,
+    "prev_value": 0,
+    "delta": 534960,
+    "sort_order": 55
+   },
+   {
+    "metric": "margin_amount",
+    "name": "Маржа",
+    "unit": "₽",
+    "value": 260904,
+    "prev_value": 0,
+    "delta": 260904,
+    "sort_order": 60
+   },
+   {
+    "metric": "margin_pct",
+    "name": "Маржинальность",
+    "unit": "%",
+    "value": 32.6,
+    "prev_value": null,
+    "delta": null,
+    "sort_order": 65
+   },
+   {
+    "metric": "active_base",
+    "name": "Активная база",
+    "unit": "чел.",
+    "value": 15,
+    "prev_value": 0,
+    "delta": 15,
+    "sort_order": 70
+   },
+   {
+    "metric": "retention_30",
+    "name": "Удержание 30 дней",
+    "unit": "%",
+    "value": null,
+    "prev_value": 83.3,
+    "delta": null,
+    "sort_order": 71
+   },
+   {
+    "metric": "retention_60",
+    "name": "Удержание 60 дней",
+    "unit": "%",
+    "value": null,
+    "prev_value": 0,
+    "delta": null,
+    "sort_order": 72
+   },
+   {
+    "metric": "retention_90",
+    "name": "Удержание 90 дней",
+    "unit": "%",
+    "value": null,
+    "prev_value": null,
+    "delta": null,
+    "sort_order": 73
+   },
+   {
+    "metric": "hire_conversion",
+    "name": "Конверсия найма",
+    "unit": "%",
+    "value": 16.7,
+    "prev_value": null,
+    "delta": null,
+    "sort_order": 80
+   },
+   {
+    "metric": "time_to_admit_days",
+    "name": "Время до допуска",
+    "unit": "дн.",
+    "value": 0,
+    "prev_value": 0,
+    "delta": 0,
+    "sort_order": 85
+   },
+   {
+    "metric": "overdue_receivables",
+    "name": "Просроченная дебиторка",
+    "unit": "₽",
+    "value": 356000,
+    "prev_value": 356000,
+    "delta": 0,
+    "sort_order": 90
+   },
+   {
+    "metric": "receivables_total",
+    "name": "Дебиторка всего",
+    "unit": "₽",
+    "value": 356000,
+    "prev_value": 356000,
+    "delta": 0,
+    "sort_order": 91
+   }
+  ],
+  "analytics_series": [
+   {
+    "bucket": "2026-09-01",
+    "needed": 84,
+    "confirmed": 79,
+    "started_needed": 84,
+    "on_site": 79,
+    "started_assigned": 84,
+    "no_shows": 5,
+    "revenue": 271280,
+    "worker_costs": 181600,
+    "margin": 88672
+   },
+   {
+    "bucket": "2026-10-01",
+    "needed": 199,
+    "confirmed": 181,
+    "started_needed": 154,
+    "on_site": 146,
+    "started_assigned": 162,
+    "no_shows": 9,
+    "revenue": 528000,
+    "worker_costs": 353360,
+    "margin": 172232
+   }
+  ],
+  "analytics_counters": [
+   {
+    "key": "timesheets_pending",
+    "name": "Табели на подтверждении",
+    "unit": "шт.",
+    "value": 2,
+    "link": "/timesheets",
+    "grp": "ops"
+   },
+   {
+    "key": "timesheets_disputed",
+    "name": "Споры по табелям",
+    "unit": "шт.",
+    "value": 0,
+    "link": "/timesheets",
+    "grp": "ops"
+   },
+   {
+    "key": "unconfirmed_tomorrow",
+    "name": "Не подтвердили выход на завтра",
+    "unit": "чел.",
+    "value": 0,
+    "link": "/planning",
+    "grp": "ops"
+   },
+   {
+    "key": "rating_avg",
+    "name": "Средняя оценка заказчиков",
+    "unit": "★",
+    "value": null,
+    "link": null,
+    "grp": "ops"
+   },
+   {
+    "key": "idle_clients_30",
+    "name": "Заказчики без заказов 30 дней",
+    "unit": "шт.",
+    "value": 0,
+    "link": "/clients",
+    "grp": "ops"
+   },
+   {
+    "key": "unbilled_accruals",
+    "name": "Невыставленные начисления",
+    "unit": "₽",
+    "value": 242400,
+    "link": "/documents",
+    "grp": "fin"
+   },
+   {
+    "key": "to_pay",
+    "name": "К выплате исполнителям",
+    "unit": "₽",
+    "value": 534960,
+    "link": "/payout-registries",
+    "grp": "fin"
+   },
+   {
+    "key": "paid_out",
+    "name": "Выплачено за период",
+    "unit": "₽",
+    "value": 0,
+    "link": "/payout-registries",
+    "grp": "fin"
+   },
+   {
+    "key": "registry_errors",
+    "name": "Ошибки выплат",
+    "unit": "шт.",
+    "value": 0,
+    "link": "/payout-registries",
+    "grp": "fin"
+   },
+   {
+    "key": "unsorted_cash",
+    "name": "Неразнесённые операции ДДС",
+    "unit": "шт.",
+    "value": 0,
+    "link": "/cash?category=none",
+    "grp": "fin"
+   },
+   {
+    "key": "unallocated_payments",
+    "name": "Платежи заказчиков без разнесения",
+    "unit": "₽",
+    "value": 0,
+    "link": "/payments",
+    "grp": "fin"
+   },
+   {
+    "key": "docs_expiring_30",
+    "name": "Документы истекают за 30 дней",
+    "unit": "шт.",
+    "value": 4,
+    "link": "/workers",
+    "grp": "hire"
+   },
+   {
+    "key": "no_shift_14",
+    "name": "Допущены, но без смен 14 дней",
+    "unit": "чел.",
+    "value": 0,
+    "link": "/hiring/today",
+    "grp": "hire"
+   }
+  ],
+  "analytics_by_client": [
+   {
+    "client_id": "c83f8c53-6715-46cd-a17d-801a078ada4b",
+    "client_name": "ТЕСТ Логистик",
+    "revenue": 584480,
+    "margin": 190824,
+    "margin_pct": 32.6,
+    "prev_margin_pct": null,
+    "margin_falling": false
+   },
+   {
+    "client_id": "b410de01-6442-44b7-aa50-dbc6d6f6e68d",
+    "client_name": "ТЕСТ Фабрика",
+    "revenue": 214800,
+    "margin": 70080,
+    "margin_pct": 32.6,
+    "prev_margin_pct": null,
+    "margin_falling": false
+   }
+  ],
+  "analytics_by_site": [
+   {
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "client_name": "ТЕСТ Логистик",
+    "needed": 140,
+    "confirmed": 133,
+    "started_needed": 119,
+    "on_site": 115,
+    "started_assigned": 127,
+    "no_shows": 5,
+    "today_needed": 0,
+    "today_confirmed": 0,
+    "week_needed": 21,
+    "week_confirmed": 18
+   },
+   {
+    "site_id": "7e6a97e5-0e91-40ce-b63e-72106874a268",
+    "site_name": "ТЕСТ Склад Юг",
+    "client_name": "ТЕСТ Логистик",
+    "needed": 60,
+    "confirmed": 56,
+    "started_needed": 51,
+    "on_site": 49,
+    "started_assigned": 51,
+    "no_shows": 2,
+    "today_needed": 0,
+    "today_confirmed": 0,
+    "week_needed": 9,
+    "week_confirmed": 7
+   },
+   {
+    "site_id": "629252e3-f7e8-4545-a983-783fdd4a44c3",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "client_name": "ТЕСТ Фабрика",
+    "needed": 43,
+    "confirmed": 35,
+    "started_needed": 34,
+    "on_site": 30,
+    "started_assigned": 34,
+    "no_shows": 4,
+    "today_needed": 0,
+    "today_confirmed": 0,
+    "week_needed": 12,
+    "week_confirmed": 5
+   },
+   {
+    "site_id": "0e7c52d1-c7a7-4eaa-b458-742793d3af6f",
+    "site_name": "ТЕСТ Цех 1",
+    "client_name": "ТЕСТ Фабрика",
+    "needed": 40,
+    "confirmed": 36,
+    "started_needed": 34,
+    "on_site": 31,
+    "started_assigned": 34,
+    "no_shows": 3,
+    "today_needed": 0,
+    "today_confirmed": 0,
+    "week_needed": 6,
+    "week_confirmed": 5
+   }
+  ],
+  "analytics_candidates": [
+   {
+    "dimension": "source",
+    "key": "508239a6-d46e-4b08-98b7-6851d246930a",
+    "name": "Импорт из Excel",
+    "total": 3,
+    "admitted": 1,
+    "sort_order": 0
+   },
+   {
+    "dimension": "source",
+    "key": "6127f5f8-8d9c-48dd-95a0-4be436611bf5",
+    "name": "Форма на сайте",
+    "total": 3,
+    "admitted": 0,
+    "sort_order": 0
+   },
+   {
+    "dimension": "source",
+    "key": "711ba4e0-dd06-4617-b2ff-1682c686b65b",
+    "name": "Вручную",
+    "total": 3,
+    "admitted": 0,
+    "sort_order": 0
+   },
+   {
+    "dimension": "source",
+    "key": "dbb1590e-8080-4d25-be71-1a9d55177360",
+    "name": "Регистрация на сайте",
+    "total": 3,
+    "admitted": 1,
+    "sort_order": 0
+   },
+   {
+    "dimension": "stage",
+    "key": "new",
+    "name": "Новые",
+    "total": 2,
+    "admitted": 0,
+    "sort_order": 1
+   },
+   {
+    "dimension": "stage",
+    "key": "contacted",
+    "name": "Связались",
+    "total": 2,
+    "admitted": 0,
+    "sort_order": 2
+   },
+   {
+    "dimension": "stage",
+    "key": "interview",
+    "name": "Собеседование",
+    "total": 2,
+    "admitted": 0,
+    "sort_order": 3
+   },
+   {
+    "dimension": "stage",
+    "key": "documents",
+    "name": "Документы",
+    "total": 2,
+    "admitted": 0,
+    "sort_order": 4
+   },
+   {
+    "dimension": "stage",
+    "key": "admitted",
+    "name": "Допущены",
+    "total": 2,
+    "admitted": 2,
+    "sort_order": 5
+   },
+   {
+    "dimension": "stage",
+    "key": "reserve",
+    "name": "Резерв",
+    "total": 2,
+    "admitted": 0,
+    "sort_order": 7
+   }
+  ],
+  "analytics_plan_fact": [
+   {
+    "revenue_plan": 425806.4516129032,
+    "revenue_fact": 528000,
+    "margin_plan": 127741.93548387097,
+    "margin_fact": 172232
+   }
+  ],
+  "analytics_unconfirmed": [],
+  "bdr_report": [
+   {
+    "month": "2026-10-01",
+    "article": "revenue",
+    "article_name": "Выручка",
+    "sort_order": 10,
+    "plan": 600000,
+    "fact": 528000
+   },
+   {
+    "month": "2026-10-01",
+    "article": "worker_costs",
+    "article_name": "Затраты на исполнителей",
+    "sort_order": 20,
+    "plan": 380000,
+    "fact": 353360
+   },
+   {
+    "month": "2026-10-01",
+    "article": "worker_taxes",
+    "article_name": "Налоги и взносы по исполнителям",
+    "sort_order": 30,
+    "plan": 40000,
+    "fact": 0
+   },
+   {
+    "month": "2026-10-01",
+    "article": "payout_fees",
+    "article_name": "Комиссии выплат",
+    "sort_order": 40,
+    "plan": 0,
+    "fact": 2408
+   },
+   {
+    "month": "2026-10-01",
+    "article": "admin_costs",
+    "article_name": "Управленческие расходы",
+    "sort_order": 60,
+    "plan": 90000,
+    "fact": 167000
+   },
+   {
+    "month": "2026-10-01",
+    "article": "operating_profit",
+    "article_name": "Операционная прибыль",
+    "sort_order": 70,
+    "plan": 90000,
+    "fact": 5232
+   },
+   {
+    "month": "2026-10-01",
+    "article": "usn_tax",
+    "article_name": "Налог по УСН (оценка)",
+    "sort_order": 80,
+    "plan": 36000,
+    "fact": 31680
+   },
+   {
+    "month": "2026-10-01",
+    "article": "net_profit",
+    "article_name": "Чистая прибыль",
+    "sort_order": 90,
+    "plan": 54000,
+    "fact": -26448
+   }
+  ],
+  "bdr_breakdown": [
+   {
+    "key": "c83f8c53-6715-46cd-a17d-801a078ada4b",
+    "name": "ТЕСТ Логистик",
+    "revenue": 584480,
+    "worker_costs": 390960,
+    "margin": 193520,
+    "margin_pct": 33.1
+   },
+   {
+    "key": "b410de01-6442-44b7-aa50-dbc6d6f6e68d",
+    "name": "ТЕСТ Фабрика",
+    "revenue": 214800,
+    "worker_costs": 144000,
+    "margin": 70800,
+    "margin_pct": 33
+   }
+  ],
+  "payment_calendar": [
+   {
+    "day": "2026-10-17",
+    "balance_open": 213880,
+    "in_invoices": 356000,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 569880,
+    "gap": false
+   },
+   {
+    "day": "2026-10-18",
+    "balance_open": 569880,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 569880,
+    "gap": false
+   },
+   {
+    "day": "2026-10-19",
+    "balance_open": 569880,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 569880,
+    "gap": false
+   },
+   {
+    "day": "2026-10-20",
+    "balance_open": 569880,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 569880,
+    "gap": false
+   },
+   {
+    "day": "2026-10-21",
+    "balance_open": 569880,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 569880,
+    "gap": false
+   },
+   {
+    "day": "2026-10-22",
+    "balance_open": 569880,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 569880,
+    "gap": false
+   },
+   {
+    "day": "2026-10-23",
+    "balance_open": 569880,
+    "in_invoices": 0,
+    "in_plan": 3600,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 534960,
+    "out_plan": 103920,
+    "out_manual": 0,
+    "balance_close": -65400,
+    "gap": true
+   },
+   {
+    "day": "2026-10-24",
+    "balance_open": -65400,
+    "in_invoices": 0,
+    "in_plan": 3600,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": -61800,
+    "gap": true
+   },
+   {
+    "day": "2026-10-25",
+    "balance_open": -61800,
+    "in_invoices": 0,
+    "in_plan": 3600,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": -58200,
+    "gap": true
+   },
+   {
+    "day": "2026-10-26",
+    "balance_open": -58200,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": -58200,
+    "gap": true
+   },
+   {
+    "day": "2026-10-27",
+    "balance_open": -58200,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": -58200,
+    "gap": true
+   },
+   {
+    "day": "2026-10-28",
+    "balance_open": -58200,
+    "in_invoices": 0,
+    "in_plan": 31120,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": -27080,
+    "gap": true
+   },
+   {
+    "day": "2026-10-29",
+    "balance_open": -27080,
+    "in_invoices": 0,
+    "in_plan": 37680,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 10600,
+    "gap": false
+   },
+   {
+    "day": "2026-10-30",
+    "balance_open": 10600,
+    "in_invoices": 0,
+    "in_plan": 34480,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 49500,
+    "out_manual": 0,
+    "balance_close": -4420,
+    "gap": true
+   },
+   {
+    "day": "2026-10-31",
+    "balance_open": -4420,
+    "in_invoices": 0,
+    "in_plan": 37680,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 33260,
+    "gap": false
+   },
+   {
+    "day": "2026-11-01",
+    "balance_open": 33260,
+    "in_invoices": 0,
+    "in_plan": 44800,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 78060,
+    "gap": false
+   },
+   {
+    "day": "2026-11-02",
+    "balance_open": 78060,
+    "in_invoices": 0,
+    "in_plan": 14080,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 92140,
+    "gap": false
+   },
+   {
+    "day": "2026-11-03",
+    "balance_open": 92140,
+    "in_invoices": 0,
+    "in_plan": 10640,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 102780,
+    "gap": false
+   },
+   {
+    "day": "2026-11-04",
+    "balance_open": 102780,
+    "in_invoices": 0,
+    "in_plan": 48320,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 151100,
+    "gap": false
+   },
+   {
+    "day": "2026-11-05",
+    "balance_open": 151100,
+    "in_invoices": 0,
+    "in_plan": 48160,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 199260,
+    "gap": false
+   },
+   {
+    "day": "2026-11-06",
+    "balance_open": 199260,
+    "in_invoices": 0,
+    "in_plan": 37680,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 8250,
+    "out_manual": 0,
+    "balance_close": 228690,
+    "gap": false
+   },
+   {
+    "day": "2026-11-07",
+    "balance_open": 228690,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 228690,
+    "gap": false
+   },
+   {
+    "day": "2026-11-08",
+    "balance_open": 228690,
+    "in_invoices": 0,
+    "in_plan": 14080,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 242770,
+    "gap": false
+   },
+   {
+    "day": "2026-11-09",
+    "balance_open": 242770,
+    "in_invoices": 0,
+    "in_plan": 14080,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 256850,
+    "gap": false
+   },
+   {
+    "day": "2026-11-10",
+    "balance_open": 256850,
+    "in_invoices": 0,
+    "in_plan": 14080,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 270930,
+    "gap": false
+   },
+   {
+    "day": "2026-11-11",
+    "balance_open": 270930,
+    "in_invoices": 0,
+    "in_plan": 0,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 270930,
+    "gap": false
+   },
+   {
+    "day": "2026-11-12",
+    "balance_open": 270930,
+    "in_invoices": 0,
+    "in_plan": 12540,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 283470,
+    "gap": false
+   },
+   {
+    "day": "2026-11-13",
+    "balance_open": 283470,
+    "in_invoices": 0,
+    "in_plan": 12540,
+    "in_manual": 0,
+    "out_registries": 0,
+    "out_accrued": 0,
+    "out_plan": 0,
+    "out_manual": 0,
+    "balance_close": 296010,
+    "gap": false
+   }
+  ],
+  "cash_balances": [
+   {
+    "account_id": "6e7afeaa-eca0-47d8-90c1-1d7c82cf6237",
+    "name": "Расчётный счёт",
+    "kind": "bank",
+    "balance": 213880
+   },
+   {
+    "account_id": "903a7a8e-a19e-4ad4-a76f-64223082b426",
+    "name": "Платформа выплат",
+    "kind": "platform",
+    "balance": 0
+   },
+   {
+    "account_id": "ca641396-2901-45c8-ad37-3b2ef0ba2d9b",
+    "name": "Касса",
+    "kind": "cash",
+    "balance": 0
+   }
+  ],
+  "cash_total_balance": 213880,
+  "cashflow_report": [
+   {
+    "month": "2026-10-01",
+    "article": "client_payment",
+    "article_name": "Оплата заказчиков",
+    "direction": "in",
+    "bdr_article": "revenue",
+    "amount_in": 200880,
+    "amount_out": 0,
+    "entries": 1
+   },
+   {
+    "month": "2026-10-01",
+    "article": "rent",
+    "article_name": "Аренда офиса",
+    "direction": "out",
+    "bdr_article": "admin_costs",
+    "amount_in": 0,
+    "amount_out": 35000,
+    "entries": 1
+   },
+   {
+    "month": "2026-10-01",
+    "article": "office_salary",
+    "article_name": "Зарплата штата",
+    "direction": "out",
+    "bdr_article": "admin_costs",
+    "amount_in": 0,
+    "amount_out": 120000,
+    "entries": 1
+   },
+   {
+    "month": "2026-10-01",
+    "article": "advertising",
+    "article_name": "Реклама",
+    "direction": "out",
+    "bdr_article": "admin_costs",
+    "amount_in": 0,
+    "amount_out": 12000,
+    "entries": 1
+   }
+  ],
+  "deal_funnel": [
+   {
+    "stage": "new",
+    "deals": 1,
+    "revenue": 250000,
+    "weighted": 25000,
+    "margin": 50000,
+    "sort_order": 1
+   },
+   {
+    "stage": "qualification",
+    "deals": 1,
+    "revenue": 180000,
+    "weighted": 45000,
+    "margin": 40000,
+    "sort_order": 2
+   },
+   {
+    "stage": "proposal",
+    "deals": 1,
+    "revenue": 420000,
+    "weighted": 168000,
+    "margin": 90000,
+    "sort_order": 3
+   },
+   {
+    "stage": "negotiation",
+    "deals": 1,
+    "revenue": 500000,
+    "weighted": 300000,
+    "margin": 110000,
+    "sort_order": 4
+   },
+   {
+    "stage": "contract",
+    "deals": 1,
+    "revenue": 300000,
+    "weighted": 240000,
+    "margin": 70000,
+    "sort_order": 5
+   }
+  ],
+  "deal_lost_reasons": [
+   {
+    "reason": "Дорого",
+    "deals": 1,
+    "revenue": 40000
+   }
+  ],
+  "my_sales_day": [
+   {
+    "kind": "next_step",
+    "ref_id": "5f7d8b99-a759-4e76-be92-861ad1969f26",
+    "deal_id": "5f7d8b99-a759-4e76-be92-861ad1969f26",
+    "deal_title": "Сортировка посылок",
+    "title": "Дожать по КП",
+    "due": "2026-10-16",
+    "overdue": true
+   },
+   {
+    "kind": "task",
+    "ref_id": "270c5ab7-5090-4f47-aa2a-bc7e94a624c0",
+    "deal_id": "de108f0a-ab3f-4765-8a0d-3924a7d1926b",
+    "deal_title": "Грузчики на оптовую базу",
+    "title": "call: Первичный звонок",
+    "due": "2026-10-17",
+    "overdue": false
+   },
+   {
+    "kind": "next_step",
+    "ref_id": "de108f0a-ab3f-4765-8a0d-3924a7d1926b",
+    "deal_id": "de108f0a-ab3f-4765-8a0d-3924a7d1926b",
+    "deal_title": "Грузчики на оптовую базу",
+    "title": "Позвонить",
+    "due": "2026-10-17",
+    "overdue": false
+   }
+  ],
+  "sales_plan_fact": [
+   {
+    "manager_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "manager_name": "ТЕСТ Менеджер продаж",
+    "month": "2026-10-01",
+    "plan": 400000,
+    "fact": 528000
+   }
+  ],
+  "document_registry": [
+   {
+    "kind": "document",
+    "doc_id": "e5a4bf56-d4b5-41d3-9fb1-d7d7798bae77",
+    "worker_id": "17932973-aa2d-4988-b1fa-ba675392bfc1",
+    "worker_name": "ТЕСТ Исполнитель 2",
+    "phone": "+7 900 100-00-02",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0002",
+    "valid_until": "2026-10-15",
+    "days_left": -2,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "bc1fd8a9-c933-42aa-ba1b-6a037c90a0e1",
+    "worker_id": "b88cbab8-a7da-4a3b-b78f-91b643820664",
+    "worker_name": "ТЕСТ Исполнитель 3",
+    "phone": "+7 900 100-00-03",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0003",
+    "valid_until": "2026-10-19",
+    "days_left": 2,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "cf626e2d-711e-42e3-9406-3eb7690f5bad",
+    "worker_id": "f9127978-75ca-4c7d-85be-6905deb21524",
+    "worker_name": "ТЕСТ Исполнитель 5",
+    "phone": "+7 900 100-00-05",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0005",
+    "valid_until": "2026-10-19",
+    "days_left": 2,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "bf78df86-c113-433d-8d28-81672e4b8260",
+    "worker_id": "329c1c67-fecc-43bf-a424-f8cb424606b7",
+    "worker_name": "ТЕСТ Исполнитель 6",
+    "phone": "+7 900 100-00-06",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0006",
+    "valid_until": "2026-10-29",
+    "days_left": 12,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "1b8d8bed-d334-481a-a545-ae0be34353ae",
+    "worker_id": "f80f4e26-d6a1-49a7-89b6-b4a406121544",
+    "worker_name": "ТЕСТ Исполнитель 7",
+    "phone": "+7 900 100-00-07",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0007",
+    "valid_until": "2026-10-29",
+    "days_left": 12,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "e8ef94ff-2344-41e7-8d3d-0f57a0c61f4c",
+    "worker_id": "ff70acdc-767c-4d52-be4a-03c76bd79129",
+    "worker_name": "ТЕСТ Исполнитель 1",
+    "phone": "+7 900 100-00-01",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0001",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "03ec3275-9e5d-4fa8-8ce3-c2a44c0c50d9",
+    "worker_id": "1652b486-9cf7-4201-be3e-715a9a8fa801",
+    "worker_name": "ТЕСТ Исполнитель 10",
+    "phone": "+7 900 100-00-10",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0010",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Юг",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "5febcfd5-e958-4873-82ab-b8e483d8d5c0",
+    "worker_id": "44505208-881c-4c6b-a39d-40d6ce25006e",
+    "worker_name": "ТЕСТ Исполнитель 11",
+    "phone": "+7 900 100-00-11",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0011",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Цех 1",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "77f05db3-40e9-4b35-b40b-a214f878de39",
+    "worker_id": "367507e1-7d6a-4716-9760-2d995d98c689",
+    "worker_name": "ТЕСТ Исполнитель 12",
+    "phone": "+7 900 100-00-12",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0012",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Цех 1",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "2419f82c-3a44-4e45-89cb-92e5f82e82be",
+    "worker_id": "5896a66b-80da-49f6-994f-912b2956dad5",
+    "worker_name": "ТЕСТ Исполнитель 13",
+    "phone": "+7 900 100-00-13",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0013",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Вахтовый посёлок",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "9de5a1a2-3361-4933-aae5-ce99a1592b2b",
+    "worker_id": "907bd96e-c559-461a-bc92-0d194a782813",
+    "worker_name": "ТЕСТ Исполнитель 14",
+    "phone": "+7 900 100-00-14",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0014",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Вахтовый посёлок",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "df5cab33-8065-44f0-9b91-db1b1ea0a1d7",
+    "worker_id": "daa2173a-19e3-4f91-a94e-59aee196bcca",
+    "worker_name": "ТЕСТ Исполнитель 4",
+    "phone": "+7 900 100-00-04",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0004",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Север",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "f30688b0-d2e9-4e48-99c4-dd21a29d64af",
+    "worker_id": "42ae90b9-9a0f-4900-9355-342eae534d60",
+    "worker_name": "ТЕСТ Исполнитель 8",
+    "phone": "+7 900 100-00-08",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0008",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Юг",
+    "total": 14
+   },
+   {
+    "kind": "document",
+    "doc_id": "14fd068a-7a68-4280-9a20-67a3f9798aba",
+    "worker_id": "ca7e497f-70b6-40f2-95f0-d9c6ea26a091",
+    "worker_name": "ТЕСТ Исполнитель 9",
+    "phone": "+7 900 100-00-09",
+    "type_id": "9db3510d-281e-4807-acd9-86934f53f611",
+    "type_name": "Медицинская книжка",
+    "number_masked": "**0009",
+    "valid_until": "2027-05-05",
+    "days_left": 200,
+    "status": "verified",
+    "next_site": "ТЕСТ Склад Юг",
+    "total": 14
+   }
+  ],
+  "document_conflicts": [
+   {
+    "assignment_id": "7ec61344-e846-460e-a844-65b554b3013e",
+    "shift_id": "22684172-0f96-4138-ac7f-95992a684058",
+    "worker_id": "978765db-3e09-428f-8fb3-467e7fbff405",
+    "worker_name": "ТЕСТ Исполнитель",
+    "shift_date": "2026-10-18",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "ef669d55-cd3f-4a33-9374-e12681992287",
+    "shift_id": "22684172-0f96-4138-ac7f-95992a684058",
+    "worker_id": "17932973-aa2d-4988-b1fa-ba675392bfc1",
+    "worker_name": "ТЕСТ Исполнитель 2",
+    "shift_date": "2026-10-18",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "945b809a-ae52-4ba2-9501-48bc47eb37e2",
+    "shift_id": "632e0e7f-8970-465d-9aaf-f1fe39cee6af",
+    "worker_id": "978765db-3e09-428f-8fb3-467e7fbff405",
+    "worker_name": "ТЕСТ Исполнитель",
+    "shift_date": "2026-10-19",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "0ed0bc2f-8e58-40d9-ab3a-2bb516841c4c",
+    "shift_id": "632e0e7f-8970-465d-9aaf-f1fe39cee6af",
+    "worker_id": "17932973-aa2d-4988-b1fa-ba675392bfc1",
+    "worker_name": "ТЕСТ Исполнитель 2",
+    "shift_date": "2026-10-19",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "62548879-d7e2-4727-b95e-deb2078f86f8",
+    "shift_id": "c151ae3a-970a-4926-a18c-c359ee5a39a0",
+    "worker_id": "978765db-3e09-428f-8fb3-467e7fbff405",
+    "worker_name": "ТЕСТ Исполнитель",
+    "shift_date": "2026-10-20",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "d5dcf99e-ed50-40dc-8eba-e32204256ac6",
+    "shift_id": "c151ae3a-970a-4926-a18c-c359ee5a39a0",
+    "worker_id": "17932973-aa2d-4988-b1fa-ba675392bfc1",
+    "worker_name": "ТЕСТ Исполнитель 2",
+    "shift_date": "2026-10-20",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "09d7ecac-968b-4f84-b020-37445e0bd216",
+    "shift_id": "c151ae3a-970a-4926-a18c-c359ee5a39a0",
+    "worker_id": "b88cbab8-a7da-4a3b-b78f-91b643820664",
+    "worker_name": "ТЕСТ Исполнитель 3",
+    "shift_date": "2026-10-20",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   },
+   {
+    "assignment_id": "e1289f04-7452-4850-bb7e-b3cae931b9c5",
+    "shift_id": "b279b6d2-1c1e-468d-a2ff-446e83849505",
+    "worker_id": "f9127978-75ca-4c7d-85be-6905deb21524",
+    "worker_name": "ТЕСТ Исполнитель 5",
+    "shift_date": "2026-10-20",
+    "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+    "site_name": "ТЕСТ Склад Север",
+    "problem": "Нет действующего документа: Медицинская книжка"
+   }
+  ],
+  "rotation_calendar": [
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "client_name": "ТЕСТ Фабрика",
+    "housing_address": "Общежитие №3, п. Северный",
+    "worker_id": "b10bc2a5-615f-4493-82eb-8112bdf929d0",
+    "worker_name": "ТЕСТ Исполнитель 15",
+    "arrival_date": "2026-10-21",
+    "departure_date": "2026-10-29"
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "client_name": "ТЕСТ Фабрика",
+    "housing_address": "Общежитие №3, п. Северный",
+    "worker_id": "62c48e31-0253-4850-828b-2fbe475dd359",
+    "worker_name": "ТЕСТ Исполнитель 16",
+    "arrival_date": "2026-10-21",
+    "departure_date": "2026-10-29"
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "client_name": "ТЕСТ Фабрика",
+    "housing_address": "Общежитие №3, п. Северный",
+    "worker_id": "7f30a3e7-d1d1-4646-82f1-98f5a4eaf5f9",
+    "worker_name": "ТЕСТ Исполнитель 17",
+    "arrival_date": "2026-10-21",
+    "departure_date": "2026-10-29"
+   }
+  ],
+  "rotation_housing_load": [
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-17",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-18",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-19",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-20",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-21",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-22",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-23",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-24",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-25",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-26",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-27",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-28",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-29",
+    "beds": 2,
+    "occupied": 3,
+    "free": -1
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-30",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-10-31",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-01",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-02",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-03",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-04",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-05",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-06",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-07",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-08",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-09",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-10",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-11",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-12",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   },
+   {
+    "order_id": "a487d2e6-38c9-42f8-90a3-8d236afda3ff",
+    "housing_address": "Общежитие №3, п. Северный",
+    "site_name": "ТЕСТ Вахтовый посёлок",
+    "day": "2026-11-13",
+    "beds": 2,
+    "occupied": 0,
+    "free": 2
+   }
+  ],
+  "client_receivables": [
+   {
+    "client_id": "c83f8c53-6715-46cd-a17d-801a078ada4b",
+    "client_name": "ТЕСТ Логистик",
+    "invoiced": 402000,
+    "paid": 200880,
+    "debt": 201120,
+    "not_due": 0,
+    "overdue_30": 201120,
+    "overdue_60": 0,
+    "overdue_60p": 0,
+    "unallocated": 0,
+    "max_overdue_days": 2,
+    "credit_limit": null,
+    "blocked": false
+   },
+   {
+    "client_id": "b410de01-6442-44b7-aa50-dbc6d6f6e68d",
+    "client_name": "ТЕСТ Фабрика",
+    "invoiced": 154880,
+    "paid": 0,
+    "debt": 154880,
+    "not_due": 0,
+    "overdue_30": 154880,
+    "overdue_60": 0,
+    "overdue_60p": 0,
+    "unallocated": 0,
+    "max_overdue_days": 10,
+    "credit_limit": null,
+    "blocked": false
+   }
+  ]
+ },
+ "tables": {
+  "deals": [
+   {
+    "id": "215eb1ba-966c-4385-ae98-1287e53522f8",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "Разгрузка фур",
+    "company": "ТЕСТ Транзит",
+    "contact_name": "Павел",
+    "contact_phone": "+7 900 200-00-05",
+    "contact_email": null,
+    "source": "manual",
+    "stage": "contract",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 300000,
+    "expected_margin": 70000,
+    "next_step": "Подписать",
+    "next_step_date": "2026-10-20",
+    "expected_close": null,
+    "lost_reason": null,
+    "note": null,
+    "won_at": null,
+    "closed_at": null,
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00",
+    "updated_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "2e5b99af-421d-41b4-a5f2-e1601f0625fe",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "Мелкий заказ на выходные",
+    "company": "ТЕСТ Мини",
+    "contact_name": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "source": "manual",
+    "stage": "lost",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 40000,
+    "expected_margin": 0,
+    "next_step": null,
+    "next_step_date": null,
+    "expected_close": null,
+    "lost_reason": "Дорого",
+    "note": null,
+    "won_at": null,
+    "closed_at": "2026-10-14T18:27:14.58881+00:00",
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00",
+    "updated_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "8f1c5752-72b4-4c8f-bc14-f4c1d04bfce1",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "Сезонный набор на склад",
+    "company": "ТЕСТ Маркет",
+    "contact_name": "Олег",
+    "contact_phone": "+7 900 200-00-04",
+    "contact_email": null,
+    "source": "self_registration",
+    "stage": "negotiation",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 500000,
+    "expected_margin": 110000,
+    "next_step": "Согласовать договор",
+    "next_step_date": "2026-10-19",
+    "expected_close": null,
+    "lost_reason": null,
+    "note": null,
+    "won_at": null,
+    "closed_at": null,
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00",
+    "updated_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "de108f0a-ab3f-4765-8a0d-3924a7d1926b",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "Грузчики на оптовую базу",
+    "company": "ТЕСТ Опт-Сервис",
+    "contact_name": "Анна",
+    "contact_phone": "+7 900 200-00-01",
+    "contact_email": null,
+    "source": "site_form",
+    "stage": "new",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 250000,
+    "expected_margin": 50000,
+    "next_step": "Позвонить",
+    "next_step_date": "2026-10-17",
+    "expected_close": null,
+    "lost_reason": null,
+    "note": null,
+    "won_at": null,
+    "closed_at": null,
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00",
+    "updated_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "5f7d8b99-a759-4e76-be92-861ad1969f26",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "Сортировка посылок",
+    "company": "ТЕСТ Почта Плюс",
+    "contact_name": "Марина",
+    "contact_phone": "+7 900 200-00-03",
+    "contact_email": null,
+    "source": "manual",
+    "stage": "proposal",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 420000,
+    "expected_margin": 90000,
+    "next_step": "Дожать по КП",
+    "next_step_date": "2026-10-16",
+    "expected_close": null,
+    "lost_reason": null,
+    "note": null,
+    "won_at": null,
+    "closed_at": null,
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00",
+    "updated_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "5655d6c1-43ae-4a5d-b45b-e54059dc09b5",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "Фасовка продуктов",
+    "company": "ТЕСТ Продукты+",
+    "contact_name": "Игорь",
+    "contact_phone": "+7 900 200-00-02",
+    "contact_email": null,
+    "source": "manual",
+    "stage": "qualification",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 180000,
+    "expected_margin": 40000,
+    "next_step": "Уточнить объёмы",
+    "next_step_date": "2026-10-18",
+    "expected_close": null,
+    "lost_reason": null,
+    "note": null,
+    "won_at": null,
+    "closed_at": null,
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00",
+    "updated_at": "2026-10-17T18:27:14.58881+00:00"
+   }
+  ],
+  "deal_quotes": [
+   {
+    "id": "fefb3dd3-a018-4cd5-a56f-753cb42a6a0a",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "deal_id": "5f7d8b99-a759-4e76-be92-861ad1969f26",
+    "version": 1,
+    "lines": [
+     {
+      "unit": "hour",
+      "headcount": 8,
+      "client_rate": 410,
+      "position_id": "95478204-5564-48f6-aec5-8adedda7d76f",
+      "worker_rate": 275,
+      "hours_per_month": 1300
+     }
+    ],
+    "valid_until": "2026-10-31",
+    "note": "Демо-КП",
+    "sent_at": null,
+    "sent_to": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00"
+   }
+  ],
+  "deal_touches": [
+   {
+    "id": "270c5ab7-5090-4f47-aa2a-bc7e94a624c0",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "deal_id": "de108f0a-ab3f-4765-8a0d-3924a7d1926b",
+    "kind": "call",
+    "title": "Первичный звонок",
+    "note": null,
+    "due_at": "2026-10-17T18:27:14.58881+00:00",
+    "done_at": null,
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:27:14.58881+00:00"
+   }
+  ],
+  "cash_accounts": [
+   {
+    "id": "6e7afeaa-eca0-47d8-90c1-1d7c82cf6237",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "kind": "bank",
+    "name": "Расчётный счёт",
+    "bank_name": "Т-Банк",
+    "account_number": "40702810000000000099",
+    "opening_balance": 180000,
+    "opening_date": "2026-09-07",
+    "sort_order": 10,
+    "is_active": true,
+    "created_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "903a7a8e-a19e-4ad4-a76f-64223082b426",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "kind": "platform",
+    "name": "Платформа выплат",
+    "bank_name": null,
+    "account_number": null,
+    "opening_balance": 0,
+    "opening_date": "2026-01-01",
+    "sort_order": 20,
+    "is_active": true,
+    "created_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "ca641396-2901-45c8-ad37-3b2ef0ba2d9b",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "kind": "cash",
+    "name": "Касса",
+    "bank_name": null,
+    "account_number": null,
+    "opening_balance": 0,
+    "opening_date": "2026-01-01",
+    "sort_order": 30,
+    "is_active": true,
+    "created_at": "2026-10-17T18:27:14.58881+00:00"
+   }
+  ],
+  "staff_profiles": [
+   {
+    "user_id": "f3859323-8488-4c2b-bb89-4f355b8be1e0",
+    "full_name": "ТЕСТ Руководитель"
+   }
+  ],
+  "positions": [
+   {
+    "id": "95478204-5564-48f6-aec5-8adedda7d76f",
+    "name": "Сортировщик"
+   },
+   {
+    "id": "d241e7f7-e5e5-41ae-940f-763499684fe8",
+    "name": "Упаковщик"
+   },
+   {
+    "id": "2440f322-dfbe-4857-a7f0-6dfe4d48c0a3",
+    "name": "Грузчик"
+   },
+   {
+    "id": "734659d2-9332-43e9-84e8-ef9d4941e2f6",
+    "name": "Комплектовщик"
+   },
+   {
+    "id": "5615236a-43ce-41fe-99c4-be8befe8d8b3",
+    "name": "Кладовщик"
+   },
+   {
+    "id": "c8102f4b-f022-4867-abe9-32912589a76d",
+    "name": "Водитель погрузчика"
+   },
+   {
+    "id": "964122d0-85d0-4dcb-8c3a-de5cf7bae712",
+    "name": "Разнорабочий"
+   }
+  ]
+ },
+ "clientId": "c83f8c53-6715-46cd-a17d-801a078ada4b",
+ "clientDashboard": [
+  {
+   "site_id": "471cb774-0ee9-4aae-b33f-93f4aefcf4f1",
+   "site_name": "ТЕСТ Склад Север",
+   "needed": 140,
+   "confirmed": 133,
+   "started_needed": 119,
+   "on_site": 115,
+   "hours": 976,
+   "amount": 427680,
+   "avg_rating": null
+  },
+  {
+   "site_id": "7e6a97e5-0e91-40ce-b63e-72106874a268",
+   "site_name": "ТЕСТ Склад Юг",
+   "needed": 60,
+   "confirmed": 56,
+   "started_needed": 51,
+   "on_site": 49,
+   "hours": 392,
+   "amount": 156800,
+   "avg_rating": null
+  }
+ ]
+}
