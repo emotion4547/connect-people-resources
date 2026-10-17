@@ -101,5 +101,7 @@ select pg_temp.check('администратор организации 2 не �
 reset role;
 set local role anon;
 select pg_temp.check('аноним не читает организации', pg_temp.denied($$select count(*) from public.organizations$$));
+select pg_temp.check('аноним не читает табели', pg_temp.denied($$select count(*) from public.timesheets$$));
+select pg_temp.check('аноним не отмечает приход', pg_temp.denied($$select public.check_in(gen_random_uuid())$$));
 
 rollback;

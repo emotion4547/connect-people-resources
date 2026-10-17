@@ -7,7 +7,7 @@ export const COMMON_TIMEZONES = [
 
 export interface Site {
   id: string; org_id: string; client_id: string | null; name: string; address: string | null; city: string | null;
-  latitude: number | null; longitude: number | null; checkin_radius_m: number | null; checkin_method: string;
+  latitude: number | null; longitude: number | null; checkin_radius_m: number | null; checkin_method: string; hours_mode: string;
   status: string; instructions: string | null; contact_name: string | null; contact_phone: string | null;
   site_manager_id: string | null; qr_printed_at: string | null; required_docs_confirmed: boolean; timezone: string;
 }

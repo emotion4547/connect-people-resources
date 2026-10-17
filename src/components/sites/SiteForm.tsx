@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { db } from '@/lib/db';
 import { CHECKIN_METHODS, COMMON_TIMEZONES, SITE_STATUSES, type Site } from '@/lib/sitesMeta';
+import { HOURS_MODES } from '@/lib/timesheetsMeta';
 import type { StaffOption } from '@/lib/clientsMeta';
 
 interface Props { site: Site; clients: { id: string; name: string }[]; staff: StaffOption[]; canEdit: boolean; onSaved: () => void }
@@ -26,7 +27,7 @@ export const SiteForm: React.FC<Props> = ({ site, clients, staff, canEdit, onSav
     const { error } = await db('sites').update({
       name: form.name.trim(), client_id: form.client_id, address: form.address || null, city: form.city || null,
       latitude: form.latitude, longitude: form.longitude, checkin_radius_m: form.checkin_radius_m,
-      checkin_method: form.checkin_method, instructions: form.instructions || null,
+      checkin_method: form.checkin_method, hours_mode: form.hours_mode, instructions: form.instructions || null,
       contact_name: form.contact_name || null, contact_phone: form.contact_phone || null,
       site_manager_id: form.site_manager_id, timezone: form.timezone,
       // Статус «Активный» из «Запуск» ставится кнопкой запуска; здесь — только пауза, закрытие и возврат.
@@ -93,6 +94,13 @@ export const SiteForm: React.FC<Props> = ({ site, clients, staff, canEdit, onSav
             <Select value={form.checkin_method} onValueChange={(v) => set('checkin_method', v)} disabled={!canEdit}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{Object.entries(CHECKIN_METHODS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Учёт часов</Label>
+            <Select value={form.hours_mode} onValueChange={(v) => set('hours_mode', v)} disabled={!canEdit}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{Object.entries(HOURS_MODES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="space-y-2">

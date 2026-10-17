@@ -57,6 +57,8 @@ const WorkerDetail = lazy(() => import("./pages/workers/WorkerDetail"));
 const PlanningGrid = lazy(() => import("./pages/planning/PlanningGrid"));
 const OrdersList = lazy(() => import("./pages/orders/OrdersList"));
 const OrderDetail = lazy(() => import("./pages/orders/OrderDetail"));
+const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
+const TimesheetDetail = lazy(() => import("./pages/timesheets/TimesheetDetail"));
 const SitesList = lazy(() => import("./pages/sites/SitesList"));
 const SiteDetail = lazy(() => import("./pages/sites/SiteDetail"));
 const SiteQrPrint = lazy(() => import("./pages/sites/SiteQrPrint"));
@@ -252,6 +254,16 @@ const App = () => (
             <Route path="/orders/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <OrderDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/timesheets" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <TimesheetsList />
+              </ProtectedRoute>
+            } />
+            <Route path="/timesheets/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <TimesheetDetail />
               </ProtectedRoute>
             } />
             <Route path="/sites" element={

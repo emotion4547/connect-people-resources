@@ -47,6 +47,7 @@ import {
   Calendar,
   MoreHorizontal,
   Building2,
+  FileCheck,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -101,6 +102,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" /> },
   { label: 'База исполнителей', href: '/workers', icon: <HardHat className="w-5 h-5" /> },
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" /> },
+  { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
@@ -122,6 +124,7 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" />, module: 'candidates' },
   { label: 'Исполнители', href: '/workers', icon: <HardHat className="w-5 h-5" />, module: 'workers' },
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders' },
+  { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" />, module: 'timesheets' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {
