@@ -81,6 +81,7 @@ const PayoutRegistryDetail = lazy(() => import("./pages/payouts/PayoutRegistryDe
 const Advances = lazy(() => import("./pages/payouts/Advances"));
 const WorkerPayments = lazy(() => import("./pages/worker/WorkerPayments"));
 const WorkerCertificate = lazy(() => import("./pages/worker/WorkerCertificate"));
+const CashPage = lazy(() => import("./pages/cash/CashPage"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -395,6 +396,11 @@ const App = () => (
             <Route path="/worker/certificate" element={
               <ProtectedRoute allowedRoles={['worker']}>
                 <WorkerCertificate />
+              </ProtectedRoute>
+            } />
+            <Route path="/cash" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <CashPage />
               </ProtectedRoute>
             } />
             <Route path="/documents/:id" element={
