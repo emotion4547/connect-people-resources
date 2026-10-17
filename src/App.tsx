@@ -72,6 +72,8 @@ const ClientDocuments = lazy(() => import("./pages/client/ClientDocuments"));
 const PaymentsPage = lazy(() => import("./pages/payments/PaymentsPage"));
 const ReceivablesPage = lazy(() => import("./pages/payments/ReceivablesPage"));
 const ReconciliationPrint = lazy(() => import("./pages/documents/ReconciliationPrint"));
+const MonthClosePage = lazy(() => import("./pages/payments/MonthClosePage"));
+const Export1CPage = lazy(() => import("./pages/payments/Export1CPage"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -341,6 +343,16 @@ const App = () => (
             <Route path="/receivables" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant']}>
                 <ReceivablesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/month-close" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <MonthClosePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/export-1c" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
+                <Export1CPage />
               </ProtectedRoute>
             } />
             <Route path="/documents/:id" element={

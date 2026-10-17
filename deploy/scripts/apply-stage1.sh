@@ -35,6 +35,7 @@ MIGRATIONS=(
   20261017232000_client_order_quote.sql
   20261018100000_client_documents.sql
   20261018110000_payments_receivables.sql
+  20261018120000_period_locks_export.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -95,6 +96,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261018120000*) q="select to_regclass('public.period_locks') is not null" ;;
     20261018110000*) q="select to_regclass('public.client_payments') is not null" ;;
     20261018100000*) q="select to_regclass('public.client_documents') is not null" ;;
     20261017232000*) q="select to_regprocedure('public.client_timesheet_summary(uuid)') is not null" ;;
