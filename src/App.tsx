@@ -82,6 +82,7 @@ const Advances = lazy(() => import("./pages/payouts/Advances"));
 const WorkerPayments = lazy(() => import("./pages/worker/WorkerPayments"));
 const WorkerCertificate = lazy(() => import("./pages/worker/WorkerCertificate"));
 const PaymentCalendar = lazy(() => import("./pages/cash/PaymentCalendar"));
+const AdminErrors = lazy(() => import("./pages/admin/AdminErrors"));
 const TimesheetPrint = lazy(() => import("./pages/timesheets/TimesheetPrint"));
 const ImportPage = lazy(() => import("./pages/import/ImportPage"));
 const RotationCalendar = lazy(() => import("./pages/orders/RotationCalendar"));
@@ -415,6 +416,11 @@ const App = () => (
             <Route path="/worker/certificate" element={
               <ProtectedRoute allowedRoles={['worker']}>
                 <WorkerCertificate />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/errors" element={
+              <ProtectedRoute allowedRoles={['admin', 'director']}>
+                <AdminErrors />
               </ProtectedRoute>
             } />
             <Route path="/import" element={

@@ -34,6 +34,7 @@ import {
   Building,
   UserCog,
   ShieldCheck,
+  ShieldAlert,
   BookOpen,
   KeyRound,
   Briefcase,
@@ -147,6 +148,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Права ролей', href: '/admin/permissions', icon: <ShieldCheck className="w-5 h-5" /> },
   { label: 'Справочники', href: '/admin/directories', icon: <BookOpen className="w-5 h-5" /> },
   { label: 'Безопасность', href: '/security', icon: <KeyRound className="w-5 h-5" /> },
+  { label: 'Журнал ошибок', href: '/admin/errors', icon: <ShieldAlert className="w-5 h-5" /> },
   { label: 'Правила и ставки', href: '/admin/rules', icon: <SlidersHorizontal className="w-5 h-5" /> },
   { label: 'Настройки', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
 ];
@@ -178,6 +180,7 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Реестры выплат', href: '/payout-registries', icon: <ListChecks className="w-5 h-5" />, module: 'payout_registries', group: 'Деньги' },
   { label: 'Авансы', href: '/advances', icon: <Banknote className="w-5 h-5" />, module: 'payout_registries', group: 'Деньги' },
   { label: 'Импорт из Excel', href: '/import', icon: <Upload className="w-5 h-5" />, module: 'clients', group: 'Сервис' },
+  { label: 'Журнал ошибок', href: '/admin/errors', icon: <ShieldAlert className="w-5 h-5" />, module: 'users_directories', group: 'Сервис' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {

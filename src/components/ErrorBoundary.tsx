@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { reportError } from '@/lib/errorReporter';
 import { AlertTriangle } from 'lucide-react';
 
 interface State {
@@ -16,6 +17,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('ErrorBoundary caught', error, info);
+    reportError(error, 'страница упала');
   }
 
   handleReset = () => {

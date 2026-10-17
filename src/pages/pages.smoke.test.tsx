@@ -12,6 +12,7 @@ import DocumentControl from '@/pages/workers/DocumentControl';
 import RotationCalendar from '@/pages/orders/RotationCalendar';
 import ImportPage from '@/pages/import/ImportPage';
 import CashPage from '@/pages/cash/CashPage';
+import AdminErrors from '@/pages/admin/AdminErrors';
 
 const today = new Date().toISOString().slice(0, 10);
 const month = `${today.slice(0, 7)}-01`;
@@ -133,6 +134,14 @@ describe('страницы этапа 3 отрисовываются на отв
     fireEvent.click(screen.getByRole('button', { name: 'Счета' }));
     expect(await screen.findByText(/Остаток на начало и его дата/)).toBeTruthy();
     expect(screen.getByText('Добавить счёт')).toBeTruthy();
+  });
+
+  it('Журнал ошибок интерфейса', async () => {
+    fixtures.tables.client_errors = [{ id: 'e1', role: 'sales', message: 'TypeError: x is undefined', stack: 'at Foo', url: '/deals/1', user_agent: 'Chrome', created_at: new Date().toISOString() }];
+    renderPage(<AdminErrors />);
+    expect(await screen.findByText('TypeError: x is undefined')).toBeTruthy();
+    fireEvent.click(screen.getByText('TypeError: x is undefined'));
+    expect(await screen.findByText(/at Foo/)).toBeTruthy();
   });
 
   it('Импорт: вкладки и шаблон', async () => {
