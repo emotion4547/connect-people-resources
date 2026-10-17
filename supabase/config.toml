@@ -21,3 +21,7 @@ verify_jwt = true
 # Вызывается по расписанию сервера, защита — секрет в заголовке x-cron-secret
 [functions.deliver-notifications]
 verify_jwt = false
+
+# Отправка реестра на платформу самозанятых: вход пользователя проверяется внутри функции
+[functions.send-platform-payouts]
+verify_jwt = false

@@ -98,6 +98,7 @@ const workerNavItems: NavItem[] = [
   { label: 'Мои смены', href: '/worker/my-shifts', icon: <Clock className="w-5 h-5" /> },
   { label: 'Открытые смены', href: '/worker/open-shifts', icon: <Search className="w-5 h-5" /> },
   { label: 'Заработок', href: '/worker/earnings', icon: <Wallet className="w-5 h-5" /> },
+  { label: 'Выплаты', href: '/worker/payments', icon: <Banknote className="w-5 h-5" /> },
   { label: 'Реквизиты', href: '/worker/payouts', icon: <CreditCard className="w-5 h-5" /> },
   { label: 'Главная', href: '/worker/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },

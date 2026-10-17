@@ -65,13 +65,19 @@ const PaymentsPage: React.FC = () => {
   const upload = async (f: File | undefined) => {
     if (!f || !orgId) return;
     const parsed = parseStatement(decodeStatement(await f.arrayBuffer()));
-    if (!parsed.payments.length) { toast({ title: 'В файле нет входящих платежей', description: 'Проверьте, что это выписка kl_to_1c.txt по нашему счёту.', variant: 'destructive' }); return; }
+    if (!parsed.payments.length && !parsed.outgoing.length) { toast({ title: 'В файле нет платежей', description: 'Проверьте, что это выписка kl_to_1c.txt по нашему счёту.', variant: 'destructive' }); return; }
     setBusy(true);
-    const { data, error } = await rpc('import_bank_statement', { _org_id: orgId, _filename: f.name, _account: parsed.account, _payments: parsed.payments });
+    const { data, error } = parsed.payments.length
+      ? await rpc('import_bank_statement', { _org_id: orgId, _filename: f.name, _account: parsed.account, _payments: parsed.payments })
+      : { data: { new: 0, allocated: 0, queue: 0, duplicates: 0 }, error: null };
+    // Исходящие платежи по реестрам выплат: отмечают строки «проведена».
+    const rec = !error && parsed.outgoing.length ? await rpc('reconcile_bank_statement', { _org_id: orgId, _payments: parsed.outgoing }) : null;
     setBusy(false);
     if (fileRef.current) fileRef.current.value = '';
     if (error) { toast({ title: 'Выписка не загружена', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: `Загружено: ${data.new}, разнесено само: ${data.allocated}, в очередь: ${data.queue}`, description: data.duplicates ? `Повторов пропущено: ${data.duplicates}` : undefined });
+    const paidOut = rec?.data?.matched ?? 0;
+    toast({ title: `Загружено: ${data.new}, разнесено само: ${data.allocated}, в очередь: ${data.queue}`,
+      description: [data.duplicates ? `Повторов пропущено: ${data.duplicates}` : '', paidOut ? `Выплат отмечено проведёнными: ${paidOut}` : ''].filter(Boolean).join('. ') || undefined });
     load();
   };
 

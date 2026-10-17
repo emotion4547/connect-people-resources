@@ -38,6 +38,7 @@ MIGRATIONS=(
   20261018120000_period_locks_export.sql
   20261018130000_payout_requisites.sql
   20261018140000_payout_registries.sql
+  20261018150000_payout_channels.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -48,7 +49,7 @@ if [ "${1:-}" != "--yes" ]; then
   1. бэкап базы (/opt/supabase/backup.sh) и проверка, что файл создан
   2. миграции по порядку, каждая в своей транзакции, уже применённые пропускаются:
 $(printf '       %s\n' "${MIGRATIONS[@]}")
-  3. edge-функции invite-staff, admit-candidate, deliver-notifications и check-npd-status в /opt/supabase/volumes/functions, перезапуск supabase-edge-functions
+  3. edge-функции invite-staff, admit-candidate, deliver-notifications, check-npd-status и send-platform-payouts в /opt/supabase/volumes/functions, перезапуск supabase-edge-functions
   4. docker-compose.yml: GOTRUE_MFA_TOTP_* и расширенный GOTRUE_URI_ALLOW_LIST (копия файла рядом),
      перезапуск только сервиса входа (auth), вход прервётся на несколько секунд
   5. проверка (deploy/scripts/stage1-smoke.sql): выполняется в транзакции и откатывается
@@ -60,6 +61,7 @@ fi
 
 for f in "${MIGRATIONS[@]}"; do [ -f "supabase/migrations/$f" ] || { echo "Нет файла supabase/migrations/$f"; exit 1; }; done
 [ -f deploy/supabase/volumes/functions/admit-candidate/index.ts ] || { echo "Нет файла функции admit-candidate"; exit 1; }
+[ -f deploy/supabase/volumes/functions/send-platform-payouts/index.ts ] || { echo "Нет файла функции send-platform-payouts"; exit 1; }
 [ -f deploy/supabase/volumes/functions/check-npd-status/index.ts ] || { echo "Нет файла функции check-npd-status"; exit 1; }
 [ -f deploy/supabase/volumes/functions/deliver-notifications/index.ts ] || { echo "Нет файла функции deliver-notifications"; exit 1; }
 [ -f deploy/supabase/volumes/functions/invite-staff/index.ts ] || { echo "Нет файла функции invite-staff"; exit 1; }
@@ -75,6 +77,7 @@ scp -q deploy/supabase/volumes/functions/invite-staff/index.ts "$HOST:$REMOTE_DI
 scp -q deploy/supabase/volumes/functions/admit-candidate/index.ts "$HOST:$REMOTE_DIR/functions/admit-candidate.ts"
 scp -q deploy/supabase/volumes/functions/deliver-notifications/index.ts "$HOST:$REMOTE_DIR/functions/deliver-notifications.ts"
 scp -q deploy/supabase/volumes/functions/check-npd-status/index.ts "$HOST:$REMOTE_DIR/functions/check-npd-status.ts"
+scp -q deploy/supabase/volumes/functions/send-platform-payouts/index.ts "$HOST:$REMOTE_DIR/functions/send-platform-payouts.ts"
 
 echo "== Выполнение на сервере"
 ssh "$HOST" "REMOTE_DIR=$REMOTE_DIR STAMP=$STAMP bash -s" <<'REMOTE'
@@ -100,6 +103,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261018150000*) q="select to_regprocedure('public.payout_registry_export(uuid)') is not null" ;;
     20261018140000*) q="select to_regclass('public.payout_registries') is not null" ;;
     20261018130000*) q="select to_regclass('public.payout_requisites') is not null" ;;
     20261018120000*) q="select to_regclass('public.period_locks') is not null" ;;
@@ -144,8 +148,8 @@ else
   echo "   ключ уже задан"
 fi
 
-echo "-- 3. Edge-функции invite-staff, admit-candidate, deliver-notifications и check-npd-status"
-for fn in invite-staff admit-candidate deliver-notifications check-npd-status; do
+echo "-- 3. Edge-функции invite-staff, admit-candidate, deliver-notifications, check-npd-status и send-platform-payouts"
+for fn in invite-staff admit-candidate deliver-notifications check-npd-status send-platform-payouts; do
   mkdir -p "volumes/functions/$fn"
   cp "$REMOTE_DIR/functions/$fn.ts" "volumes/functions/$fn/index.ts"
 done

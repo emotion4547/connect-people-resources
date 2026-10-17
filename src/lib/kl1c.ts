@@ -2,7 +2,8 @@
 // на наш расчётный счёт. Файл обычно в кодировке Windows-1251, иногда DOS (866) или UTF-8.
 
 export interface ParsedPayment { date: string; amount: number; number: string; payer_name: string; payer_inn: string; purpose: string }
-export interface ParsedStatement { account: string; payments: ParsedPayment[]; skipped: number }
+export interface ParsedOutgoing { date: string; amount: number; number: string; recipient_name: string; purpose: string }
+export interface ParsedStatement { account: string; payments: ParsedPayment[]; outgoing: ParsedOutgoing[]; skipped: number }
 
 export function decodeStatement(bytes: ArrayBuffer): string {
   const win = new TextDecoder('windows-1251').decode(bytes);
@@ -35,9 +36,19 @@ export function parseStatement(text: string): ParsedStatement {
     else if (key === 'РасчСчет' && !account) account = value.trim();
   }
   const payments: ParsedPayment[] = [];
+  const outgoing: ParsedOutgoing[] = [];
   let skipped = 0;
   for (const d of docs) {
     // Входящий платёж: получатель — наш счёт (или проставлена дата поступления).
+    const outgo = !!account && (d['ПлательщикСчет'] ?? '').trim() === account && (d['ПолучательСчет'] ?? '').trim() !== account;
+    if (outgo) {
+      const amt = Number((d['Сумма'] ?? '').replace(/\s/g, '').replace(',', '.'));
+      const dt = isoDate(d['ДатаСписано'] || d['Дата'] || '');
+      if (dt && amt > 0) {
+        outgoing.push({ date: dt, amount: amt, number: (d['Номер'] ?? '').trim(), recipient_name: (d['Получатель1'] || (d['Получатель'] ?? '').replace(/^ИНН\s*\d*\s*/i, '')).trim(), purpose: (d['НазначениеПлатежа'] ?? '').trim() });
+      } else skipped++;
+      continue;
+    }
     const incoming = d['ПолучательСчет'] ? d['ПолучательСчет'].trim() === account : !!d['ДатаПоступления'];
     const amount = Number((d['Сумма'] ?? '').replace(/\s/g, '').replace(',', '.'));
     const date = isoDate(d['ДатаПоступления'] || d['Дата'] || '');
@@ -48,5 +59,5 @@ export function parseStatement(text: string): ParsedStatement {
       purpose: (d['НазначениеПлатежа'] ?? '').trim(),
     });
   }
-  return { account, payments, skipped };
+  return { account, payments, outgoing, skipped };
 }

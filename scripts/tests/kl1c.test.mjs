@@ -37,11 +37,13 @@ const SAMPLE = `1CClientBankExchange
 КонецДокумента
 КонецФайла`;
 
-test('входящий платёж разобран, исходящий пропущен', () => {
+test('входящий платёж и исходящий разобраны по отдельности', () => {
   const r = mod.parseStatement(SAMPLE);
   assert.equal(r.account, '40702810000000000001');
   assert.equal(r.payments.length, 1);
-  assert.equal(r.skipped, 1);
+  assert.equal(r.outgoing.length, 1);
+  assert.equal(r.outgoing[0].amount, 1200.5);
+  assert.equal(r.skipped, 0);
   assert.deepEqual(r.payments[0], {
     date: '2026-03-06', amount: 5000, number: '101', payer_name: 'ООО Ромашка', payer_inn: '5612345678', purpose: 'Оплата по счёту СЧ-2026/17',
   });

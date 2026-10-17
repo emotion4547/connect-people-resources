@@ -79,6 +79,8 @@ const WorkerPayouts = lazy(() => import("./pages/worker/WorkerPayouts"));
 const PayoutRegistries = lazy(() => import("./pages/payouts/PayoutRegistries"));
 const PayoutRegistryDetail = lazy(() => import("./pages/payouts/PayoutRegistryDetail"));
 const Advances = lazy(() => import("./pages/payouts/Advances"));
+const WorkerPayments = lazy(() => import("./pages/worker/WorkerPayments"));
+const WorkerCertificate = lazy(() => import("./pages/worker/WorkerCertificate"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -383,6 +385,16 @@ const App = () => (
             <Route path="/advances" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'accountant']}>
                 <Advances />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/payments" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerPayments />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/certificate" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerCertificate />
               </ProtectedRoute>
             } />
             <Route path="/documents/:id" element={
