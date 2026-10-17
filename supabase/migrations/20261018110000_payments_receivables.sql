@@ -582,6 +582,6 @@ BEGIN
     RAISE EXCEPTION 'Укажите причину аннулирования' USING ERRCODE = '22023';
   END IF;
   UPDATE public.client_documents SET status = 'cancelled', cancel_reason = _reason, cancelled_at = now() WHERE id = a.id OR parent_document_id = a.id;
-  UPDATE public.accruals SET status = 'approved', client_document_id = NULL WHERE client_document_id = a.id AND status = 'in_act';
+  UPDATE public.accruals SET status = CASE WHEN status = 'in_act' THEN 'approved' ELSE status END, client_document_id = NULL WHERE client_document_id = a.id;
 END;
 $$;

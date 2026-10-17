@@ -69,7 +69,7 @@ BEGIN
        WHERE x.org_id = _org_id AND x.shift_date BETWEEN m1 AND m2 AND x.needs_approval AND x.status = 'draft'), '/accruals'),
     ('block', 'not_invoiced', 'Утверждённые начисления не вошли в акт', (
        SELECT count(*)::integer FROM public.accruals x
-       WHERE x.org_id = _org_id AND x.shift_date BETWEEN m1 AND m2 AND x.kind <> 'correction' AND x.status = 'approved'
+       WHERE x.org_id = _org_id AND x.shift_date BETWEEN m1 AND m2 AND x.kind <> 'correction' AND x.status <> 'draft'
          AND x.client_document_id IS NULL AND x.amount_client <> 0), '/documents'),
     ('block', 'drafts', 'Остались черновики актов и счетов за месяц', (
        SELECT count(*)::integer FROM public.client_documents d

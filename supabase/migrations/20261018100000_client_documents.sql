@@ -246,7 +246,7 @@ BEGIN
   -- В документ входят утверждённые начисления заказчика, ещё не попавшие в другой документ: за период, а также
   -- доначисления за прошлые периоды и корректировки, подтверждённые позже.
   UPDATE public.accruals SET client_document_id = act_id
-   WHERE client_id = _client_id AND org_id = c.org_id AND status = 'approved' AND client_document_id IS NULL
+   WHERE client_id = _client_id AND org_id = c.org_id AND status IN ('approved', 'in_registry', 'paid') AND client_document_id IS NULL
      AND amount_client <> 0 AND shift_date <= _to;
   GET DIAGNOSTICS linked = ROW_COUNT;
   IF linked = 0 THEN
@@ -528,7 +528,7 @@ BEGIN
     RAISE EXCEPTION 'Укажите причину аннулирования' USING ERRCODE = '22023';
   END IF;
   UPDATE public.client_documents SET status = 'cancelled', cancel_reason = _reason, cancelled_at = now() WHERE id = a.id OR parent_document_id = a.id;
-  UPDATE public.accruals SET status = 'approved', client_document_id = NULL WHERE client_document_id = a.id AND status = 'in_act';
+  UPDATE public.accruals SET status = CASE WHEN status = 'in_act' THEN 'approved' ELSE status END, client_document_id = NULL WHERE client_document_id = a.id;
 END;
 $$;
 

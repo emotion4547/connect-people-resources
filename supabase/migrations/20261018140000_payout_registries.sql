@@ -174,7 +174,7 @@ BEGIN
   SELECT org_id INTO org FROM public.workers WHERE user_id = _worker_id;
   pct := coalesce(public.get_setting_numeric(org, 'advance.max_pct'), 50);
   SELECT coalesce(sum(amount_worker), 0) INTO accrued FROM public.accruals
-   WHERE worker_id = _worker_id AND status IN ('approved', 'in_registry') AND date_trunc('month', shift_date) = date_trunc('month', current_date);
+   WHERE worker_id = _worker_id AND status IN ('approved', 'in_act', 'in_registry') AND date_trunc('month', shift_date) = date_trunc('month', current_date);
   SELECT coalesce(sum(CASE WHEN status = 'issued' THEN remaining ELSE amount END), 0) INTO open_advances FROM public.worker_advances
    WHERE worker_id = _worker_id AND status IN ('requested', 'approved', 'in_registry', 'issued');
   room := greatest(accrued * pct / 100 - open_advances, 0);
@@ -319,7 +319,7 @@ BEGIN
     FOR c IN
       SELECT x.worker_id, w.full_name, w.tax_status, sum(x.amount_worker) AS gross, array_agg(x.id) AS accrual_ids
       FROM public.accruals x JOIN public.workers w ON w.user_id = x.worker_id
-      WHERE x.org_id = _org_id AND x.status = 'approved' AND x.payout_line_id IS NULL AND x.amount_worker <> 0 AND x.shift_date <= _to
+      WHERE x.org_id = _org_id AND x.status IN ('approved', 'in_act') AND x.payout_line_id IS NULL AND x.amount_worker <> 0 AND x.shift_date <= _to
       GROUP BY x.worker_id, w.full_name, w.tax_status ORDER BY w.full_name
     LOOP
       SELECT * INTO el FROM private.payout_eligibility(c.worker_id);
@@ -458,7 +458,7 @@ DECLARE
   d record;
 BEGIN
   SELECT * INTO l FROM public.payout_lines WHERE id = _line_id;
-  UPDATE public.accruals SET status = 'approved', payout_line_id = NULL WHERE payout_line_id = _line_id AND status IN ('in_registry', 'paid');
+  UPDATE public.accruals SET status = CASE WHEN client_document_id IS NOT NULL THEN 'in_act' ELSE 'approved' END, payout_line_id = NULL WHERE payout_line_id = _line_id AND status IN ('in_registry', 'paid');
   FOR d IN SELECT advance_id, amount FROM public.advance_deductions WHERE line_id = _line_id LOOP
     UPDATE public.worker_advances SET remaining = remaining + d.amount, status = 'issued' WHERE id = d.advance_id;
   END LOOP;
@@ -651,7 +651,7 @@ BEGIN
        WHERE x.org_id = _org_id AND x.shift_date BETWEEN m1 AND m2 AND x.needs_approval AND x.status = 'draft'), '/accruals'),
     ('block', 'not_invoiced', 'Утверждённые начисления не вошли в акт', (
        SELECT count(*)::integer FROM public.accruals x
-       WHERE x.org_id = _org_id AND x.shift_date BETWEEN m1 AND m2 AND x.kind <> 'correction' AND x.status = 'approved'
+       WHERE x.org_id = _org_id AND x.shift_date BETWEEN m1 AND m2 AND x.kind <> 'correction' AND x.status <> 'draft'
          AND x.client_document_id IS NULL AND x.amount_client <> 0), '/documents'),
     ('block', 'drafts', 'Остались черновики актов и счетов за месяц', (
        SELECT count(*)::integer FROM public.client_documents d
