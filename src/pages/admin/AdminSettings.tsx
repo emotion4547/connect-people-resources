@@ -205,6 +205,7 @@ const AdminSettings: React.FC = () => {
                     </p>
                   </div>
                   <Switch
+                    aria-label="Отправлять заявки на адрес автоматически"
                     checked={settings.is_active}
                     onCheckedChange={(checked) => setSettings({ ...settings, is_active: checked })}
                   />

@@ -34,7 +34,7 @@ const SiteQrPrint: React.FC = () => {
         <>
           <h1 className="text-4xl font-bold text-center">{name}</h1>
           {address && <p className="text-xl text-center">{address}</p>}
-          {payload && <QRCodeSVG value={payload} size={420} marginSize={2} />}
+          {payload && <QRCodeSVG title="QR-код объекта для отметки прихода" value={payload} size={420} marginSize={2} />}
           <p className="text-2xl text-center max-w-xl">Отметьтесь в приложении «Работа для Всех», когда придёте на смену и когда закончите её.</p>
           <Button className="print:hidden" onClick={() => window.print()}>Печать</Button>
         </>

@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 
 // Подмена слоя данных: таблицы отдают заготовленные строки, функции — заготовленные ответы.
 import liveTables from './fixtures/live-tables.json';
+import liveSnapshot from './fixtures/live.json';
 
 export const fixtures: {
   tables: Record<string, unknown[]>;
@@ -34,7 +35,7 @@ export const dbMock = {
   db: (table: string) => chain(rowsOf(table)),
   rpc: (fn: string, args?: Record<string, unknown>) => {
     fixtures.calls.push({ fn, args });
-    const f = fixtures.rpc[fn];
+    const f = fixtures.rpc[fn] ?? (fixtures.useLive ? (liveSnapshot as unknown as { rpc: Record<string, unknown> }).rpc[fn] : undefined);
     const data = typeof f === 'function' ? (f as (a?: Record<string, unknown>) => unknown)(args) : f;
     return Promise.resolve({ data: data ?? [], error: null });
   },

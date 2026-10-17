@@ -304,7 +304,7 @@ const WorkerSupport: React.FC = () => {
                 disabled={sending}
                 className="flex-1"
               />
-              <Button type="submit" disabled={!newMessage.trim() || sending}>
+              <Button type="submit" disabled={!newMessage.trim() || sending} aria-label="Отправить">
                 <Send className="w-4 h-4" />
               </Button>
             </form>

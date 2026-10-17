@@ -175,11 +175,11 @@ const AdminReports: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-end">
             <div>
               <Label className="text-xs">Период с</Label>
-              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9" />
+              <Input type="date" aria-label="Дата с" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9" />
             </div>
             <div>
               <Label className="text-xs">по</Label>
-              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-9" />
+              <Input type="date" aria-label="Дата по" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-9" />
             </div>
             <div className="col-span-2 text-xs text-muted-foreground">
               Всего откликов в системе: <strong>{responsesCount}</strong>

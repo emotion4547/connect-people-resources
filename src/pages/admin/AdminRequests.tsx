@@ -511,6 +511,7 @@ const AdminRequests: React.FC = () => {
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="date"
+                    aria-label="Дата начала"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
                     className="pl-9"

@@ -282,10 +282,10 @@ const AdminSites: React.FC = () => {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => setManageSite(site)}>
+                            <Button size="sm" variant="ghost" onClick={() => setManageSite(site)} aria-label="Участники">
                               <Users className="w-4 h-4" />
                             </Button>
-                            <Button size="sm" variant="ghost" onClick={() => openEdit(site)}>
+                            <Button size="sm" variant="ghost" onClick={() => openEdit(site)} aria-label="Изменить">
                               <Edit className="w-4 h-4" />
                             </Button>
                             <Button
@@ -293,7 +293,7 @@ const AdminSites: React.FC = () => {
                               variant="ghost"
                               onClick={() => setDeleteSite(site)}
                               className="text-destructive hover:text-destructive"
-                            >
+                             aria-label="Удалить">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
@@ -378,7 +378,7 @@ const AdminSites: React.FC = () => {
                   return (
                     <div key={id} className="flex items-center justify-between bg-muted/40 px-3 py-2 rounded-md">
                       <span className="text-sm">{u?.full_name || u?.login || u?.email || id}</span>
-                      <Button size="sm" variant="ghost" onClick={() => removeManager(id)}>
+                      <Button size="sm" variant="ghost" onClick={() => removeManager(id)} aria-label="Закрыть">
                         <X className="w-4 h-4" />
                       </Button>
                     </div>
@@ -420,7 +420,7 @@ const AdminSites: React.FC = () => {
                   return (
                     <div key={id} className="flex items-center justify-between bg-muted/40 px-3 py-2 rounded-md">
                       <span className="text-sm">{u?.full_name || u?.login || u?.email || id}</span>
-                      <Button size="sm" variant="ghost" onClick={() => removeWorker(id)}>
+                      <Button size="sm" variant="ghost" onClick={() => removeWorker(id)} aria-label="Закрыть">
                         <X className="w-4 h-4" />
                       </Button>
                     </div>

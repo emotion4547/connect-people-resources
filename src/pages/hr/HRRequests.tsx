@@ -486,6 +486,7 @@ const HRRequests: React.FC = () => {
                 <Label className="text-xs">Дата от</Label>
                 <Input
                   type="date"
+                  aria-label="Дата от"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
                   className="h-9 text-sm"
@@ -495,6 +496,7 @@ const HRRequests: React.FC = () => {
                 <Label className="text-xs">Дата до</Label>
                 <Input
                   type="date"
+                  aria-label="Дата до"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
                   className="h-9 text-sm"

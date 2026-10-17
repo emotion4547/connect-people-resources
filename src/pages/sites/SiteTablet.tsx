@@ -40,7 +40,7 @@ const SiteTablet: React.FC = () => {
       {error ? <p>{error}</p> : (
         <>
           <h1 className="text-4xl font-bold text-center">{name}</h1>
-          {payload && <QRCodeSVG value={payload} size={Math.min(window.innerHeight - 260, 520)} marginSize={2} />}
+          {payload && <QRCodeSVG title="QR-код объекта для отметки прихода" value={payload} size={Math.min(window.innerHeight - 260, 520)} marginSize={2} />}
           <p className="text-2xl">Код обновится через {left} с</p>
           <p className="text-lg text-neutral-600">Отметьтесь в приложении, наведя камеру на код</p>
         </>

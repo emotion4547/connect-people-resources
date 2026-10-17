@@ -194,6 +194,7 @@ const WorkerVacancies: React.FC = () => {
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="date"
+                    aria-label="Дата"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
                     className="pl-9"
@@ -298,7 +299,7 @@ const WorkerVacancies: React.FC = () => {
                       size="icon"
                       onClick={() => handleContactSupport(vacancy.id)}
                       title="Связаться с поддержкой"
-                    >
+                     aria-label="Действие">
                       <MessageCircle className="w-4 h-4" />
                     </Button>
                   </div>

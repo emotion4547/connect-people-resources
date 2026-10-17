@@ -146,7 +146,7 @@ const WorkerCalendar: React.FC = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                >
+                 aria-label="Назад">
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
                 <CardTitle className="text-xl capitalize">
@@ -156,7 +156,7 @@ const WorkerCalendar: React.FC = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                >
+                 aria-label="Вперёд">
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>

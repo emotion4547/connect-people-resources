@@ -13,9 +13,19 @@ const SelectValue = SelectPrimitive.Value;
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => {
+  // У выпадающего списка нет имени от содержимого (роль combobox). Если страница не задала aria-label или label,
+  // читалке достаточно названия по текущему значению — лучше, чем безымянная кнопка.
+  const inner = React.useRef<HTMLButtonElement | null>(null);
+  React.useEffect(() => {
+    const el = inner.current;
+    if (!el) return;
+    const labelled = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || (el.id && document.querySelector(`label[for="${el.id}"]`));
+    if (!labelled) el.setAttribute('aria-label', el.textContent?.trim() || 'Выбор из списка');
+  });
+  return (
   <SelectPrimitive.Trigger
-    ref={ref}
+    ref={(node) => { inner.current = node; if (typeof ref === 'function') ref(node); else if (ref) (ref as React.MutableRefObject<HTMLButtonElement | null>).current = node; }}
     className={cn(
       "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className,
@@ -27,7 +37,8 @@ const SelectTrigger = React.forwardRef<
       <ChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
-));
+  );
+});
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 const SelectScrollUpButton = React.forwardRef<

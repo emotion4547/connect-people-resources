@@ -387,6 +387,7 @@ const AdminUsers: React.FC = () => {
                             <Button
                               variant="ghost"
                               size="sm"
+                              aria-label={user.is_active ? 'Заблокировать' : 'Разблокировать'}
                               onClick={() => handleOpenBlockDialog(user)}
                               className={user.is_active ? "text-destructive hover:text-destructive" : "text-status-success hover:text-status-success"}
                             >
@@ -399,7 +400,7 @@ const AdminUsers: React.FC = () => {
                                 onClick={() => { setUserToDelete(user); setShowDeleteDialog(true); }}
                                 className="text-destructive hover:text-destructive"
                                 title="Удалить аккаунт"
-                              >
+                               aria-label="Удалить">
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             )}

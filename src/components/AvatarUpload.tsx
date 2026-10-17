@@ -172,6 +172,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         type="button"
         variant="secondary"
         size="icon"
+        aria-label="Загрузить фото"
         className={`absolute -bottom-1 -right-1 ${buttonSizeClasses[size]} rounded-full p-0 shadow-md`}
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}

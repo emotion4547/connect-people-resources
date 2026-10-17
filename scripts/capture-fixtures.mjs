@@ -70,6 +70,27 @@ for (const t of names) {
 mkdirSync('src/test/fixtures', { recursive: true });
 writeFileSync('src/test/fixtures/live-tables.json', JSON.stringify(all));
 console.log('таблиц снято:', Object.keys(all).length);
+// Остальные функции чтения, которыми пользуются страницы этапов 1 и 2 (каждая под своей ролью и с настоящими идентификаторами демо-организации)
+const wlogin = await (await fetch(URL + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: KEY, 'content-type': 'application/json' }, body: JSON.stringify({ email: acc.worker[0], password: acc.worker[1] }) })).json();
+const wtok = wlogin.access_token, wid = wlogin.user.id;
+const sm = await login(...acc.site_manager), acct = await login(...acc.accountant), recr = await login(...acc.recruiter);
+const pastShift = (all.shifts ?? []).filter((x) => x.shift_date < today).sort((a, b) => b.shift_date.localeCompare(a.shift_date))[0];
+const ts = (all.timesheets ?? [])[0], cand = (all.candidates ?? [])[0], site = (all.sites ?? [])[0];
+const d60 = new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10);
+const extra = {
+  worker_my_shifts: [wtok, { _from: d60, _to: to }], worker_open_shifts: [wtok, { _from: today, _to: to }], worker_earnings: [wtok, { _from: d60, _to: to }],
+  worker_payouts: [wtok, { _from: d60, _to: to }], worker_statement: [wtok, { _from: d60, _to: to }], my_payout_requisites: [wtok, {}],
+  client_shifts: [cli, { _from: d60, _to: to }], client_shift_people: [cli, { _shift_id: pastShift?.id }], client_statement: [cli, { _from: d60, _to: to }],
+  client_reconciliation: [cli, { _client_id: out.clientId, _from: d60, _to: to }], client_tariffs: [cli, {}], client_timesheet_summary: [cli, { _timesheet_id: ts?.id }],
+  month_close_blockers: [acct, { _org_id: org, _month: monthFrom }], payout_eligibility: [acct, { _worker_id: wid }], payout_requisites_queue: [acct, { _org_id: org }],
+  referral_report: [recr, { _org_id: org }], worker_activation_list: [recr, { _org_id: org, _kind: 'no_shift_14' }], shift_money: [sm, { _from: d60, _to: to }],
+  site_launch_checklist: [sm, { _site_id: site?.id }], timesheet_lines: [sm, { _timesheet_id: ts?.id }], find_workers: [sm, { _shift_id: pastShift?.id, _query: null, _limit: 50 }],
+  candidate_checklist: [recr, { _candidate_id: cand?.id }], my_permissions: [dir, { _org_id: org }],
+};
+for (const [fn, [tok, args]] of Object.entries(extra)) {
+  const v = await rpc(tok, fn, args);
+  out.rpc[fn] = v;
+}
 const bad = Object.entries(out.rpc).filter(([, v]) => !Array.isArray(v) && typeof v !== 'string' && typeof v !== 'number');
 if (bad.length) { console.error('Ошибки в ответах:', bad.map(([k, v]) => k + ': ' + JSON.stringify(v).slice(0, 120))); process.exit(1); }
 mkdirSync('src/test/fixtures', { recursive: true });

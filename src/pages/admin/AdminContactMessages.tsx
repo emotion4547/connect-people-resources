@@ -195,7 +195,7 @@ const AdminContactMessages: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => { setSearchQuery(''); setFilterRead('all'); }}
-                  >
+                   aria-label="Сбросить">
                     <RotateCcw className="w-4 h-4" />
                   </Button>
                 )}
@@ -245,7 +245,7 @@ const AdminContactMessages: React.FC = () => {
                               variant="ghost"
                               size="icon"
                               onClick={() => openMessage(message)}
-                            >
+                             aria-label="Показать">
                               <Eye className="w-4 h-4" />
                             </Button>
                             <Button
@@ -253,7 +253,7 @@ const AdminContactMessages: React.FC = () => {
                               size="icon"
                               onClick={() => deleteMessage(message.id)}
                               className="text-destructive hover:text-destructive"
-                            >
+                             aria-label="Удалить">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
