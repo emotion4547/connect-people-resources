@@ -88,6 +88,7 @@ const hrNavItems: NavItem[] = [
   { label: 'Новый заказ', href: '/client/order', icon: <PlusCircle className="w-5 h-5" /> },
   { label: 'Табели', href: '/client/timesheets', icon: <FileCheck className="w-5 h-5" /> },
   { label: 'Документы', href: '/client/documents', icon: <FileText className="w-5 h-5" /> },
+  { label: 'Показатели', href: '/client/analytics', icon: <BarChart3 className="w-5 h-5" /> },
   { label: 'Дашборд', href: '/hr/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
   { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
@@ -148,6 +149,7 @@ const adminNavItems: NavItem[] = [
 // Разделы рабочего места сотрудника: показываются, если у роли есть право «смотреть» в этом модуле.
 // Список растёт вместе с шагами этапа 1 (заказы, табель, найм и т. д.).
 const staffNavItems: (NavItem & { module: string })[] = [
+  { label: 'Дашборды', href: '/dashboards', icon: <Home className="w-5 h-5" />, module: 'analytics' },
   { label: 'Аналитика', href: '/analytics', icon: <BarChart3 className="w-5 h-5" />, module: 'analytics' },
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
   { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
