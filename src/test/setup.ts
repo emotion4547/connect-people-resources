@@ -16,7 +16,12 @@ window.print = vi.fn();
 vi.mock('@/lib/db', async () => (await import('./harness')).dbMock);
 vi.mock('@/contexts/AuthContext', async () => {
   const { fixtures } = await import('./harness');
-  return { useAuth: () => ({ user: { id: 'u1' }, role: fixtures.role, profile: { full_name: 'Тест' }, loading: false, signOut: async () => {} }) };
+  // Объекты стабильны между вызовами, как в настоящем контексте: иначе эффекты, зависящие от user, зацикливаются
+  const user = { id: 'u1', email: 'test@test.local' };
+  const profile = { full_name: 'Тест', email: 'test@test.local', company: 'Организация' };
+  const signOut = async () => {};
+  const cache: { role?: string; value?: unknown } = {};
+  return { useAuth: () => { if (cache.role !== fixtures.role) { cache.role = fixtures.role; cache.value = { user, role: fixtures.role, profile, loading: false, signOut, session: null }; } return cache.value; } };
 });
 vi.mock('@/contexts/OrgContext', () => {
   const org = { id: 'org1', name: 'Организация' };
@@ -35,3 +40,4 @@ vi.mock('@/components/layouts/DashboardLayout', async () => {
   const React = await import('react');
   return { DashboardLayout: ({ children }: { children: unknown }) => React.createElement('div', null, children as never) };
 });
+vi.mock('@/integrations/supabase/client', async () => ({ supabase: (await import('./harness')).supabaseStub }));

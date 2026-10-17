@@ -1020,6 +1020,11 @@
     "reason": "Дорого",
     "deals": 1,
     "revenue": 40000
+   },
+   {
+    "reason": "Проверка записи",
+    "deals": 1,
+    "revenue": 2000
    }
   ],
   "my_sales_day": [
@@ -1728,6 +1733,32 @@
     "updated_at": "2026-10-17T18:27:14.58881+00:00"
    },
    {
+    "id": "a2b6f6f4-d342-4c69-bf93-e182b3bfc9e2",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "client_id": null,
+    "title": "ТЕСТ проверка записи",
+    "company": "Проверка",
+    "contact_name": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "source": "manual",
+    "stage": "lost",
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "expected_revenue": 2000,
+    "expected_margin": 100,
+    "next_step": "Позвонить",
+    "next_step_date": "2026-10-17",
+    "expected_close": null,
+    "lost_reason": "Проверка записи",
+    "note": "обновлено",
+    "won_at": null,
+    "closed_at": "2026-10-17T18:33:20.737663+00:00",
+    "last_touch_at": null,
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:33:20.081073+00:00",
+    "updated_at": "2026-10-17T18:33:20.737663+00:00"
+   },
+   {
     "id": "8f1c5752-72b4-4c8f-bc14-f4c1d04bfce1",
     "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
     "client_id": null,
@@ -1869,6 +1900,19 @@
     "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
     "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
     "created_at": "2026-10-17T18:27:14.58881+00:00"
+   },
+   {
+    "id": "6cdb7c35-e68e-43dc-93e5-3273872d6133",
+    "org_id": "d165aa57-7aec-4928-b95c-a174c64d734b",
+    "deal_id": "a2b6f6f4-d342-4c69-bf93-e182b3bfc9e2",
+    "kind": "call",
+    "title": "Проверка",
+    "note": null,
+    "due_at": "2026-10-17T18:33:20.4+00:00",
+    "done_at": null,
+    "owner_id": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_by": "f07d3fa4-7128-40d6-b8b9-83934caf6faf",
+    "created_at": "2026-10-17T18:33:20.437168+00:00"
    }
   ],
   "cash_accounts": [

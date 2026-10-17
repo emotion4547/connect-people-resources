@@ -54,6 +54,22 @@ const out = {
 const clientsRows = await get(cli, 'clients?select=id,name');
 out.clientId = clientsRows.find((c) => c.name === 'ТЕСТ Логистик')?.id ?? clientsRows[0]?.id;
 out.clientDashboard = await rpc(cli, 'client_dashboard', { _client_id: out.clientId, _from: from, _to: to });
+// Все таблицы, которые читает интерфейс: только строки демо-организации (в рабочей организации — настоящие люди, их не снимаем)
+import { readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
+const names = new Set();
+for (const file of walk('src').filter((x) => /\.tsx?$/.test(x) && !x.includes('test') && !x.includes('integrations'))) {
+  for (const m of readFileSync(file, 'utf8').matchAll(/\b(?:db|from)\(\s*'([a-z_]+)'\s*\)/g)) names.add(m[1]);
+}
+const all = {};
+for (const t of names) {
+  const r = await fetch(`${URL}/rest/v1/${t}?select=*&org_id=eq.${org}&limit=200`, { headers: { apikey: KEY, authorization: 'Bearer ' + dir } });
+  if (r.ok) all[t] = await r.json();
+}
+mkdirSync('src/test/fixtures', { recursive: true });
+writeFileSync('src/test/fixtures/live-tables.json', JSON.stringify(all));
+console.log('таблиц снято:', Object.keys(all).length);
 const bad = Object.entries(out.rpc).filter(([, v]) => !Array.isArray(v) && typeof v !== 'string' && typeof v !== 'number');
 if (bad.length) { console.error('Ошибки в ответах:', bad.map(([k, v]) => k + ': ' + JSON.stringify(v).slice(0, 120))); process.exit(1); }
 mkdirSync('src/test/fixtures', { recursive: true });
