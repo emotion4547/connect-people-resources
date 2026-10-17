@@ -17,13 +17,13 @@ import { Building } from 'lucide-react';
 interface OrgCard {
   id: string; name: string; legal_form: 'ООО' | 'ИП'; inn: string | null; kpp: string | null; ogrn: string | null;
   address: string | null; bank_name: string | null; bank_account: string | null; bik: string | null;
-  tax_regime: 'usn6' | 'usn15' | 'osno'; vat_rate: number; signer_name: string | null; signer_position: string | null;
+  tax_regime: 'usn6' | 'usn15' | 'osno'; vat_rate: number; signer_name: string | null; signer_position: string | null; document_form: 'act' | 'upd';
   is_active: boolean;
 }
 
 const TAX_REGIMES: Record<string, string> = { usn6: 'УСН 6%', usn15: 'УСН 15%', osno: 'ОСНО' };
 const DIGITS = /^\d*$/;
-const COLUMNS = 'id,name,legal_form,inn,kpp,ogrn,address,bank_name,bank_account,bik,tax_regime,vat_rate,signer_name,signer_position,is_active';
+const COLUMNS = 'id,name,legal_form,inn,kpp,ogrn,address,bank_name,bank_account,bik,tax_regime,vat_rate,signer_name,signer_position,document_form,is_active';
 
 const AdminOrganizations: React.FC = () => {
   const { toast } = useToast();
@@ -167,6 +167,16 @@ const AdminOrganizations: React.FC = () => {
                   <Label htmlFor="org-vat">Ставка НДС, %</Label>
                   <Input id="org-vat" inputMode="decimal" value={String(form.vat_rate)}
                     onChange={(e) => set('vat_rate', Number(e.target.value.replace(',', '.')) || 0)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Закрывающий документ</Label>
+                  <Select value={form.document_form} onValueChange={(v) => set('document_form', v as 'act' | 'upd')}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="act">Акт + счёт</SelectItem>
+                      <SelectItem value="upd">УПД + счёт</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="org-signer">Подписант</Label>

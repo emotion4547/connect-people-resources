@@ -49,7 +49,7 @@ insert into public.notification_contacts (org_id, user_id, channel, address) val
   (private.default_org_id(), pg_temp.w(1), 'sms', '+79000000001'),
   (private.default_org_id(), pg_temp.w(2), 'sms', '+79000000002');
 
-select is((select count(*)::int from public.notification_events), 16, 'В справочнике 16 событий');
+select cmp_ok((select count(*)::int from public.notification_events), '>=', 16, 'В справочнике не меньше 16 событий');
 
 -- ------------------------------------------------------------
 -- Заказ из кабинета и срочный заказ

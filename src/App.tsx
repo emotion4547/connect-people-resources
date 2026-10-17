@@ -65,6 +65,10 @@ const ClientShifts = lazy(() => import("./pages/client/ClientShifts"));
 const ClientOrder = lazy(() => import("./pages/client/ClientOrder"));
 const ClientTimesheets = lazy(() => import("./pages/client/ClientTimesheets"));
 const ClientTimesheetDetail = lazy(() => import("./pages/client/ClientTimesheetDetail"));
+const DocumentsList = lazy(() => import("./pages/documents/DocumentsList"));
+const DocumentDetail = lazy(() => import("./pages/documents/DocumentDetail"));
+const DocumentPrint = lazy(() => import("./pages/documents/DocumentPrint"));
+const ClientDocuments = lazy(() => import("./pages/client/ClientDocuments"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
@@ -314,6 +318,31 @@ const App = () => (
             <Route path="/client/timesheets/:id" element={
               <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
                 <ClientTimesheetDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/documents" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant']}>
+                <DocumentsList />
+              </ProtectedRoute>
+            } />
+            <Route path="/documents/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant']}>
+                <DocumentDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/documents/:id/print" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'accountant', 'hr', 'client_admin', 'client_manager']}>
+                <DocumentPrint />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/documents" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientDocuments />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/documents/:id" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientDocuments />
               </ProtectedRoute>
             } />
             <Route path="/notifications" element={

@@ -81,6 +81,7 @@ const hrNavItems: NavItem[] = [
   { label: 'Смены', href: '/client/shifts', icon: <CalendarDays className="w-5 h-5" /> },
   { label: 'Новый заказ', href: '/client/order', icon: <PlusCircle className="w-5 h-5" /> },
   { label: 'Табели', href: '/client/timesheets', icon: <FileCheck className="w-5 h-5" /> },
+  { label: 'Документы', href: '/client/documents', icon: <FileText className="w-5 h-5" /> },
   { label: 'Дашборд', href: '/hr/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
   { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
@@ -116,6 +117,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" /> },
   { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" /> },
   { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" /> },
+  { label: 'Документы', href: '/documents', icon: <FileText className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
   { label: 'Организации', href: '/admin/organizations', icon: <Building className="w-5 h-5" /> },
@@ -139,6 +141,7 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders' },
   { label: 'Табель', href: '/timesheets', icon: <FileCheck className="w-5 h-5" />, module: 'timesheets' },
   { label: 'Начисления', href: '/accruals', icon: <Wallet className="w-5 h-5" />, module: 'accruals' },
+  { label: 'Документы', href: '/documents', icon: <FileText className="w-5 h-5" />, module: 'client_documents' },
 ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role }) => {

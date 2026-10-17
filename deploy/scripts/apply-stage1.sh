@@ -33,6 +33,7 @@ MIGRATIONS=(
   20261017230000_server_mfa.sql
   20261017231000_tax_rate_snapshot.sql
   20261017232000_client_order_quote.sql
+  20261018100000_client_documents.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -93,6 +94,7 @@ applied() {  # 0, если миграция уже применена
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
     20261017220000*) q="select to_regclass('public.legacy_migration_log') is not null" ;;
+    20261018100000*) q="select to_regclass('public.client_documents') is not null" ;;
     20261017232000*) q="select to_regprocedure('public.client_timesheet_summary(uuid)') is not null" ;;
     20261017231000*) q="select to_regprocedure('private.capture_shift_taxes()') is not null" ;;
     20261017230000*) q="select to_regprocedure('private.session_mfa_ok(uuid)') is not null" ;;

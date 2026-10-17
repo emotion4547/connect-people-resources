@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -14,10 +15,10 @@ import { BILLING_PERIODS, CONTRACT_STATUSES } from '@/lib/clientsMeta';
 
 interface Contract {
   id: string; number: string; signed_on: string; valid_until: string | null; billing_period: string;
-  payment_delay_days: number; status: string;
+  payment_delay_days: number; status: string; allows_simple_esign: boolean;
 }
 
-const emptyForm = { number: '', signed_on: today(), valid_until: '', billing_period: 'month', payment_delay_days: '0' };
+const emptyForm = { number: '', signed_on: today(), valid_until: '', billing_period: 'month', payment_delay_days: '0', allows_simple_esign: false };
 
 export const ClientContracts: React.FC<{ clientId: string; orgId: string; canEdit: boolean }> = ({ clientId, orgId, canEdit }) => {
   const { toast } = useToast();
@@ -39,7 +40,7 @@ export const ClientContracts: React.FC<{ clientId: string; orgId: string; canEdi
     const { error } = await db('contracts').insert({
       org_id: orgId, client_id: clientId, number: form.number.trim(), signed_on: form.signed_on,
       valid_until: form.valid_until || null, billing_period: form.billing_period,
-      payment_delay_days: Number(form.payment_delay_days) || 0,
+      payment_delay_days: Number(form.payment_delay_days) || 0, allows_simple_esign: form.allows_simple_esign,
     });
     setSaving(false);
     if (error) {
@@ -111,6 +112,7 @@ export const ClientContracts: React.FC<{ clientId: string; orgId: string; canEdi
               </Select>
             </div>
             <div className="space-y-2"><Label htmlFor="k-delay">Отсрочка оплаты, дней</Label><Input id="k-delay" inputMode="numeric" value={form.payment_delay_days} onChange={(e) => setForm({ ...form, payment_delay_days: e.target.value })} /></div>
+            <label className="flex items-center gap-2 text-sm sm:col-span-2"><Checkbox checked={form.allows_simple_esign} onCheckedChange={(v) => setForm({ ...form, allows_simple_esign: v === true })} /> Договор допускает подписание кнопкой «Принято» в кабинете</label>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Отмена</Button>
