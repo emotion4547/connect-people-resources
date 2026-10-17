@@ -30,8 +30,8 @@ grant execute on function pg_temp.check(text, boolean), pg_temp.denied(text), pg
 -- Состояние после миграций
 select pg_temp.check('есть организация по умолчанию', (select count(*) from public.organizations) >= 1);
 select pg_temp.check('у всех ролей есть организация', (select count(*) from public.user_roles where org_id is null) = 0);
-select pg_temp.check('матрица прав: 480 строк на организацию',
-  (select bool_and(n = 480) from (select count(*) n from public.role_permissions group by org_id) t));
+select pg_temp.check('матрица прав: 510 строк на организацию',
+  (select bool_and(n = 510) from (select count(*) n from public.role_permissions group by org_id) t));
 select pg_temp.check('в каталоге настроек не меньше 21 правила', (select count(*) from public.setting_definitions) >= 21);
 select pg_temp.check('двухфакторный вход по умолчанию выключен', public.get_setting(private.default_org_id(), 'auth.mfa_enforced') = 'false'::jsonb);
 select pg_temp.check('RLS включён на новых таблицах',
