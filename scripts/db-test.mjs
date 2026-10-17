@@ -79,6 +79,12 @@ const SUPABASE_STUBS = `
   alter table realtime.messages enable row level security;
 
   create publication supabase_realtime;
+
+  -- как в настоящем Supabase: новые таблицы и функции в public доступны ролям API по умолчанию,
+  -- а ограничивают их RLS и явные REVOKE в миграциях
+  alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+  alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
+  alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
 `;
 
 let failed = 0;

@@ -31,14 +31,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Role and profile are independent — fetch them in parallel.
       const [{ data: roleData, error: roleError }, { data: profileData }] = await Promise.all([
-        supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(),
+        supabase.from('user_roles').select('role').eq('user_id', userId),
         supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle(),
       ]);
       if (roleError) throw roleError;
       // Another user signed in while this request was in flight.
       if (loadedUserId.current !== userId) return;
 
-      setRole((roleData?.role as AppRole) ?? null);
+      // С организациями у человека может быть несколько строк ролей (по одной на организацию):
+      // берём старшую. Выбор организации в интерфейсе появится на шаге 3.
+      const roles = (roleData ?? []).map((r) => r.role as AppRole);
+      setRole((['admin', 'hr', 'worker'] as AppRole[]).find((r) => roles.includes(r)) ?? roles[0] ?? null);
       setProfile(profileData ?? null);
     } catch (error) {
       console.error('Error fetching user data:', error);
