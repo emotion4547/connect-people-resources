@@ -25,6 +25,7 @@ MIGRATIONS=(
   20261017170000_hiring.sql
   20261017180000_timesheets.sql
   20261017190000_accruals.sql
+  20261017200000_cabinets.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -80,6 +81,7 @@ applied() {  # 0, если миграция уже применена
     20261017110000*) q="select to_regclass('public.setting_definitions') is not null" ;;
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
+    20261017200000*) q="select to_regprocedure('public.client_shifts(date,date)') is not null" ;;
     20261017190000*) q="select to_regclass('public.accruals') is not null" ;;
     20261017180000*) q="select to_regclass('public.timesheets') is not null" ;;
     20261017170000*) q="select to_regclass('public.candidates') is not null" ;;

@@ -13,6 +13,7 @@ const Workspace: React.FC = () => {
   const { can, loading } = usePermissions();
   // Сотрудникам, у которых уже есть рабочие разделы, сразу открываем первый из них.
   if (loading) return null;
+  if (role === 'client_admin' || role === 'client_manager') return <Navigate to="/client/today" replace />;
   if (can('clients', 'view')) return <Navigate to="/clients" replace />;
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

@@ -57,6 +57,14 @@ const WorkerDetail = lazy(() => import("./pages/workers/WorkerDetail"));
 const PlanningGrid = lazy(() => import("./pages/planning/PlanningGrid"));
 const OrdersList = lazy(() => import("./pages/orders/OrdersList"));
 const OrderDetail = lazy(() => import("./pages/orders/OrderDetail"));
+const WorkerShifts = lazy(() => import("./pages/worker/WorkerShifts"));
+const WorkerOpenShifts = lazy(() => import("./pages/worker/WorkerOpenShifts"));
+const WorkerEarnings = lazy(() => import("./pages/worker/WorkerEarnings"));
+const ClientToday = lazy(() => import("./pages/client/ClientToday"));
+const ClientShifts = lazy(() => import("./pages/client/ClientShifts"));
+const ClientOrder = lazy(() => import("./pages/client/ClientOrder"));
+const ClientTimesheets = lazy(() => import("./pages/client/ClientTimesheets"));
+const ClientTimesheetDetail = lazy(() => import("./pages/client/ClientTimesheetDetail"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
 const TimesheetDetail = lazy(() => import("./pages/timesheets/TimesheetDetail"));
@@ -265,6 +273,46 @@ const App = () => (
             <Route path="/timesheets/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <TimesheetDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/my-shifts" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerShifts />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/open-shifts" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerOpenShifts />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/earnings" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerEarnings />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/today" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientToday />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/shifts" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientShifts />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/order" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientOrder />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/timesheets" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientTimesheets />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/timesheets/:id" element={
+              <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
+                <ClientTimesheetDetail />
               </ProtectedRoute>
             } />
             <Route path="/accruals" element={

@@ -49,6 +49,8 @@ import {
   Building2,
   FileCheck,
   Wallet,
+  Clock,
+  Search,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -73,6 +75,10 @@ interface DashboardLayoutProps {
 }
 
 const hrNavItems: NavItem[] = [
+  { label: 'Сегодня', href: '/client/today', icon: <Sun className="w-5 h-5" /> },
+  { label: 'Смены', href: '/client/shifts', icon: <CalendarDays className="w-5 h-5" /> },
+  { label: 'Новый заказ', href: '/client/order', icon: <PlusCircle className="w-5 h-5" /> },
+  { label: 'Табели', href: '/client/timesheets', icon: <FileCheck className="w-5 h-5" /> },
   { label: 'Дашборд', href: '/hr/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Мои заявки', href: '/hr/requests', icon: <FileText className="w-5 h-5" /> },
   { label: 'Создать заявку', href: '/hr/create-request', icon: <PlusCircle className="w-5 h-5" /> },
@@ -81,6 +87,9 @@ const hrNavItems: NavItem[] = [
 ];
 
 const workerNavItems: NavItem[] = [
+  { label: 'Мои смены', href: '/worker/my-shifts', icon: <Clock className="w-5 h-5" /> },
+  { label: 'Открытые смены', href: '/worker/open-shifts', icon: <Search className="w-5 h-5" /> },
+  { label: 'Заработок', href: '/worker/earnings', icon: <Wallet className="w-5 h-5" /> },
   { label: 'Главная', href: '/worker/dashboard', icon: <Home className="w-5 h-5" /> },
   { label: 'Смены', href: '/worker/vacancies', icon: <FileText className="w-5 h-5" /> },
   { label: 'Календарь', href: '/worker/calendar', icon: <Calendar className="w-5 h-5" /> },
