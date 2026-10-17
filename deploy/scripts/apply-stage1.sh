@@ -26,6 +26,7 @@ MIGRATIONS=(
   20261017180000_timesheets.sql
   20261017190000_accruals.sql
   20261017200000_cabinets.sql
+  20261017210000_notifications.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -36,7 +37,7 @@ if [ "${1:-}" != "--yes" ]; then
   1. бэкап базы (/opt/supabase/backup.sh) и проверка, что файл создан
   2. миграции по порядку, каждая в своей транзакции, уже применённые пропускаются:
 $(printf '       %s\n' "${MIGRATIONS[@]}")
-  3. edge-функция invite-staff в /opt/supabase/volumes/functions, перезапуск supabase-edge-functions
+  3. edge-функции invite-staff, admit-candidate и deliver-notifications в /opt/supabase/volumes/functions, перезапуск supabase-edge-functions
   4. docker-compose.yml: GOTRUE_MFA_TOTP_* и расширенный GOTRUE_URI_ALLOW_LIST (копия файла рядом),
      перезапуск только сервиса входа (auth), вход прервётся на несколько секунд
   5. проверка (deploy/scripts/stage1-smoke.sql): выполняется в транзакции и откатывается
@@ -48,6 +49,7 @@ fi
 
 for f in "${MIGRATIONS[@]}"; do [ -f "supabase/migrations/$f" ] || { echo "Нет файла supabase/migrations/$f"; exit 1; }; done
 [ -f deploy/supabase/volumes/functions/admit-candidate/index.ts ] || { echo "Нет файла функции admit-candidate"; exit 1; }
+[ -f deploy/supabase/volumes/functions/deliver-notifications/index.ts ] || { echo "Нет файла функции deliver-notifications"; exit 1; }
 [ -f deploy/supabase/volumes/functions/invite-staff/index.ts ] || { echo "Нет файла функции invite-staff"; exit 1; }
 [ -f deploy/scripts/stage1-smoke.sql ] || { echo "Нет файла stage1-smoke.sql"; exit 1; }
 
@@ -59,6 +61,7 @@ ssh "$HOST" "mkdir -p $REMOTE_DIR/functions"
 scp -q "${MIGRATIONS[@]/#/supabase/migrations/}" deploy/scripts/stage1-smoke.sql "$HOST:$REMOTE_DIR/"
 scp -q deploy/supabase/volumes/functions/invite-staff/index.ts "$HOST:$REMOTE_DIR/functions/invite-staff.ts"
 scp -q deploy/supabase/volumes/functions/admit-candidate/index.ts "$HOST:$REMOTE_DIR/functions/admit-candidate.ts"
+scp -q deploy/supabase/volumes/functions/deliver-notifications/index.ts "$HOST:$REMOTE_DIR/functions/deliver-notifications.ts"
 
 echo "== Выполнение на сервере"
 ssh "$HOST" "REMOTE_DIR=$REMOTE_DIR STAMP=$STAMP bash -s" <<'REMOTE'
@@ -81,6 +84,7 @@ applied() {  # 0, если миграция уже применена
     20261017110000*) q="select to_regclass('public.setting_definitions') is not null" ;;
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
+    20261017210000*) q="select to_regclass('public.notification_outbox') is not null" ;;
     20261017200000*) q="select to_regprocedure('public.client_shifts(date,date)') is not null" ;;
     20261017190000*) q="select to_regclass('public.accruals') is not null" ;;
     20261017180000*) q="select to_regclass('public.timesheets') is not null" ;;
@@ -116,8 +120,8 @@ else
   echo "   ключ уже задан"
 fi
 
-echo "-- 3. Edge-функции invite-staff и admit-candidate"
-for fn in invite-staff admit-candidate; do
+echo "-- 3. Edge-функции invite-staff, admit-candidate и deliver-notifications"
+for fn in invite-staff admit-candidate deliver-notifications; do
   mkdir -p "volumes/functions/$fn"
   cp "$REMOTE_DIR/functions/$fn.ts" "volumes/functions/$fn/index.ts"
 done

@@ -49,9 +49,11 @@ import {
   Building2,
   FileCheck,
   Wallet,
+  Bell,
   Clock,
   Search,
 } from 'lucide-react';
+import { useUnreadNotifications } from '@/hooks/useNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -183,7 +185,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role
     });
   };
 
-  const navItems = getNavItems();
+  const { count: unread } = useUnreadNotifications();
+  // Уведомления есть у всех ролей: вторым пунктом, с числом непрочитанных.
+  const baseNav = getNavItems();
+  const navItems: NavItem[] = [baseNav[0], { label: 'Уведомления', href: '/notifications', icon: <Bell className="w-5 h-5" />, badge: unread }, ...baseNav.slice(1)].filter(Boolean);
 
   // For mobile bottom nav, show first 4 items + "More" menu for the rest
   const mobileNavItems = navItems.slice(0, 4);

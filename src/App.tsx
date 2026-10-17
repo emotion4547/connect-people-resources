@@ -65,6 +65,7 @@ const ClientShifts = lazy(() => import("./pages/client/ClientShifts"));
 const ClientOrder = lazy(() => import("./pages/client/ClientOrder"));
 const ClientTimesheets = lazy(() => import("./pages/client/ClientTimesheets"));
 const ClientTimesheetDetail = lazy(() => import("./pages/client/ClientTimesheetDetail"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 const Statements = lazy(() => import("./pages/accruals/Statements"));
 const TimesheetsList = lazy(() => import("./pages/timesheets/TimesheetsList"));
 const TimesheetDetail = lazy(() => import("./pages/timesheets/TimesheetDetail"));
@@ -313,6 +314,11 @@ const App = () => (
             <Route path="/client/timesheets/:id" element={
               <ProtectedRoute allowedRoles={['hr', 'client_admin', 'client_manager']}>
                 <ClientTimesheetDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant', 'client_admin', 'client_manager', 'hr', 'worker']}>
+                <Notifications />
               </ProtectedRoute>
             } />
             <Route path="/accruals" element={

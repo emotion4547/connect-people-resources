@@ -48,6 +48,8 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        // Показ push-уведомлений и переход по нажатию.
+        importScripts: ["/push-sw.js"],
       },
     }),
   ].filter(Boolean),
