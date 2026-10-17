@@ -54,6 +54,9 @@ select pg_temp.check('у каждой смены есть ставки', (select
 select pg_temp.check('у каждого исполнителя есть запись workers',
   (select count(*) from public.user_roles ur where ur.role = 'worker' and not exists (select 1 from public.workers w where w.user_id = ur.user_id)) = 0);
 
+select pg_temp.check('у типов документов есть коды', (select count(*) from public.directories where kind = 'document_type' and code is null) = 0);
+select pg_temp.check('шифрование доступно (расширение pgcrypto)', exists (select 1 from pg_extension where extname = 'pgcrypto'));
+
 -- Сценарий: администраторы двух организаций, обычный сотрудник
 insert into public.organizations (id, name) values ('b2000000-0000-0000-0000-000000000002', 'ПРОВЕРКА организация 2');
 insert into auth.users (id, email) values

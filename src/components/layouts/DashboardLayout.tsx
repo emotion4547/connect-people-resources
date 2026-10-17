@@ -36,6 +36,9 @@ import {
   Briefcase,
   ClipboardList,
   CalendarDays,
+  UserSearch,
+  HardHat,
+  Sun,
   Rocket,
   ListChecks,
   LogOut,
@@ -95,6 +98,8 @@ const adminNavItems: NavItem[] = [
   { label: 'Обращения', href: '/admin/contact-messages', icon: <MessageCircle className="w-5 h-5" /> },
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" /> },
   { label: 'Планирование', href: '/planning', icon: <CalendarDays className="w-5 h-5" /> },
+  { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" /> },
+  { label: 'База исполнителей', href: '/workers', icon: <HardHat className="w-5 h-5" /> },
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" /> },
   { label: 'Запуск объектов', href: '/sites', icon: <Rocket className="w-5 h-5" /> },
   { label: 'Позиции', href: '/admin/positions', icon: <ListChecks className="w-5 h-5" /> },
@@ -113,6 +118,9 @@ const staffNavItems: (NavItem & { module: string })[] = [
   { label: 'Заказчики', href: '/clients', icon: <Briefcase className="w-5 h-5" />, module: 'clients' },
   { label: 'Объекты', href: '/sites', icon: <Building2 className="w-5 h-5" />, module: 'sites' },
   { label: 'Планирование', href: '/planning', icon: <CalendarDays className="w-5 h-5" />, module: 'assignments' },
+  { label: 'Мой день', href: '/hiring/today', icon: <Sun className="w-5 h-5" />, module: 'candidates' },
+  { label: 'Кандидаты', href: '/candidates', icon: <UserSearch className="w-5 h-5" />, module: 'candidates' },
+  { label: 'Исполнители', href: '/workers', icon: <HardHat className="w-5 h-5" />, module: 'workers' },
   { label: 'Заказы', href: '/orders', icon: <ClipboardList className="w-5 h-5" />, module: 'orders' },
 ];
 

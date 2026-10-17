@@ -22,6 +22,7 @@ MIGRATIONS=(
   20261017140000_sites_launch.sql
   20261017150000_orders_shifts.sql
   20261017160000_workers_assignments.sql
+  20261017170000_hiring.sql
 )
 
 cd "$(dirname "$0")/../.."
@@ -43,6 +44,7 @@ EOF
 fi
 
 for f in "${MIGRATIONS[@]}"; do [ -f "supabase/migrations/$f" ] || { echo "Нет файла supabase/migrations/$f"; exit 1; }; done
+[ -f deploy/supabase/volumes/functions/admit-candidate/index.ts ] || { echo "Нет файла функции admit-candidate"; exit 1; }
 [ -f deploy/supabase/volumes/functions/invite-staff/index.ts ] || { echo "Нет файла функции invite-staff"; exit 1; }
 [ -f deploy/scripts/stage1-smoke.sql ] || { echo "Нет файла stage1-smoke.sql"; exit 1; }
 
@@ -53,6 +55,7 @@ echo "== Копирование файлов на сервер ($REMOTE_DIR)"
 ssh "$HOST" "mkdir -p $REMOTE_DIR/functions"
 scp -q "${MIGRATIONS[@]/#/supabase/migrations/}" deploy/scripts/stage1-smoke.sql "$HOST:$REMOTE_DIR/"
 scp -q deploy/supabase/volumes/functions/invite-staff/index.ts "$HOST:$REMOTE_DIR/functions/invite-staff.ts"
+scp -q deploy/supabase/volumes/functions/admit-candidate/index.ts "$HOST:$REMOTE_DIR/functions/admit-candidate.ts"
 
 echo "== Выполнение на сервере"
 ssh "$HOST" "REMOTE_DIR=$REMOTE_DIR STAMP=$STAMP bash -s" <<'REMOTE'
@@ -75,6 +78,7 @@ applied() {  # 0, если миграция уже применена
     20261017110000*) q="select to_regclass('public.setting_definitions') is not null" ;;
     20261017120000*) q="select exists (select 1 from pg_enum where enumtypid = 'public.app_role'::regtype and enumlabel = 'accountant')" ;;
     20261017120100*) q="select to_regclass('public.staff_profiles') is not null" ;;
+    20261017170000*) q="select to_regclass('public.candidates') is not null" ;;
     20261017160000*) q="select to_regclass('public.assignments') is not null" ;;
     20261017150000*) q="select to_regclass('public.shifts') is not null" ;;
     20261017140000*) q="select to_regclass('public.site_secrets') is not null" ;;
@@ -95,9 +99,22 @@ for f in $(ls "$REMOTE_DIR"/2026*.sql | sort); do
   fi
 done
 
-echo "-- 3. Edge-функция invite-staff"
-mkdir -p volumes/functions/invite-staff
-cp "$REMOTE_DIR/functions/invite-staff.ts" volumes/functions/invite-staff/index.ts
+echo "-- 2а. Ключ шифрования персональных данных"
+if [ "$($DB -tAc "select coalesce(current_setting('app.pii_key', true), '') = ''")" = "t" ]; then
+  PII_KEY="$(openssl rand -hex 32)"
+  $DB -qc "ALTER SYSTEM SET app.pii_key = '$PII_KEY'" >/dev/null
+  $DB -qc "select pg_reload_conf()" >/dev/null
+  echo "   ключ создан. СОХРАНИТЕ ЕГО В ПАРОЛЬНОМ МЕНЕДЖЕРЕ ОТДЕЛЬНО ОТ СЕРВЕРА: без него зашифрованные номера документов не прочитать."
+  echo "   КЛЮЧ: $PII_KEY"
+else
+  echo "   ключ уже задан"
+fi
+
+echo "-- 3. Edge-функции invite-staff и admit-candidate"
+for fn in invite-staff admit-candidate; do
+  mkdir -p "volumes/functions/$fn"
+  cp "$REMOTE_DIR/functions/$fn.ts" "volumes/functions/$fn/index.ts"
+done
 docker restart supabase-edge-functions >/dev/null
 echo "   функция на месте, edge-runtime перезапущен"
 

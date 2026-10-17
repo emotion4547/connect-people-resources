@@ -48,7 +48,7 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
 1. Миграции по одной, как в разделе «Новая миграция БД», строго в этом порядке:
    `20261017100000_organizations_and_audit_log.sql`, `20261017110000_settings_and_tax_rates.sql`,
    `20261017120000_new_roles.sql`, `20261017120100_staff_permissions_directories.sql`,
-   `20261017120200_mfa_setting.sql`, `20261017130000_clients_contracts_tariffs.sql`, `20261017140000_sites_launch.sql`, `20261017150000_orders_shifts.sql`, `20261017160000_workers_assignments.sql`. Миграция `…120000_new_roles.sql` обязательно отдельным
+   `20261017120200_mfa_setting.sql`, `20261017130000_clients_contracts_tariffs.sql`, `20261017140000_sites_launch.sql`, `20261017150000_orders_shifts.sql`, `20261017160000_workers_assignments.sql`, `20261017170000_hiring.sql`. Миграция `…120000_new_roles.sql` обязательно отдельным
    запуском: новые значения enum нельзя использовать в той же транзакции.
 2. Edge-функция `invite-staff`: скопировать `deploy/supabase/volumes/functions/invite-staff/` на сервер
    в `/opt/supabase/volumes/functions/` и `docker restart supabase-edge-functions`.
@@ -67,4 +67,16 @@ docker exec -i supabase-db psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1
 вызывать функцию базы; на сервере добавьте в cron (`crontab -e`):
 ```
 */5 * * * * docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.advance_shift_statuses()" >/dev/null 2>&1
+```
+
+### Ключ шифрования персональных данных
+Номера документов, ИНН, СНИЛС и реквизиты выплаты шифруются в базе ключом `app.pii_key`. Ключ хранится в настройках
+сервера Postgres, а не в таблицах, поэтому в логические бэкапы (`backup.sh`) не попадает. `apply-stage1.sh` создаёт ключ при первом
+применении и один раз показывает его в терминале. **Сохраните его в парольном менеджере отдельно от сервера:** потеря ключа означает
+потерю зашифрованных данных, а смена ключа требует перешифровки.
+
+### Ежедневная проверка сроков документов
+Задачи по истекающим документам и налогу патента создаёт функция базы. Добавьте в cron (раз в день):
+```
+15 6 * * * docker exec supabase-db psql -U supabase_admin -d postgres -qc "select private.generate_document_tasks()" >/dev/null 2>&1
 ```

@@ -49,6 +49,11 @@ const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
 const AdminPermissions = lazy(() => import("./pages/admin/AdminPermissions"));
 const AdminDirectories = lazy(() => import("./pages/admin/AdminDirectories"));
 const Workspace = lazy(() => import("./pages/Workspace"));
+const CandidatesBoard = lazy(() => import("./pages/hiring/CandidatesBoard"));
+const CandidateDetail = lazy(() => import("./pages/hiring/CandidateDetail"));
+const HiringToday = lazy(() => import("./pages/hiring/HiringToday"));
+const WorkersList = lazy(() => import("./pages/workers/WorkersList"));
+const WorkerDetail = lazy(() => import("./pages/workers/WorkerDetail"));
 const PlanningGrid = lazy(() => import("./pages/planning/PlanningGrid"));
 const OrdersList = lazy(() => import("./pages/orders/OrdersList"));
 const OrderDetail = lazy(() => import("./pages/orders/OrderDetail"));
@@ -207,6 +212,31 @@ const App = () => (
             <Route path="/clients/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
                 <ClientDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/candidates" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <CandidatesBoard />
+              </ProtectedRoute>
+            } />
+            <Route path="/candidates/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <CandidateDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/hiring/today" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <HiringToday />
+              </ProtectedRoute>
+            } />
+            <Route path="/workers" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <WorkersList />
+              </ProtectedRoute>
+            } />
+            <Route path="/workers/:id" element={
+              <ProtectedRoute allowedRoles={['admin', 'director', 'sales', 'site_manager', 'recruiter', 'accountant']}>
+                <WorkerDetail />
               </ProtectedRoute>
             } />
             <Route path="/planning" element={

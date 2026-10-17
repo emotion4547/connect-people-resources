@@ -16,6 +16,7 @@
 import { PGlite } from "@electric-sql/pglite";
 import { pgtap } from "@electric-sql/pglite-pgtap";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
+import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -81,6 +82,9 @@ const SUPABASE_STUBS = `
   );
   alter table realtime.messages enable row level security;
 
+  -- в настоящем Supabase роли API имеют права на таблицы хранилища; доступ ограничивают политики RLS
+  grant all on all tables in schema storage to anon, authenticated, service_role;
+
   create publication supabase_realtime;
 
   -- как в настоящем Supabase: новые таблицы и функции в public доступны ролям API по умолчанию,
@@ -96,7 +100,7 @@ const fail = (msg) => {
   console.log(msg);
 };
 
-const db = new PGlite({ extensions: { pgtap, btree_gist } });
+const db = new PGlite({ extensions: { pgtap, btree_gist, pgcrypto } });
 
 console.log("ОКРУЖЕНИЕ (имитация Supabase)");
 await db.exec(SUPABASE_STUBS);
