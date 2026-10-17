@@ -92,7 +92,7 @@ const TimesheetDetail: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="gap-2" onClick={() => window.print()}><Printer className="w-4 h-4" /> Печать</Button>
+            <Button asChild variant="outline" className="gap-2"><Link to={`/timesheets/${ts.id}/print`} target="_blank"><Printer className="w-4 h-4" /> Печатная форма</Link></Button>
             <Badge variant={ts.status === 'disputed' ? 'destructive' : 'secondary'}>{TIMESHEET_STATUSES[ts.status]}</Badge>
             {ts.confirmed_auto && <Badge variant="outline">подтверждён автоматически</Badge>}
             {ts.status === 'draft' && canUpdate && (

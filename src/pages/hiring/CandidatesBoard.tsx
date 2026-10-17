@@ -16,7 +16,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { db, rpc } from '@/lib/db';
 import { STAGES, daysSince, type Candidate } from '@/lib/hiringMeta';
 import PageMeta from '@/components/PageMeta';
-import { Plus, Upload } from 'lucide-react';
+import { downloadExcel } from '@/lib/csv';
+import { Download, Plus, Upload } from 'lucide-react';
 
 interface Option { id: string; name: string }
 interface Duplicate { kind: string; id: string; full_name: string; phone: string | null }
@@ -121,6 +122,8 @@ const CandidatesBoard: React.FC = () => {
             <h1 className="text-3xl font-bold mb-2">Кандидаты</h1>
             <p className="text-muted-foreground">Перетащите карточку на другой этап. В «Допущен» кандидат попадает только через допуск с закрытым чек-листом документов.</p>
           </div>
+          <Button variant="outline" className="gap-2" disabled={!rows.length} onClick={() => downloadExcel('kandidaty.xlsx', ['ФИО', 'Телефон', 'Город', 'Район', 'Гражданство', 'Этап', 'В этапе, дн.', 'Следующий контакт', 'Дата создания'],
+            rows.map((c) => [c.full_name, c.phone, c.city, c.district, c.citizenship, STAGES.find((x) => x.id === c.stage)?.label ?? c.stage, daysSince(c.stage_changed_at), c.next_contact_at ? c.next_contact_at.slice(0, 10).split('-').reverse().join('.') : '', c.created_at.slice(0, 10).split('-').reverse().join('.')]))}><Download className="w-4 h-4" /> В Excel</Button>
           {can('candidates', 'create') && (
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setImporting(true)} className="gap-2"><Upload className="w-4 h-4" /> Импорт</Button>
